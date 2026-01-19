@@ -26,7 +26,7 @@ import websockets
 WS_URL = "wss://waves-api.smallest.ai/api/v1/lightning/get_text"
 OUTPUT_DIR = "."
 
-# Features
+# The following are all the features supported by the WebSocket endpoint (Streaming API)
 LANGUAGE = "hi"
 ENCODING = "linear16"
 SAMPLE_RATE = 16000
@@ -82,6 +82,8 @@ async def transcribe(audio_file: str, api_key: str, on_response):
         await asyncio.gather(send_audio(), receive_responses())
 
 
+# This function is designed to process feature outputs for all the features supported
+# by the WebSocket endpoint (Streaming API)
 def process_response(result: dict, output_file: Path):
     transcript = result.get("transcript", "")
     if transcript:
@@ -99,6 +101,7 @@ def process_response(result: dict, output_file: Path):
                 print("=" * 60)
                 print(result.get("full_transcript"))
 
+            # Language
             if result.get("language"):
                 print("\n" + "-" * 60)
                 print("LANGUAGE")
@@ -107,6 +110,7 @@ def process_response(result: dict, output_file: Path):
                 if result.get("languages"):
                     print(f"All: {result.get('languages')}")
 
+            # Utterances (speaker diarization)
             if result.get("utterances"):
                 print("\n" + "-" * 60)
                 print("UTTERANCES")
@@ -121,6 +125,7 @@ def process_response(result: dict, output_file: Path):
                     else:
                         print(f"[{start:.2f}s - {end:.2f}s] {text}")
 
+            # Word timestamps
             if result.get("words"):
                 print("\n" + "-" * 60)
                 print("WORD TIMESTAMPS")
@@ -136,6 +141,7 @@ def process_response(result: dict, output_file: Path):
                     else:
                         print(f"[{start:.2f}s - {end:.2f}s] {text} ({confidence:.2f})")
 
+            # Redacted entities
             if result.get("redacted_entities"):
                 print("\n" + "-" * 60)
                 print("REDACTED ENTITIES")

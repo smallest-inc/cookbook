@@ -20,7 +20,7 @@ const wav = require("wav");
 const WS_URL = "wss://waves-api.smallest.ai/api/v1/lightning/get_text";
 const OUTPUT_DIR = ".";
 
-// Features
+// The following are all the features supported by the WebSocket endpoint (Streaming API)
 const LANGUAGE = "en";
 const ENCODING = "linear16";
 const SAMPLE_RATE = 16000;
@@ -117,6 +117,8 @@ async function transcribe(audioFile, apiKey, onResponse) {
 }
 
 
+// This function is designed to process feature outputs for all the features supported
+// by the WebSocket endpoint (Streaming API)
 function processResponse(result, outputFile) {
   const transcript = result.transcript || "";
   if (transcript) {
@@ -134,6 +136,7 @@ function processResponse(result, outputFile) {
         console.log(result.full_transcript);
       }
 
+      // Language
       if (result.language) {
         console.log("\n" + "-".repeat(60));
         console.log("LANGUAGE");
@@ -144,6 +147,7 @@ function processResponse(result, outputFile) {
         }
       }
 
+      // Utterances (speaker diarization)
       if (result.utterances && result.utterances.length > 0) {
         console.log("\n" + "-".repeat(60));
         console.log("UTTERANCES");
@@ -161,6 +165,7 @@ function processResponse(result, outputFile) {
         }
       }
 
+      // Word timestamps
       if (result.words && result.words.length > 0) {
         console.log("\n" + "-".repeat(60));
         console.log("WORD TIMESTAMPS");
@@ -179,6 +184,7 @@ function processResponse(result, outputFile) {
         }
       }
 
+      // Redacted entities
       if (result.redacted_entities && result.redacted_entities.length > 0) {
         console.log("\n" + "-".repeat(60));
         console.log("REDACTED ENTITIES");

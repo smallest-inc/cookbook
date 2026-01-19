@@ -9,9 +9,17 @@ Convert audio to text using Smallest AI's Lightning Speech-to-Text API. Supports
 | Example | Description |
 |---------|-------------|
 | [Getting Started](./getting-started/) | Basic transcription - the simplest way to get started |
-| [Realtime Transcription](./realtime-transcription/) | Gradio web UI with live microphone transcription |
-| [Streaming Transcription](./streaming-transcription/) | Stream audio files via WebSocket, save responses in text |
-| [File Transcription](./file-transcription/) | Transcribe files with advanced features |
+| [Word-Level Outputs](./word-level-outputs/) | Word timestamps and speaker diarization |
+| [Subtitle Generation](./subtitle-generation/) | Generate SRT/VTT subtitles from audio or video |
+| [Podcast Summarizer](./podcast-summarizer/) | Transcribe and summarize podcasts with GPT-5 |
+| [File Transcription](./file-transcription/) | Transcribe files with all advanced features |
+
+### WebSocket Examples
+
+| Example | Description |
+|---------|-------------|
+| [Streaming Transcription](./websocket/streaming-text-output-transcription/) | Stream audio files via WebSocket |
+| [Realtime Microphone](./websocket/realtime-microphone-transcription/) | Gradio web UI with live microphone transcription |
 
 ## Quick Start
 

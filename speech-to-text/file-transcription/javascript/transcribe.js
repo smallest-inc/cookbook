@@ -19,7 +19,7 @@ const path = require("path");
 const API_URL = "https://waves-api.smallest.ai/api/v1/lightning/get_text";
 const OUTPUT_DIR = ".";
 
-// Features
+// The following are all the features supported by the POST endpoint (Pre-Recorded API)
 const LANGUAGE = "en"; // Use ISO 639-1 codes or "multi" for auto-detect
 const WORD_TIMESTAMPS = true;
 const DIARIZE = true;
@@ -55,6 +55,8 @@ async function transcribe(audioFile, apiKey) {
   return response.json();
 }
 
+// This function is designed to process feature outputs for all the features supported
+// by the POST endpoint (Pre-Recorded API)
 function processResponse(result, audioPath) {
   if (result.status !== "success") {
     console.error("Error: Transcription failed");
