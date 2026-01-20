@@ -1,0 +1,19 @@
+{
+  "name": "stt-streaming-transcription",
+  "version": "1.0.0",
+  "description": "Smallest AI Speech-to-Text - Streaming Transcription",
+  "main": "transcribe.js",
+  "scripts": {
+    "start": "node transcribe.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "wav": "^1.0.2"
+  },
+  "keywords": ["smallest-ai", "stt", "speech-to-text", "streaming", "websocket"],
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+
