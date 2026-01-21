@@ -1,5 +1,7 @@
 # YouTube Summarizer (YT Summarizer)
 
+![Demo](demo.png)
+
 A lightning-fast tool to transcribe and summarize YouTube videos or uploaded audio files. Powered by **Smallest AI Pulse** for ultra-low latency transcription and **Groq** for instant summarization.
 
 ## Features
