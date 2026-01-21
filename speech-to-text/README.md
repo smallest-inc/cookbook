@@ -11,7 +11,8 @@ Convert audio to text using Smallest AI's Pulse Speech-to-Text API. Supports 30+
 | [Getting Started](./getting-started/) | Basic transcription - the simplest way to get started |
 | [Word-Level Outputs](./word-level-outputs/) | Word timestamps and speaker diarization |
 | [Subtitle Generation](./subtitle-generation/) | Generate SRT/VTT subtitles from audio or video |
-| [Podcast Summarizer](./podcast-summarizer/) | Transcribe and summarize podcasts with GPT-5 |
+| [Meeting Notes](./meeting-notes/) | Join meetings via Recall.ai, auto-identify speakers by name |
+| [Podcast Summarizer](./podcast-summarizer/) | Transcribe and summarize podcasts with GPT-4o |
 | [File Transcription](./file-transcription/) | Transcribe files with all advanced features |
 
 ### WebSocket Examples

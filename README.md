@@ -39,6 +39,7 @@ Convert audio and video to text with industry-leading accuracy. Supports 30+ lan
 | [Getting Started](./speech-to-text/getting-started/) | Basic transcription — the simplest way to start |
 | [Word-Level Outputs](./speech-to-text/word-level-outputs/) | Word timestamps and speaker diarization |
 | [Subtitle Generation](./speech-to-text/subtitle-generation/) | Generate SRT/VTT subtitles from audio or video |
+| [Meeting Notes](./speech-to-text/meeting-notes/) | Join meetings via Recall.ai, meeting notes with auto-identification of speakers by name |
 | [Podcast Summarizer](./speech-to-text/podcast-summarizer/) | Transcribe and summarize with GPT-4o |
 | [File Transcription](./speech-to-text/file-transcription/) | All advanced features (emotions, age, gender, PII redaction) |
 
