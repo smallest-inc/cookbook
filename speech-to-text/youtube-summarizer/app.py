@@ -8,9 +8,9 @@ import os
 from dotenv import load_dotenv
 
 # Helpers
-from utils.youtube import get_video_info, download_audio
-from utils.transcription import transcribe_bytes
-from utils.analysis import analyze_transcript
+from youtube import get_video_info, download_audio
+from transcription import transcribe_bytes
+from analysis import analyze_transcript
 
 load_dotenv()
 
