@@ -28,7 +28,7 @@ export GROQ_API_KEY="your-groq-api-key"
 ## Usage
 
 ```bash
-streamlit run youtube_summary.py
+streamlit run app.py
 ```
 
 ## How It Works
