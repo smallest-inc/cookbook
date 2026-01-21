@@ -8,9 +8,15 @@ import os
 from dotenv import load_dotenv
 
 # Helpers
+# Helpers
+import requests
 from youtube import get_video_info, download_audio
 from transcription import transcribe_bytes
 from analysis import analyze_transcript
+
+@st.cache_resource
+def get_api_session():
+    return requests.Session()
 
 load_dotenv()
 
@@ -98,8 +104,9 @@ if analyze_btn:
     try:
         # A. Transcribe (Pulse)
         step_box.info("👂 Pulse is listening...")
+        session = get_api_session()
         t0 = time.time()
-        pulse_data = transcribe_bytes(audio_bytes)
+        pulse_data = transcribe_bytes(audio_bytes, session=session)
         stt_time = time.time() - t0
         
         if "error" in pulse_data:

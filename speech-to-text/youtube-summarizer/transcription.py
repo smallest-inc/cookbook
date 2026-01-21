@@ -10,7 +10,7 @@ SMALLEST_STT_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
 # Global session to reuse TCP connections (Keep-Alive)
 session = requests.Session()
 
-def transcribe_bytes(audio_bytes):
+def transcribe_bytes(audio_bytes, session=None):
     """Send audio bytes to Pulse STT API."""
     if not SMALLEST_API_KEY: return {"error": "Error: No API Key"}
     
@@ -25,7 +25,8 @@ def transcribe_bytes(audio_bytes):
     }
     
     try:
-        response = session.post(
+        requester = session if session else requests
+        response = requester.post(
             SMALLEST_STT_URL, 
             headers=headers, 
             params=params, 
