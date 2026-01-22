@@ -24,8 +24,17 @@ This cookbook is organized into focused modules, each demonstrating real-world u
 1. A Smallest AI account
 2. An API key — get one at [smallest.ai/console](https://smallest.ai/console)
 
+**Setup:**
+
 ```bash
+# Each example includes a .env.sample file
+cd speech-to-text/getting-started
+cp .env.sample .env
+# Edit .env with your API keys
+
+# Or export directly
 export SMALLEST_API_KEY="your-api-key-here"
+# any other api keys the example needs
 ```
 
 ---
@@ -40,7 +49,7 @@ Convert audio and video to text with industry-leading accuracy. Supports 30+ lan
 | [Word-Level Outputs](./speech-to-text/word-level-outputs/) | Word timestamps and speaker diarization |
 | [Subtitle Generation](./speech-to-text/subtitle-generation/) | Generate SRT/VTT subtitles from audio or video |
 | [Meeting Notes](./speech-to-text/meeting-notes/) | Join meetings via Recall.ai, meeting notes with auto-identification of speakers by name |
-| [Podcast Summarizer](./speech-to-text/podcast-summarizer/) | Transcribe and summarize with GPT-4o |
+| [Podcast Summarizer](./speech-to-text/podcast-summarizer/) | Transcribe and summarize with GPT-5 |
 | [File Transcription](./speech-to-text/file-transcription/) | All advanced features (emotions, age, gender, PII redaction) |
 
 ### WebSocket / Streaming
