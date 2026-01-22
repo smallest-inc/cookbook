@@ -1,0 +1,5 @@
+streamlit
+yt-dlp
+groq
+python-dotenv
+requests
