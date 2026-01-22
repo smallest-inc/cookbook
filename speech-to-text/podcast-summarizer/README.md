@@ -15,7 +15,10 @@ export OPENAI_API_KEY="your-openai-api-key"
 
 ## Usage
 
+### Python
+
 ```bash
+pip install requests openai
 python python/summarize.py podcast.mp3
 python python/summarize.py video_podcast.mp4
 ```

@@ -14,19 +14,20 @@ Stream an audio file through the WebSocket API and capture all transcription res
 export SMALLEST_API_KEY="your-api-key-here"
 ```
 
-## Python
+## Usage
+
+### Python
 
 ```bash
 pip install websockets librosa numpy
-python transcribe.py audio.wav
+python python/transcribe.py audio.wav
 ```
 
-## JavaScript
+### JavaScript
 
 ```bash
-cd javascript
-npm install
-node transcribe.js audio.wav
+cd javascript && npm install
+node javascript/transcribe.js audio.wav
 ```
 
 ## Output

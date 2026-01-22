@@ -192,7 +192,7 @@ def wait_for_meeting_end(bot_id: str, poll_interval: int = 10) -> dict:
             message = status_changes[-1].get("message", "Unknown error") if status_changes else "Unknown"
             raise Exception(f"Bot encountered an error: {message}")
         elif state == "joining_call":
-            print("Bot is joining the call... (admit the bot when prompted)")
+            print("Bot is joining the call... (admit the bot inside the meeting)")
         elif state == "in_waiting_room":
             print("Bot is in waiting room. Please admit the bot.")
         elif state == "in_call_not_recording":

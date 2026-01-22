@@ -14,17 +14,19 @@ Transcribe audio files with advanced features like word timestamps, speaker diar
 export SMALLEST_API_KEY="your-api-key-here"
 ```
 
-## Python
+## Usage
+
+### Python
 
 ```bash
 pip install requests
-python transcribe.py recording.wav
+python python/transcribe.py recording.wav
 ```
 
-## JavaScript
+### JavaScript
 
 ```bash
-node transcribe.js recording.wav
+node javascript/transcribe.js recording.wav
 ```
 
 ## Features
