@@ -46,6 +46,7 @@ Convert audio and video to text with industry-leading accuracy. Supports 30+ lan
 | Example | Description |
 |---------|-------------|
 | [Getting Started](./speech-to-text/getting-started/) | Basic transcription — the simplest way to start |
+| [Audio Preprocessing](./speech-to-text/audio-preprocessing/) | Optimize audio quality with FFmpeg before transcription |
 | [Word-Level Outputs](./speech-to-text/word-level-outputs/) | Word timestamps and speaker diarization |
 | [Subtitle Generation](./speech-to-text/subtitle-generation/) | Generate SRT/VTT subtitles from audio or video |
 | [Meeting Notes](./speech-to-text/meeting-notes/) | Join meetings via Recall.ai, meeting notes with auto-identification of speakers by name |
@@ -56,6 +57,7 @@ Convert audio and video to text with industry-leading accuracy. Supports 30+ lan
 
 | Example | Description |
 |---------|-------------|
+| [Audio Preprocessing](./speech-to-text/websocket/audio-preprocessing/) | Optimize audio for low-latency streaming |
 | [Streaming Transcription](./speech-to-text/websocket/streaming-text-output-transcription/) | Stream audio files via WebSocket |
 | [Realtime Microphone](./speech-to-text/websocket/realtime-microphone-transcription/) | Gradio web UI with live microphone input |
 

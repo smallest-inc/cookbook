@@ -9,6 +9,7 @@ Convert audio to text using Smallest AI's Pulse Speech-to-Text API. Supports 30+
 | Example | Description |
 |---------|-------------|
 | [Getting Started](./getting-started/) | Basic transcription - the simplest way to get started |
+| [Audio Preprocessing](./audio-preprocessing/) | Optimize audio quality with FFmpeg before transcription |
 | [Word-Level Outputs](./word-level-outputs/) | Word timestamps and speaker diarization |
 | [Subtitle Generation](./subtitle-generation/) | Generate SRT/VTT subtitles from audio or video |
 | [Meeting Notes](./meeting-notes/) | Join meetings via Recall.ai, auto-identify speakers by name |
@@ -19,6 +20,7 @@ Convert audio to text using Smallest AI's Pulse Speech-to-Text API. Supports 30+
 
 | Example | Description |
 |---------|-------------|
+| [Audio Preprocessing](./websocket/audio-preprocessing/) | Optimize audio for low-latency WebSocket streaming |
 | [Streaming Transcription](./websocket/streaming-text-output-transcription/) | Stream audio files via WebSocket |
 | [Realtime Microphone](./websocket/realtime-microphone-transcription/) | Gradio web UI with live microphone transcription |
 
