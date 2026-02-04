@@ -30,6 +30,13 @@ class MyAgent(OutputAgentNode):
             messages=self.context.messages,
             stream=True
         )
+        
+        full_response = ""
         async for chunk in response:
             if chunk.content:
+                full_response += chunk.content
                 yield chunk.content
+        
+        # Add assistant response to context for conversation continuity
+        if full_response:
+            self.context.add_message({"role": "assistant", "content": full_response})

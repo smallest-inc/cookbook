@@ -54,14 +54,24 @@ Be friendly and conversational.""",
         )
 
         tool_calls: List[ToolCall] = []
+        full_response = ""
 
         async for chunk in response:
             if chunk.content:
+                full_response += chunk.content
                 yield chunk.content
             if chunk.tool_calls:
                 tool_calls.extend(chunk.tool_calls)
 
+        # Add assistant response to context (if no tool calls)
+        if full_response and not tool_calls:
+            self.context.add_message({"role": "assistant", "content": full_response})
+
         if tool_calls:
+            # Provide immediate feedback while processing tools
+            # This prevents awkward silence during tool execution
+            yield "One moment while I check that for you. "
+            
             results: List[ToolResult] = await self.tool_registry.execute(
                 tool_calls=tool_calls, parallel=True
             )
@@ -83,7 +93,7 @@ Be friendly and conversational.""",
                     ],
                 },
                 *[
-                    {"role": "tool", "tool_call_id": tc.id, "content": str(result)}
+                    {"role": "tool", "tool_call_id": tc.id, "content": result.content}
                     for tc, result in zip(tool_calls, results)
                 ],
             ])

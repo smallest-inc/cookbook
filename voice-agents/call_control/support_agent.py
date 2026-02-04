@@ -12,6 +12,8 @@ from smallestai.atoms.agent.events import (
     SDKAgentTransferConversationEvent,
     TransferOption,
     TransferOptionType,
+    WarmTransferPrivateHandoffOption,
+    WarmTransferHandoffOptionType,
 )
 from smallestai.atoms.agent.nodes import OutputAgentNode
 from smallestai.atoms.agent.tools import ToolRegistry, function_tool
@@ -77,12 +79,18 @@ Before warm transfer: Say "I'll brief my supervisor and connect you."
         )
 
         tool_calls: List[ToolCall] = []
+        full_response = ""
 
         async for chunk in response:
             if chunk.content:
+                full_response += chunk.content
                 yield chunk.content
             if chunk.tool_calls:
                 tool_calls.extend(chunk.tool_calls)
+
+        # Add assistant response to context (if no tool calls)
+        if full_response and not tool_calls:
+            self.context.add_message({"role": "assistant", "content": full_response})
 
         if tool_calls:
             results: List[ToolResult] = await self.tool_registry.execute(
@@ -106,7 +114,7 @@ Before warm transfer: Say "I'll brief my supervisor and connect you."
                     ],
                 },
                 *[
-                    {"role": "tool", "tool_call_id": tc.id, "content": str(result)}
+                    {"role": "tool", "tool_call_id": tc.id, "content": result.content}
                     for tc, result in zip(tool_calls, results)
                 ],
             ])
@@ -167,10 +175,10 @@ Before warm transfer: Say "I'll brief my supervisor and connect you."
                 transfer_call_number=self.warm_transfer_number,
                 transfer_options=TransferOption(
                     type=TransferOptionType.WARM_TRANSFER,
-                    private_handoff_option={
-                        "type": "prompt",
-                        "prompt": f"Customer escalation: {reason}"
-                    }
+                    private_handoff_option=WarmTransferPrivateHandoffOption(
+                        type=WarmTransferHandoffOptionType.PROMPT,
+                        prompt=f"Customer escalation: {reason}"
+                    )
                 ),
                 on_hold_music="uplifting_beats"
             )

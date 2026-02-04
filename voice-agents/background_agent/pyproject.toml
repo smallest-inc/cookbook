@@ -1,11 +1,11 @@
 [project]
-name = "atoms-call-control"
+name = "atoms-background-agent"
 version = "0.1.0"
-description = "Agent with call control - end calls and transfer to humans"
+description = "Background processing with multi-node agent architecture"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "smallestai>=4.3.0",
+    "smallestai>=4.2.0",
     "python-dotenv",
     "loguru",
 ]

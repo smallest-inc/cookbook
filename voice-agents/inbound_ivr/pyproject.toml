@@ -1,11 +1,11 @@
 [project]
-name = "atoms-call-control"
+name = "atoms-inbound-ivr"
 version = "0.1.0"
-description = "Agent with call control - end calls and transfer to humans"
+description = "IVR-style agent with intent routing and department transfers"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "smallestai>=4.3.0",
+    "smallestai>=4.2.0",
     "python-dotenv",
     "loguru",
 ]

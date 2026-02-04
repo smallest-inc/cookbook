@@ -19,7 +19,10 @@ async def setup_session(session: AgentSession):
         logger.info(f"Event received: {event.type}")
 
         if isinstance(event, SDKSystemUserJoinedEvent):
-            await assistant.speak("Hello! I can check the weather, book appointments, and list your schedule. How can I help?")
+            greeting = "Hello! I can check the weather, book appointments, and list your schedule. How can I help?"
+            # Add to context so LLM knows conversation has started
+            assistant.context.add_message({"role": "assistant", "content": greeting})
+            await assistant.speak(greeting)
 
     await session.wait_until_complete()
     logger.success("Session complete")

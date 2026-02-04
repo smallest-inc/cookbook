@@ -1,11 +1,11 @@
 [project]
-name = "atoms-call-control"
+name = "atoms-knowledge-base-rag"
 version = "0.1.0"
-description = "Agent with call control - end calls and transfer to humans"
+description = "Knowledge Base setup and RAG-powered voice agent"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "smallestai>=4.3.0",
+    "smallestai>=4.2.0",
     "python-dotenv",
     "loguru",
 ]

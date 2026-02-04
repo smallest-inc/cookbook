@@ -13,8 +13,8 @@ async def setup_session(session: AgentSession):
     
     # Configure transfer numbers
     agent = SupportAgent(
-        cold_transfer_number="+1234567890",   # General support
-        warm_transfer_number="+1987654321"    # Supervisor/escalation
+        cold_transfer_number="+916366821717",   # General support
+        warm_transfer_number="+916366821717"    # Supervisor/escalation
     )
     
     session.add_node(agent)
@@ -25,10 +25,13 @@ async def setup_session(session: AgentSession):
         logger.info(f"Event received: {event.type}")
 
         if isinstance(event, SDKSystemUserJoinedEvent):
-            await agent.speak(
+            greeting = (
                 "Hi! I'm your support agent. I can help with orders, "
                 "or connect you to a human. How can I assist?"
             )
+            # Add to context so LLM knows conversation has started
+            agent.context.add_message({"role": "assistant", "content": greeting})
+            await agent.speak(greeting)
 
     await session.wait_until_complete()
     logger.success("Session complete")

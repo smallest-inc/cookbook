@@ -55,3 +55,6 @@ temp_audio.*
 .pytest_cache/
 .coverage
 htmlcov/
+
+# SmallestAI config
+.smallestai/

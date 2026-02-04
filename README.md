@@ -63,13 +63,37 @@ Convert audio and video to text with industry-leading accuracy. Supports 30+ lan
 
 ## Voice Agents Examples
 
-Build voice AI agents that can make calls, use tools, and handle complex conversations.
+Build voice AI agents with the Atoms SDK.
 
-| Example | Description |
-|---------|-------------|
-| [Getting Started](./voice-agents/getting_started/) | SDK setup and outbound calls |
-| [Agent with Tools](./voice-agents/agent_with_tools/) | Custom function calling |
-| [Call Control](./voice-agents/call_control/) | End calls, transfer to humans |
+### Basics
+
+| Example | What You'll Learn |
+|---------|-------------------|
+| [Getting Started](./voice-agents/getting_started/) | `OutputAgentNode`, `generate_response()`, `AtomsApp` |
+| [Agent with Tools](./voice-agents/agent_with_tools/) | `@function_tool`, `ToolRegistry`, tool execution |
+| [Call Control](./voice-agents/call_control/) | `SDKAgentEndCallEvent`, cold/warm transfers |
+
+### Multi-Node Patterns
+
+| Example | What You'll Learn |
+|---------|-------------------|
+| [Background Agent](./voice-agents/background_agent/) | `BackgroundAgentNode`, parallel nodes, cross-node state |
+| [Language Switching](./voice-agents/language_switching/) | `add_edge()`, custom nodes, event pipelines |
+
+### Call Handling
+
+| Example | What You'll Learn |
+|---------|-------------------|
+| [Inbound IVR](./voice-agents/inbound_ivr/) | Intent routing, department transfers, mute/unmute |
+| [Interrupt Control](./voice-agents/interrupt_control/) | Mute/unmute events, blocking interruptions |
+
+### Platform Features
+
+| Example | What You'll Learn |
+|---------|-------------------|
+| [Knowledge Base RAG](./voice-agents/knowledge_base_rag/) | KB creation, PDF upload, URL scraping |
+| [Campaigns](./voice-agents/campaigns/) | Audiences, outbound campaigns |
+| [Analytics](./voice-agents/analytics/) | Call logs, transcripts, post-call metrics |
 
 ---
 

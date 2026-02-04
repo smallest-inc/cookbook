@@ -112,9 +112,25 @@ async def generate_response(self):
             tool_calls.extend(chunk.tool_calls)
     
     if tool_calls:
+        # Provide immediate feedback (best practice!)
+        yield "One moment while I check that for you. "
+        
         results = await self.tool_registry.execute(tool_calls, parallel=True)
         # Add results to context and get final response
 ```
+
+### Intermediate Feedback Pattern
+
+Always provide feedback during tool execution to avoid awkward silence:
+
+```python
+if tool_calls:
+    yield "One moment while I check that for you. "  # User hears this immediately
+    results = await self.tool_registry.execute(tool_calls)  # May take time
+    # Continue with response...
+```
+
+This is essential for voice agents where silence feels unnatural.
 
 ## Next Steps
 

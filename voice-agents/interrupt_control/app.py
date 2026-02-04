@@ -1,7 +1,8 @@
-"""Getting Started - Your first Atoms agent."""
+"""Interrupt Control Example - Mute/unmute to block or allow user interruptions."""
 
-from my_agent import MyAgent
 from loguru import logger
+
+from configurable_agent import ConfigurableAgent
 
 from smallestai.atoms.agent.events import SDKEvent, SDKSystemUserJoinedEvent
 from smallestai.atoms.agent.server import AtomsApp
@@ -9,8 +10,9 @@ from smallestai.atoms.agent.session import AgentSession
 
 
 async def setup_session(session: AgentSession):
-    """Configure the agent session."""
-    agent = MyAgent()
+    """Configure agent with interrupt control (mute/unmute) capabilities."""
+    
+    agent = ConfigurableAgent()
     session.add_node(agent)
     await session.start()
 
@@ -19,8 +21,11 @@ async def setup_session(session: AgentSession):
         logger.info(f"Event received: {event.type}")
 
         if isinstance(event, SDKSystemUserJoinedEvent):
-            greeting = "Hello! I'm your AI assistant. How can I help you today?"
-            # Add to context so LLM knows conversation has started
+            greeting = (
+                "Hello! I'm your assistant with configurable settings. "
+                "I can control whether you can interrupt me during important messages. "
+                "How can I help you today?"
+            )
             agent.context.add_message({"role": "assistant", "content": greeting})
             await agent.speak(greeting)
 
