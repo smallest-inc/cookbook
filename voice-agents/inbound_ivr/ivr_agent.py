@@ -153,7 +153,11 @@ Always use the appropriate tool to transfer or end the call.""",
                     ],
                 },
                 *[
-                    {"role": "tool", "tool_call_id": tc.id, "content": result.content}
+                    {
+                        "role": "tool",
+                        "tool_call_id": tc.id,
+                        "content": "" if result.content is None else str(result.content),
+                    }
                     for tc, result in zip(tool_calls, results)
                 ],
             ])
