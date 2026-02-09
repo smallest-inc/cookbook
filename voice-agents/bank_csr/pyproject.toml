@@ -1,0 +1,11 @@
+[project]
+name = "atoms-bank-csr"
+version = "0.1.0"
+description = "Banking Customer Support Rep agent with real database access, SQL queries, and deterministic computation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "smallestai>=4.3.0",
+    "python-dotenv",
+    "loguru",
+]
