@@ -335,7 +335,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                 Source Code
               </a>
               <a
-                href="https://waves-docs.smallest.ai"
+                href="https://docs.smallest.ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -344,7 +344,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                 API Documentation
               </a>
               <a
-                href="https://smallest.ai/console"
+                href="https://app.smallest.ai/dashboard/settings/apikeys"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"

@@ -97,7 +97,7 @@ function Footer() {
               smallest.ai
             </a>
             <a
-              href="https://waves-docs.smallest.ai"
+              href="https://docs.smallest.ai"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"

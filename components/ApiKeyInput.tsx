@@ -79,12 +79,12 @@ export function ApiKeyInput({ projectSlug, onKeyChange }: ApiKeyInputProps) {
       <p className="mt-2 text-[10px] text-muted-foreground">
         Get your API key at{" "}
         <a
-          href="https://smallest.ai/console"
+          href="https://app.smallest.ai/dashboard/settings/apikeys"
           target="_blank"
           rel="noopener noreferrer"
           className="text-teal hover:underline"
         >
-          smallest.ai/console
+          app.smallest.ai
         </a>
       </p>
     </div>
