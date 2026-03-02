@@ -69,6 +69,7 @@ export const projects: Project[] = [
     cookbookPath: "voice-agents/atoms_sdk_web_agent",
     githubUrl: `${GITHUB_BASE}/voice-agents/atoms_sdk_web_agent`,
     demoUrl: "https://agent-smallest-ai.vercel.app",
+    thumbnailUrl: "/thumbnails/voice-agent-dashboard.jpg",
     techStack: ["Next.js", "TypeScript", "Atoms SDK", "Tailwind CSS"],
     apiProducts: ["atoms"],
     features: [
@@ -182,6 +183,7 @@ export const projects: Project[] = [
     featured: true,
     cookbookPath: "text-to-speech/getting-started",
     githubUrl: `${GITHUB_BASE}/text-to-speech/getting-started`,
+    thumbnailUrl: "/thumbnails/tts-playground.jpg",
     techStack: ["Lightning v2", "90+ Voices", "16 Languages", "REST API"],
     apiProducts: ["lightning-tts"],
     features: [
