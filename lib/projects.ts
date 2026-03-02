@@ -168,6 +168,38 @@ export const projects: Project[] = [
     ],
   },
 
+  {
+    slug: "tts-playground",
+    title: "TTS Playground",
+    description:
+      "Try Lightning TTS live — type any text, pick a voice, and generate speech instantly with your API key.",
+    longDescription:
+      "An interactive playground for Smallest AI's Lightning v2 TTS. Choose from 90+ voices across 16 languages, adjust speed from 0.5x to 2.0x, and hear your text spoken aloud in real time. Just enter your API key and start generating — no code needed. Download the generated audio as WAV files.",
+    category: "text-to-speech",
+    tags: ["playground", "interactive", "live-demo", "voices", "multilingual"],
+    difficulty: "beginner",
+    status: "live",
+    featured: true,
+    cookbookPath: "text-to-speech/getting-started",
+    githubUrl: `${GITHUB_BASE}/text-to-speech/getting-started`,
+    techStack: ["Lightning v2", "90+ Voices", "16 Languages", "REST API"],
+    apiProducts: ["lightning-tts"],
+    features: [
+      "90+ voices across 16 languages",
+      "Adjustable speed (0.5x to 2.0x)",
+      "Real-time speech generation",
+      "Download generated audio as WAV",
+      "Bring your own API key",
+      "Code-switching support (Hindi + English)",
+    ],
+    tryItConfig: {
+      type: "tts",
+      placeholder: "Type text and generate speech...",
+      sampleInput:
+        "Welcome to Smallest AI! Our Lightning TTS generates natural speech in real time.",
+    },
+  },
+
   // ─── SPEECH-TO-TEXT ───────────────────────────────────
   {
     slug: "getting-started-stt",

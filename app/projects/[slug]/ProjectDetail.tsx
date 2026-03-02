@@ -25,6 +25,7 @@ import { CategoryBadge } from "@/components/CategoryBadge";
 import { DifficultyBadge } from "@/components/DifficultyBadge";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { ApiKeyInput } from "@/components/ApiKeyInput";
+import { TryTTS } from "@/components/TryTTS";
 import {
   trackProjectView,
   trackDemoLaunch,
@@ -248,6 +249,17 @@ export function ProjectDetail({ project }: { project: Project }) {
                   />
                 ))}
               </div>
+            </section>
+          )}
+
+          {/* Interactive TTS Playground */}
+          {project.tryItConfig?.type === "tts" && project.slug === "tts-playground" && (
+            <section>
+              <h2 className="flex items-center gap-2 text-xl font-semibold mb-4">
+                <Zap className="h-5 w-5 text-teal" />
+                Try It Live
+              </h2>
+              <TryTTS projectSlug={project.slug} />
             </section>
           )}
 

@@ -66,10 +66,10 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             Featured
           </div>
         )}
-        {project.status === "demo" && (
+        {(project.status === "demo" || project.status === "live") && (
           <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-white/80 dark:bg-white/15 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-medium text-foreground/80">
             <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            Live Demo
+            {project.status === "live" ? "Interactive" : "Live Demo"}
           </div>
         )}
       </div>
@@ -97,7 +97,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
 
       {/* Footer */}
       <div className="flex items-center border-t border-border/60">
-        {project.demoUrl || project.status === "demo" ? (
+        {project.demoUrl || project.status === "demo" || project.status === "live" ? (
           <span className="flex flex-1 items-center justify-center gap-1.5 border-r border-border/60 py-2.5 text-[11px] text-muted-foreground transition-colors group-hover:text-foreground">
             <ExternalLink className="h-3 w-3" />
             Demo
