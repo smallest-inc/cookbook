@@ -9,23 +9,23 @@ let initialized = false;
 export function initAnalytics() {
   if (initialized || !MIXPANEL_TOKEN) return;
   mixpanel.init(MIXPANEL_TOKEN, {
-    track_pageview: "url-with-path",
+    track_pageview: false,
     persistence: "localStorage",
     ignore_dnt: false,
   });
   initialized = true;
 }
 
-export function track(
+function track(
   event: string,
   properties?: Record<string, string | number | boolean>
 ) {
   if (!initialized || !MIXPANEL_TOKEN) return;
-  mixpanel.track(event, properties);
+  mixpanel.track(event, { ...properties, app: "showcase" });
 }
 
 export function trackPageView(page: string, extra?: Record<string, string>) {
-  track("page_view", { page, ...extra });
+  track("Showcase: Page Viewed", { page, ...extra });
 }
 
 export function trackProjectCardClick(
@@ -33,59 +33,59 @@ export function trackProjectCardClick(
   category: string,
   position: number
 ) {
-  track("project_card_click", {
-    project_slug: slug,
+  track("Showcase: Project Card Clicked", {
+    project: slug,
     category,
-    position_in_grid: position,
+    position,
   });
 }
 
 export function trackProjectView(slug: string, category: string) {
-  track("project_view", { project_slug: slug, category });
+  track("Showcase: Project Viewed", { project: slug, category });
 }
 
 export function trackDemoLaunch(
   slug: string,
   demoType: "iframe" | "external" | "audio" | "try-it"
 ) {
-  track("demo_launch", { project_slug: slug, demo_type: demoType });
+  track("Showcase: Demo Launched", { project: slug, demo_type: demoType });
 }
 
 export function trackCodeView(slug: string) {
-  track("code_view", { project_slug: slug });
+  track("Showcase: Code Viewed", { project: slug });
 }
 
 export function trackVideoPlay(slug: string) {
-  track("video_play", { project_slug: slug });
+  track("Showcase: Video Played", { project: slug });
 }
 
 export function trackAudioPlay(slug: string, sampleId: string) {
-  track("audio_play", { project_slug: slug, audio_sample_id: sampleId });
+  track("Showcase: Audio Played", { project: slug, sample: sampleId });
 }
 
 export function trackApiKeyEntered(slug: string) {
-  track("api_key_entered", { project_slug: slug });
+  track("Showcase: API Key Entered", { project: slug });
 }
 
 export function trackTryItInteraction(slug: string, interactionType: string) {
-  track("try_it_interaction", {
-    project_slug: slug,
-    interaction_type: interactionType,
+  track("Showcase: Try It Used", {
+    project: slug,
+    interaction: interactionType,
   });
 }
 
 export function trackCategoryFilter(category: string, from?: string) {
-  track("category_filter", { category, from_category: from || "all" });
+  track("Showcase: Category Filtered", { category, from_category: from || "all" });
 }
 
 export function trackSearch(query: string, resultsCount: number) {
-  track("search", { query, results_count: resultsCount });
+  track("Showcase: Search Used", { query, results_count: resultsCount });
 }
 
 export function trackShareClick(slug: string, platform: string) {
-  track("share_click", { project_slug: slug, platform });
+  track("Showcase: Share Clicked", { project: slug, platform });
 }
 
 export function trackSubmitProjectClick(source: string) {
-  track("submit_project_click", { source });
+  track("Showcase: Submit Project Clicked", { source });
 }
