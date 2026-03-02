@@ -78,7 +78,7 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <a
-                href="https://smallest.ai/console"
+                href="https://app.smallest.ai/dashboard/settings/apikeys?utm_source=showcase&utm_medium=showcase&utm_campaign=get-api-key"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-all hover:opacity-90"
