@@ -68,7 +68,7 @@ export const projects: Project[] = [
     featured: true,
     cookbookPath: "voice-agents/atoms_sdk_web_agent",
     githubUrl: `${GITHUB_BASE}/voice-agents/atoms_sdk_web_agent`,
-    // thumbnailUrl available when screenshots are added
+    demoUrl: "https://agent-smallest-ai.vercel.app",
     techStack: ["Next.js", "TypeScript", "Atoms SDK", "Tailwind CSS"],
     apiProducts: ["atoms"],
     features: [
@@ -132,9 +132,9 @@ export const projects: Project[] = [
       "Configurable voice, speed, and sample rate",
     ],
     audioSamples: [
-      { label: "Harper — Welcome (1.0x)", src: "/audio-samples/harper-welcome.wav" },
-      { label: "Nicole — Fast delivery (1.3x)", src: "/audio-samples/nicole-fast.wav" },
-      { label: "Elizabeth — Slow narration (0.85x)", src: "/audio-samples/elizabeth-narration.wav" },
+      { label: "Ashley — Welcome (1.0x)", src: "/audio-samples/ashley-welcome.wav" },
+      { label: "Eleanor — Fast delivery (1.3x)", src: "/audio-samples/eleanor-fast.wav" },
+      { label: "Julian — Slow narration (0.85x)", src: "/audio-samples/julian-narration.wav" },
     ],
   },
   {
@@ -154,17 +154,17 @@ export const projects: Project[] = [
     techStack: ["Python", "Smallest SDK", "asyncio"],
     apiProducts: ["lightning-tts"],
     features: [
-      "Multiple voice characters (Harper, Daniel, Nicole, Elizabeth)",
+      "Multiple voice characters (Ashley, Ryan, Eleanor, Julian, Shivangi)",
       "Speed comparison (0.85x to 1.3x)",
       "Concurrent async batch generation",
       "Showcase-ready audio output",
     ],
     audioSamples: [
-      { label: "Harper — Welcome", src: "/audio-samples/harper-welcome.wav" },
-      { label: "Daniel — Introduction", src: "/audio-samples/daniel-intro.wav" },
-      { label: "Nicole — Fast delivery (1.3x)", src: "/audio-samples/nicole-fast.wav" },
-      { label: "Elizabeth — Narration (0.85x)", src: "/audio-samples/elizabeth-narration.wav" },
-      { label: "Sakshi — Hindi demo", src: "/audio-samples/sakshi-hindi.wav" },
+      { label: "Ashley — Welcome", src: "/audio-samples/ashley-welcome.wav" },
+      { label: "Ryan — Introduction", src: "/audio-samples/ryan-intro.wav" },
+      { label: "Eleanor — Fast delivery (1.3x)", src: "/audio-samples/eleanor-fast.wav" },
+      { label: "Julian — Narration (0.85x)", src: "/audio-samples/julian-narration.wav" },
+      { label: "Shivangi — Hindi demo", src: "/audio-samples/shivangi-hindi.wav" },
     ],
   },
 
