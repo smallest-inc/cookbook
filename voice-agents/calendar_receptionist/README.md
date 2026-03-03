@@ -2,6 +2,10 @@
 
 A voice receptionist that schedules meetings via phone. Callers speak to an Atoms agent, which checks **Google Calendar** availability and books meetings through webhook APIs. Includes a React web client with the Atoms widget and one-command agent duplication.
 
+## Demo
+
+<video src="./demo.mp4" controls width="640"></video>
+
 ## Features
 
 - **Google Calendar** — Live availability and booking; events appear on your calendar
@@ -76,6 +80,10 @@ calendar_receptionist/
 ├── client/           # React + Atoms widget
 ├── scripts/          # setup-atoms, export-atoms, list-agents
 ├── atoms-agent-config.json
+├── atoms-agent-workflow.json   # Fallback for setup script
+├── AGENT_PROMPT.txt            # Full prompt template (manual setup)
+├── ATOMS_CONFIG_NOW.txt        # Quick reference for Atoms config
+├── PRONUNCIATION_RULES.md      # Voice pronunciation rules
 ├── .env.sample
 └── README.md
 ```
