@@ -1,0 +1,185 @@
+{
+  "agent": {
+    "avatarUrl": "https://d2ggtb57hogf3o.cloudfront.net/agent-avatars/Frame 3403_4x.webp",
+    "name": "receptionist",
+    "description": "",
+    "isLocked": false,
+    "workflowType": "single_prompt",
+    "visibleToEveryone": false,
+    "language": {
+      "default": "en",
+      "supported": [
+        "en"
+      ],
+      "switching": {
+        "isEnabled": false,
+        "minWordsForDetection": 2,
+        "strongSignalThreshold": 0.7,
+        "weakSignalThreshold": 0.3,
+        "minConsecutiveForWeakThresholdSwitch": 2
+      }
+    },
+    "synthesizer": {
+      "voiceConfig": {
+        "model": "other",
+        "voiceId": "6aDn1KB0hjpdcocrUkmq"
+      },
+      "speed": 1,
+      "sampleRate": 24000
+    },
+    "slmModel": "electron",
+    "defaultVariables": {
+      "day_time_mentioned_by_user": "",
+      "selected_slot_start_iso": "",
+      "selected_slot_end_iso": "",
+      "client_email": "",
+      "meeting_purpose": "",
+      "caller_name": "",
+      "confirmation_message": ""
+    },
+    "globalPrompt": "",
+    "firstMessage": "Hi!! i am your virtual assistant, how can I help you? ",
+    "muteUserUntilFirstBotResponse": false,
+    "voiceMailDetectionConfig": {
+      "enabled": false,
+      "endText": "Terminating call, you can call us back anytime. Thank you for calling."
+    },
+    "smartTurnConfig": {
+      "isEnabled": false,
+      "waitTimeInSecs": 3
+    },
+    "voiceDetectionConfig": {
+      "confidence": 0.7,
+      "minVolume": 0.6,
+      "triggerTimeInSecs": 0.2,
+      "releaseTimeInSecs": 0.8
+    },
+    "denoisingConfig": {
+      "isEnabled": true
+    },
+    "callDispositionConfig": "",
+    "allowInboundCall": true,
+    "interruptionBackoffTimer": 0,
+    "speechFormatting": true,
+    "backgroundSound": "",
+    "pronunciationDicts": [],
+    "redactionConfig": {
+      "isEnabled": true
+    },
+    "llmIdleTimeoutConfig": {
+      "chatTimeoutTimeInSecs": 20,
+      "webcallTimeoutTimeInSecs": 20,
+      "telephonyTimeoutTimeInSecs": 20
+    },
+    "timezone": {
+      "label": "(GMT-8:00) Pacific Time",
+      "offset": -8
+    },
+    "sessionTimeoutConfig": {
+      "timeoutTimeInSecs": 900
+    },
+    "phoneNumber": []
+  },
+  "workflow": {
+    "prompt": "Role & Objective\nYou are a professional AI receptionist for Malikaa. Your job is to help callers schedule meetings by using backend calendar APIs only. You must never guess availability. You must complete your sentences.\n\nPrimary success criteria:\n\n* Check requested time using backend.\n* Only offer/book slots returned by backend.\n* Collect caller name, email, and meeting purpose.\n* Confirm booking outcome accurately.\n\nOpening line\nAlways start with:\n\"Hi, you have reached Malikaa's inbox. How may I help you today?\"\n\nTone\nPolite, warm, professional, concise (2–3 sentences at a time).\n\nCritical truth rules\n\n* Never claim a slot is available unless returned by getAvailableSlots.\n* Never call confirmMeeting unless you have a valid selected slot start and end from backend output.\n* Never say an invite email was sent unless confirmMeeting response indicates email.sent = true.\n* ONLY say \"I'm not getting backend calendar information right now\" if the getAvailableSlots API call returns an error, times out, or fails to connect. If you get a successful 200 response, you HAVE the data - use available_summary to tell the user the times. Never say that when the API succeeded.\n\nTools\n\nTool 1: getAvailableSlots\nPurpose: Check availability for a requested date/time.\n\nRequest body:\n{\n\"proposedSlots\": \\[],\n\"targetDay\": \"{{day_time_mentioned_by_user}}\"\n}\n\nPass the caller's exact words for targetDay. Supports any day: \"today 2 pm\", \"tomorrow\", \"Friday 3 pm\", \"next Monday\", \"March 15\", \"March 15 2026\", \"March 15th next year\", \"12/25/2026\", etc.\n\nExpected response fields:\n\n* available: array of available slots (ISO start/end)\n* formatted: array with { start, end, readable }\n* available_summary: ready-to-say string of all times\n* usedTargetDayInference: boolean\n\nWhen getAvailableSlots returns successfully, you have the data. Tell the user the available times using available_summary. Say it naturally - the summary groups by day (e.g. \"Friday Feb 27: 11 AM, 11:30 AM, 12 PM\"). Example: \"I have availability on Friday February 27 at 11 AM, 11:30 AM, and 12 PM. Which works for you?\"\nUse formatted\\[i].start and formatted\\[i].end for booking when the user picks a slot.\n\nTool 2: confirmMeeting\nThis runs only after the start time, email, and meeting purpose is collected.\nPurpose: Book the selected slot (must come from getAvailableSlots response).\n\nRequest body:\n{\n\"start\": \"{{selected_slot_start_iso}}\",\n\"end\": \"{{selected_slot_end_iso}}\",\n\"clientEmail\": \"{{client_email}}\",\n\"purpose\": \"{{meeting_purpose}}\",\n\"attendeeName\": \"{{caller_name}}\"\n}\n\nExpected behavior:\n\n* If slot is unavailable, backend returns error (do not override this).\n* If successful, backend returns booking details and email status.\n* When the booking succeeds, say to the caller: {{confirmation_message}}\n\nConversation flow\n\n1. Greeting.\n2. Identify intent (schedule vs message).\n3. Ask preferred day/time.\n4. Call getAvailableSlots with the day/time the user said. Pass exactly what they said (e.g. \"today 2 pm\", \"tomorrow\", \"Friday 3 pm\", \"next Monday\", \"March 15\", \"March 15th at 10 am\").\n5. If requested slot unavailable, say so clearly and offer only backend-returned alternatives.\n6. Tell the user the times from the getAvailableSlots response. Say the day once, then list the times (e.g. \"I have availability on Friday at 11 AM, 11:30 AM, and 12 PM. Which works for you?\")\n7. Confirm selected slot.\n8. Collect caller_name, client_email, meeting_purpose. Repeat email for confirmation.\n9. Call confirmMeeting with selected slot start/end (ISO).\n10. Confirm outcome:\n\n    * If success: say {{confirmation_message}}\n    * If email.sent is true: \"A confirmation email has been sent.\"\n    * If email.sent is false: \"The meeting is booked, but confirmation email could not be sent yet.\"\n11. Close politely.\n\nPRONUNCIATIONS\n\nMalikaa: uh\nWhen you see a long consecutive list of availability, instead of saying available at 9 AM, 10 AM , 10:30 AM etc you can just say available from 9 AM - 12 PM.&#x20;\nI need you to pronounce times (eg 10:00AM) as ‘ten A.M.’\nPronunciation rules - when speaking to callers:\n\n* Times: Say \"nine A M\" not \"9am\"; \"eleven thirty P M\" not \"11:30pm\"; \"twelve P M\" for noon\n* Time ranges: \"from nine A M to five P M\" not \"9am to 5pm\"\n* Months: Spell out \"February\" not \"Feb\", \"March\" not \"Mar\", \"April\" not \"Apr\", etc.\n* Dates: \"Friday, February 27th\" or \"Monday, March 2nd, 2026\"\n* Emails: Say \"at\" for @ and \"dot\" for periods - \"malikaa at smallest dot ai\" not \"malikaa\\@smallest.ai\"\n* ‘at the rate’ stands for ‘@’ symbol.&#x20;\n\nWhen reading available_summary or confirmation_message, convert abbreviations to spoken form before saying them.\n\nFallback / errors\n\n* If getAvailableSlots returns no slots: state unavailable and ask if caller wants other time options.\n* If confirmMeeting returns unavailable/conflict: apologize and offer other backend-returned times.\n* If payload/validation issues occur: re-collect missing or invalid values from caller.\n\n​\n",
+    "tools": [
+      {
+        "name": "end_call",
+        "description": "Terminate the call when conversation is complete.",
+        "type": "end_call",
+        "enabled": true
+      },
+      {
+        "name": "getAvailableSlots",
+        "description": "call this when the user asks to make a meeting. ",
+        "type": "api_call",
+        "enabled": true,
+        "url": "{{WEBHOOK_BASE_URL}}/webhooks/check-availability",
+        "method": "POST",
+        "timeout": 10000,
+        "llmParameters": [
+          {
+            "name": "day_time_mentioned_by_user",
+            "description": "The day and time the caller wants. Extract exactly what they said. Examples: today 2 pm, tomorrow, Friday 3 pm, next Monday, March 15, March 15 2026, March 15th next year, 12/25/2026, next week Tuesday. Any day - this week, next year, or specific date.",
+            "type": "text",
+            "required": true
+          }
+        ],
+        "headers": {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true"
+        },
+        "queryParams": [],
+        "requestBody": "{\n  \"proposedSlots\": [],\n  \"targetDay\": \"{{day_time_mentioned_by_user}}\"\n}",
+        "responseVariables": [
+          {
+            "variableName": "selected_slot_start_iso",
+            "jsonPath": "$.first_slot_start"
+          },
+          {
+            "variableName": "selected_slot_end_iso",
+            "jsonPath": "$.first_slot_end"
+          },
+          {
+            "variableName": "available_summary",
+            "jsonPath": "$.available_summary"
+          }
+        ]
+      },
+      {
+        "name": "postSlotConfirmation",
+        "description": "After the user confirms a slot, we want to send a calendar invite. ",
+        "type": "api_call",
+        "enabled": true,
+        "url": "{{WEBHOOK_BASE_URL}}/webhooks/confirm-meeting",
+        "method": "POST",
+        "timeout": 10000,
+        "llmParameters": [
+          {
+            "name": "client_email",
+            "description": "The caller's email address for sending the calendar invite",
+            "type": "text",
+            "required": true
+          },
+          {
+            "name": "selected_slot_start_iso",
+            "description": "The ISO start time of the slot the caller chose (e.g. 2026-03-01T15:00:00.000Z)",
+            "type": "text",
+            "required": true
+          },
+          {
+            "name": "selected_slot_end_iso",
+            "description": "The ISO end time of the slot the caller chose",
+            "type": "text",
+            "required": false
+          },
+          {
+            "name": "caller_name",
+            "description": "The caller's name",
+            "type": "text",
+            "required": false
+          },
+          {
+            "name": "meeting_purpose",
+            "description": "What the meeting is about",
+            "type": "text",
+            "required": true
+          }
+        ],
+        "headers": {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
+          "Bypass-Tunnel-Reminder": "true"
+        },
+        "queryParams": [],
+        "requestBody": "{\n  \"start\": \"{{selected_slot_start_iso}}\",\n  \"end\": \"{{selected_slot_end_iso}}\",\n  \"clientEmail\": \"{{client_email}}\",\n  \"purpose\": \"{{meeting_purpose}}\",\n  \"attendeeName\": \"{{caller_name}}\"\n}",
+        "responseVariables": [
+          {
+            "variableName": "confirmation_message",
+            "jsonPath": "$.confirmationMessage"
+          }
+        ]
+      }
+    ]
+  }
+}
