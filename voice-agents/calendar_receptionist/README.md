@@ -4,7 +4,8 @@ A voice receptionist that schedules meetings via phone. Callers speak to an Atom
 
 ## Demo
 
-<video src="./demo.mp4" controls width="640" allow="picture-in-picture" allowfullscreen></video>
+
+https://github.com/user-attachments/assets/daee2c15-8687-4ee9-b04c-43f9a1524c89
 
 ## Features
 
