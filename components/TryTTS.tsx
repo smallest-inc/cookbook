@@ -72,7 +72,10 @@ const LANG_CODE_MAP: Record<string, string> = {
   kannada: "kn",
   gujarati: "gu",
   marathi: "mr",
-  african: "af",
+  swedish: "sv",
+  malayalam: "ml",
+  telugu: "te",
+  african: "en",
 };
 
 export function TryTTS({ projectSlug }: { projectSlug: string }) {
