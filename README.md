@@ -132,7 +132,7 @@ Build AI voice agents that can talk to anyone on voice or text, in any language,
 ### Advanced
 
 - [Bank CSR](./voice-agents/bank_csr/) — Full banking agent — SQL queries, multi-round tool chaining, identity verification, FD management, audit logging
-- [Calendar Receptionist](./voice-agents/calendar_receptionist/) — Webhook endpoints for availability and booking, mock data
+- [Calendar Receptionist](./voice-agents/calendar_receptionist/) — Google Calendar, webhooks, agent duplication, React client
 - [Multi-Agent Voice AI Dashboard](./voice-agents/atoms_sdk_web_agent/) — Real-time dashboard with specialized agents for gaming and utility powered by Atoms SDK.
 
 **[See all Voice Agents examples &rarr;](./voice-agents/)**

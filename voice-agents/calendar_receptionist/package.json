@@ -1,0 +1,11 @@
+{
+  "name": "calendar-receptionist-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI voice receptionist for scheduling meetings via Atoms",
+  "scripts": {
+    "export-atoms": "node scripts/export-atoms-workflow.js",
+    "setup-atoms": "node scripts/setup-atoms-agent.js",
+    "list-atoms-agents": "node scripts/list-atoms-agents.js"
+  }
+}

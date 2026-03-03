@@ -1,118 +1,106 @@
 # Calendar Receptionist
 
-A voice receptionist that schedules meetings via Atoms webhooks. The server exposes two endpoints: check availability and confirm meeting. This example uses mock data; the full project adds Google Calendar integration, agent duplication, and a React client.
+A voice receptionist that schedules meetings via phone. Callers speak to an Atoms agent, which checks **Google Calendar** availability and books meetings through webhook APIs. Includes a React web client with the Atoms widget and one-command agent duplication.
 
 ## Features
 
-- Webhook endpoints for Atoms workflow: `check-availability`, `confirm-meeting`
-- Request/response shapes compatible with Atoms API nodes
-- Mock slot generation for testing without Google Calendar
-- Timezone-aware slot formatting for voice output
-
-## Demo
-
-Run the server, then use ngrok to expose it. Configure your Atoms agent to call `https://YOUR-NGROK-URL/webhooks/check-availability` and `https://YOUR-NGROK-URL/webhooks/confirm-meeting`.
+- **Google Calendar** — Live availability and booking; events appear on your calendar
+- **Agent duplication** — `npm run setup-atoms` creates a new agent with workflow, voice, and prompt
+- **Web client** — React app with Atoms widget for testing
+- **Webhooks** — Express server: `/webhooks/check-availability`, `/webhooks/confirm-meeting`
+- **Optional emails** — SMTP config for booking confirmations
 
 ## Requirements
 
-Base dependencies are installed via `package.json`. Additionally:
-
-- Add `SMALLEST_API_KEY` to your `.env` (for reference; the mock server runs without it)
 - Node.js 18+
+- [Smallest.ai](https://smallest.ai) account + API key
+- [Google Cloud](https://console.cloud.google.com/) — Calendar API, service account
+- [ngrok](https://ngrok.com) (free tier) for local webhooks
 
 ## Usage
 
+### 1. Install
+
 ```bash
-cd javascript
-cp ../.env.sample ../.env
-# Edit ../.env if needed
-npm install
-npm start
+cd server && npm install
+cd ../client && npm install
 ```
 
-Server runs on port 4000. Use ngrok to expose it for Atoms:
+### 2. Set up environment
 
 ```bash
+cp server/.env.example server/.env
+cp client/.env.example client/.env
+# Edit server/.env with SMALLEST_API_KEY, GCP credentials (see below)
+```
+
+### 3. Google Cloud
+
+1. Enable **Google Calendar API**
+2. Create a **Service Account** → download JSON
+3. **Personal Gmail:** Share your calendar with the service account email ("Make changes to events")
+4. Add `client_email`, `private_key`, `project_id` to `server/.env`; set `GCP_SUBJECT_EMAIL` to your Gmail
+
+### 4. Run server and ngrok
+
+```bash
+# Terminal 1
+cd server && npm run dev
+
+# Terminal 2
 ngrok http 4000
+# Copy your HTTPS URL
 ```
 
-## Recommended Usage
-
-- Test the webhook contract before wiring up Google Calendar
-- Use this as a reference for request/response shapes when building your Atoms workflow
-- For full Google Calendar integration, React client, and agent duplication, see [calendarAI](https://github.com/malikaa-27/calendarAI)
-
-## Key Snippets
-
-**Check availability endpoint** — Atoms sends `targetDay` (e.g. "tomorrow 2 pm"); you return `available_summary`, `first_slot_start`, `first_slot_end`:
-
-```javascript
-app.post('/webhooks/check-availability', (req, res) => {
-  const { proposedSlots = [], targetDay } = req.body || {};
-  const slots = proposedSlots.length > 0 ? proposedSlots : buildMockSlots(3);
-  const available = slots.filter((s) => new Date(s.start) > new Date());
-  const first = available[0];
-
-  res.json({
-    available,
-    available_summary: formatSummary(available),
-    first_slot_start: first?.start ?? null,
-    first_slot_end: first?.end ?? null,
-  });
-});
-```
-
-**Confirm meeting endpoint** — Atoms sends slot + attendee info; you return `confirmationMessage`:
-
-```javascript
-app.post('/webhooks/confirm-meeting', (req, res) => {
-  const { start, end, clientEmail, purpose, attendeeName } = req.body || {};
-  // ... validate, create event ...
-  res.json({
-    ok: true,
-    confirmationMessage: `All set! Your meeting is scheduled for ${formatted}.`,
-  });
-});
-```
-
-## Example Output
+### 5. Duplicate the agent
 
 ```bash
-$ npm start
-Calendar Receptionist webhooks listening on port 4000
-Endpoints: POST /webhooks/check-availability, POST /webhooks/confirm-meeting
+npm run setup-atoms -- https://YOUR-NGROK-URL
 ```
+
+Add the output agent ID to `server/.env` and `client/.env`.
+
+### 6. Run the client
 
 ```bash
-$ curl -X POST http://localhost:4000/webhooks/check-availability \
-  -H "Content-Type: application/json" \
-  -d '{"targetDay":"tomorrow"}'
+cd client && npm run dev
 ```
 
-```json
-{
-  "available": [...],
-  "available_summary": "Thursday Feb 26: 9:00 AM, 9:30 AM, 10:00 AM, ...",
-  "first_slot_start": "2026-02-26T17:00:00.000Z",
-  "first_slot_end": "2026-02-26T17:30:00.000Z"
-}
-```
+Open the client in your browser and test the voice agent.
 
 ## Structure
 
 ```
 calendar_receptionist/
-├── javascript/
-│   ├── server.js      # Express webhook server
-│   └── package.json
+├── server/           # Express + Google Calendar + webhooks
+├── client/           # React + Atoms widget
+├── scripts/          # setup-atoms, export-atoms, list-agents
+├── atoms-agent-config.json
 ├── .env.sample
 └── README.md
+```
+
+## Key Snippets
+
+**Webhook: check availability**
+
+```javascript
+// POST /webhooks/check-availability
+// Body: { proposedSlots: [], targetDay?: "tomorrow 2 pm" }
+// Returns: { available_summary, first_slot_start, first_slot_end }
+```
+
+**Webhook: confirm meeting**
+
+```javascript
+// POST /webhooks/confirm-meeting
+// Body: { start, end, clientEmail, purpose, attendeeName }
+// Returns: { confirmationMessage }
 ```
 
 ## Documentation
 
 - [Atoms docs](https://atoms-docs.smallest.ai/dev)
-- [Full project: calendarAI](https://github.com/malikaa-27/calendarAI) — Google Calendar, agent duplication, React client
 
 ## Next Steps
 

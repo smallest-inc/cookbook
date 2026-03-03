@@ -1,0 +1,13 @@
+diff --git a/node_modules/atoms-widget-core/dist/index.js b/node_modules/atoms-widget-core/dist/index.js
+index 32694f6..d473fa7 100644
+--- a/node_modules/atoms-widget-core/dist/index.js
++++ b/node_modules/atoms-widget-core/dist/index.js
+@@ -1,7 +1,7 @@
+ import { jsx as g, jsxs as W, Fragment as He } from "react/jsx-runtime";
+ import Ue, { useRef as Le, useMemo as Dr, useState as re, useEffect as we, useCallback as oe, forwardRef as An, createElement as dn } from "react";
+ import { AtomsClient as Br } from "atoms-client-sdk";
+-const jr = "https:///atoms-api.smallest.ai/api/v1", Vr = async (e, t) => {
++const jr = "https://atoms-api.smallest.ai/api/v1", Vr = async (e, t) => {
+   const n = `${jr}/widget/${e}`, r = {
+     agentId: t
+   };
