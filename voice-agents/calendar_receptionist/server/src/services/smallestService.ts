@@ -14,17 +14,15 @@ class SmallestService {
 
   private getOutboundCallUrl() {
     const trimmed = this.baseUrl.replace(/\/$/, '');
-
-    // Backward-compatible handling: if older host is configured, map it to Atoms API.
-    if (trimmed.includes('api.smallest.ai') && !trimmed.includes('atoms-api.smallest.ai')) {
-      return 'https://atoms-api.smallest.ai/api/v1/conversation/outbound';
-    }
-
     if (trimmed.endsWith('/api/v1')) {
       return `${trimmed}/conversation/outbound`;
     }
-
     return `${trimmed}/api/v1/conversation/outbound`;
+  }
+
+  /** Fallback URL if primary (api.smallest.ai) fails */
+  private getOutboundCallFallbackUrl() {
+    return 'https://atoms-api.smallest.ai/api/v1/conversation/outbound';
   }
 
   async startReceptionistSession(opts: StartSessionParams) {
@@ -44,15 +42,26 @@ class SmallestService {
     };
 
     const url = this.getOutboundCallUrl();
-    try {
-      const resp = await axios.post(url, payload, {
+    const fallbackUrl = this.getOutboundCallFallbackUrl();
+    const tryRequest = async (targetUrl: string) => {
+      const resp = await axios.post(targetUrl, payload, {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json'
         }
       });
       return resp.data;
+    };
+    try {
+      return await tryRequest(url);
     } catch (error: any) {
+      if (url !== fallbackUrl) {
+        try {
+          return await tryRequest(fallbackUrl);
+        } catch (_) {
+          /* fall through to throw original error */
+        }
+      }
       const status = error?.response?.status;
       const details = error?.response?.data;
       const message = `Smallest API request failed${status ? ` (${status})` : ''}`;
