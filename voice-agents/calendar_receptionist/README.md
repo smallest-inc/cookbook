@@ -6,6 +6,8 @@ A voice receptionist that schedules meetings via phone. Callers speak to an Atom
 
 <video src="./demo.mp4" controls width="640" allow="picture-in-picture" allowfullscreen></video>
 
+[Watch on Loom](https://www.loom.com/share/3d73455a99de45a5ab57ad631deb39a8)
+
 ## Features
 
 - **Google Calendar** — Live availability and booking; events appear on your calendar
