@@ -31,6 +31,7 @@ Build AI voice agents with the [Atoms SDK](https://atoms-docs.smallest.ai/dev).
 |---------|-------------------|
 | [bank_csr](./bank_csr/) | Multi-round tool chaining, real SQLite DB, deterministic computation, audit logging, banking actions |
 | [appointment_scheduler](./appointment_scheduler/) | Cal.com integration, slot negotiation ("5pm is busy, how about 7:30?"), live booking |
+| [calendar_receptionist](./calendar_receptionist/) | Webhook-based availability + confirm, mock slots, Atoms workflow pattern |
 | [form_filler](./form_filler/) | State machine data collection, Jotform integration, typed validation, backtracking |
 | [atoms_sdk_web_agent](./atoms_sdk_web_agent/) | Multi-agent collaboration, tool calling, Next.js integration |
 
