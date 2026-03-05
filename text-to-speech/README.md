@@ -4,6 +4,18 @@
 
 Generate natural-sounding speech from text using Smallest AI's Lightning TTS API. 80+ voices, 44.1 kHz native sample rate, ~200ms latency.
 
+## Try It Now (Zero Install)
+
+```bash
+curl -X POST https://api.smallest.ai/waves/v1/lightning-v3.1/get_speech \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Hello from Smallest AI!", "voice_id": "sophia", "sample_rate": 24000, "output_format": "wav"}' \
+  --output hello.wav
+```
+
+Get your API key at [app.smallest.ai](https://app.smallest.ai/dashboard/settings/apikeys).
+
 ## Quickstart
 
 Generate speech in under 2 minutes — no setup, no config files:
@@ -13,8 +25,6 @@ pip install requests
 export SMALLEST_API_KEY="your-api-key-here"
 python text-to-speech/quickstart/quickstart.py
 ```
-
-Get your API key at [app.smallest.ai](https://app.smallest.ai/dashboard/settings/apikeys).
 
 ## Examples
 
@@ -29,6 +39,12 @@ Get your API key at [app.smallest.ai](https://app.smallest.ai/dashboard/settings
 | [Pronunciation Dicts](./pronunciation-dicts/) | Custom pronunciation for names, acronyms, and domain terms |
 | [SDK Usage](./sdk-usage/) | Python SDK patterns *(coming soon — SDK does not yet support v3.1)* |
 | [Voice Cloning](./voice-cloning/) | Instant voice cloning from a short audio sample *(coming soon)* |
+
+### Web Apps (Deploy to Vercel)
+
+| Example | Description |
+|---------|-------------|
+| [Voice Gallery App](./voice-gallery-app/) | Browse, filter, preview 80+ voices in a web UI. One-click deploy to Vercel. |
 
 ### Applications
 

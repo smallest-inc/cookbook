@@ -25,6 +25,20 @@ This cookbook contains practical examples and tutorials for building with Smalle
 
 ---
 
+## Try It Now (30 Seconds)
+
+```bash
+curl -X POST https://api.smallest.ai/waves/v1/lightning-v3.1/get_speech \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Hello from Smallest AI!", "voice_id": "sophia", "sample_rate": 24000, "output_format": "wav"}' \
+  --output hello.wav
+```
+
+Replace `YOUR_API_KEY` with your key from [app.smallest.ai](https://app.smallest.ai/dashboard/settings/apikeys). That's it — you'll have audio in 2 seconds.
+
+---
+
 ## Usage
 
 ### Prerequisites
@@ -114,6 +128,7 @@ Generate natural-sounding speech from text with real-time latency. 80+ voices ac
 - [Multilingual Translator](./text-to-speech/multilingual-translator/) — Hear text spoken in English, Hindi, Spanish, and Tamil side by side
 - [Podcast Generator](./text-to-speech/podcast-generator/) — AI podcast from a topic — LLM writes the script, TTS voices the hosts
 - [Audiobook Generator](./text-to-speech/audiobook-generator/) — Convert any text file into a narrated, chaptered audiobook
+- [Voice Gallery App](./text-to-speech/voice-gallery-app/) — Web app to browse & preview all voices — [deploy to Vercel](./text-to-speech/voice-gallery-app/)
 
 **[See all Text-to-Speech examples &rarr;](./text-to-speech/)**
 

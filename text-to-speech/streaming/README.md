@@ -42,7 +42,8 @@ node javascript/stream_sse.js "This text will be streamed as audio in real-time.
 ### JavaScript — WebSocket Streaming
 
 ```bash
-node javascript/stream_ws.js "This text will be streamed via WebSocket."
+cd javascript && npm install   # installs 'ws' package
+node stream_ws.js "This text will be streamed via WebSocket."
 ```
 
 ## SSE vs WebSocket
