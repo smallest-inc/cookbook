@@ -31,7 +31,7 @@ This cookbook contains practical examples and tutorials for building with Smalle
 
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
 - Python >= 3.10 (install via `uv python install 3.13` if needed)
-- A Smallest AI API key — get one at [smallest.ai/console](https://smallest.ai/console)
+- A Smallest AI API key — get one at [app.smallest.ai](https://app.smallest.ai/dashboard/settings/apikeys)
 
 ### Quick Start
 
@@ -81,7 +81,7 @@ uv run voice-agents/bank_csr/app.py
 
 ### API Keys
 
-- `SMALLEST_API_KEY` — [smallest.ai/console](https://smallest.ai/console) — Required by all examples
+- `SMALLEST_API_KEY` — [app.smallest.ai](https://app.smallest.ai/dashboard/settings/apikeys) — Required by all examples
 - `OPENAI_API_KEY` — [platform.openai.com](https://platform.openai.com/api-keys) — Podcast Summarizer, Meeting Notes, Voice Agents
 - `GROQ_API_KEY` — [console.groq.com](https://console.groq.com) — YouTube Summarizer, Jarvis
 - `RECALL_API_KEY` — [recall.ai](https://recall.ai) — Meeting Notes
@@ -99,6 +99,23 @@ Convert audio and video to text with industry-leading accuracy. Supports 30+ lan
 - [Emotion Analyzer](./speech-to-text/emotion-analyzer/) — Visualize speaker emotions across a conversation with interactive charts
 
 **[See all Speech-to-Text examples &rarr;](./speech-to-text/)**
+
+---
+
+## Text-to-Speech Examples
+
+Generate natural-sounding speech from text with real-time latency. Supports 90+ voices across 18+ languages with customizable speed, pronunciation, and output formats. Powered by [Lightning TTS](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1).
+
+- [Quickstart](./text-to-speech/quickstart/) — Generate speech in 5 lines of code, under 2 minutes
+- [Getting Started](./text-to-speech/getting-started/) — Configurable synthesis with voice, speed, language, output format
+- [Voices](./text-to-speech/voices/) — List and preview 90+ voices, filter by language, gender, and accent
+- [Streaming](./text-to-speech/streaming/) — Real-time audio streaming via SSE and WebSocket
+- [Pronunciation Dicts](./text-to-speech/pronunciation-dicts/) — Custom pronunciation for names, acronyms, and domain terms
+- [Multilingual Translator](./text-to-speech/multilingual-translator/) — Hear any text spoken in 12+ languages side by side
+- [Podcast Generator](./text-to-speech/podcast-generator/) — AI podcast from a topic — LLM writes the script, TTS voices the hosts
+- [Audiobook Generator](./text-to-speech/audiobook-generator/) — Convert any text file into a narrated, chaptered audiobook
+
+**[See all Text-to-Speech examples &rarr;](./text-to-speech/)**
 
 ---
 
