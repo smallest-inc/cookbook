@@ -40,7 +40,9 @@ uv run sdk_examples.py --voices        # List voices
 | `VOICE_ID` | Voice to use | `ashley` |
 | `SAMPLE_RATE` | Audio sample rate in Hz | `24000` |
 
-> **Note:** The Python SDK currently supports `lightning`, `lightning-large`, and `lightning-v2`. For `lightning-v3.1`, use the REST or WebSocket API directly (see [Getting Started](../getting-started/) or [Streaming](../streaming/)).
+> **Important:** The Python SDK currently supports `lightning`, `lightning-large`, and `lightning-v2`. For `lightning-v3.1`, use the REST or WebSocket API directly (see [Getting Started](../getting-started/) or [Streaming](../streaming/)).
+>
+> **Voice IDs are model-specific.** Lightning v3.1 and v2 have completely different voice catalogs. A voice ID from v2 (e.g. `ashley`) will not work with v3.1, and vice versa (e.g. `sophia` is v3.1 only). The `--voices` flag lists voices for both models so you can see the difference.
 
 ## API Reference
 

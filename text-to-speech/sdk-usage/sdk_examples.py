@@ -124,32 +124,56 @@ def run_streaming(api_key: str):
     print(f"Saved to output_streaming.wav ({len(wav_data):,} bytes)\n")
 
 
-def run_voices(api_key: str):
-    """List available voices using the SDK."""
-    from smallestai.waves import WavesClient
-
-    print("=" * 50)
-    print("AVAILABLE VOICES")
-    print("=" * 50)
-
-    client = WavesClient(api_key=api_key)
-    voices_raw = client.get_voices(model=MODEL)
-    voices = json.loads(voices_raw)["voices"]
-
-    print(f"{'Voice ID':<16} {'Name':<16} {'Gender':<8} {'Languages':<20} {'Accent'}")
-    print("-" * 75)
-
+def print_voice_table(voices: list):
+    print(f"  {'Voice ID':<16} {'Name':<16} {'Gender':<8} {'Languages':<20} {'Accent'}")
+    print("  " + "-" * 73)
     for v in voices:
         tags = v.get("tags", {})
         print(
-            f"{v['voiceId']:<16} "
+            f"  {v['voiceId']:<16} "
             f"{v['displayName']:<16} "
             f"{tags.get('gender', '—'):<8} "
             f"{', '.join(tags.get('language', [])):<20} "
             f"{tags.get('accent', '—')}"
         )
+    print(f"  Total: {len(voices)} voice(s)")
 
-    print(f"\nTotal: {len(voices)} voice(s)\n")
+
+def run_voices(api_key: str):
+    """List available voices — SDK (v2) and REST API (v3.1)."""
+    import requests
+    from smallestai.waves import WavesClient
+
+    # v2 voices via SDK
+    print("=" * 50)
+    print("VOICES — Lightning v2 (via SDK)")
+    print("=" * 50)
+    print("Use these voice IDs with model='lightning-v2'\n")
+
+    client = WavesClient(api_key=api_key)
+    voices_raw = client.get_voices(model=MODEL)
+    v2_voices = json.loads(voices_raw)["voices"]
+    print_voice_table(v2_voices)
+
+    # v3.1 voices via REST (SDK doesn't support v3.1 yet)
+    print()
+    print("=" * 50)
+    print("VOICES — Lightning v3.1 (via REST API)")
+    print("=" * 50)
+    print("Use these voice IDs with model='lightning-v3.1'")
+    print("NOTE: v3.1 and v2 have different voice catalogs — IDs are NOT interchangeable\n")
+
+    resp = requests.get(
+        "https://api.smallest.ai/waves/v1/lightning-v3.1/get_voices",
+        headers={"Authorization": f"Bearer {api_key}"},
+    )
+    if resp.status_code == 200:
+        v31_voices = resp.json()["voices"]
+        print_voice_table(v31_voices)
+    else:
+        print(f"  Failed to fetch v3.1 voices ({resp.status_code})")
+
+    print()
 
 
 def main():
