@@ -3,11 +3,11 @@
  * Smallest AI Text-to-Speech - Multilingual Translator
  *
  * Generate speech in multiple languages from a single input text.
- * Uses v3.1 for supported languages (highest quality) and falls back to v2.
+ * Uses Lightning v3.1 for all supported languages.
  *
  * Usage:
  *   node translate.js "Hello world"
- *   node translate.js "Hello world" --languages hindi spanish french
+ *   node translate.js "Hello world" --languages hindi spanish
  *
  * Output:
  * - One WAV file per language in a translations/ folder
@@ -17,27 +17,20 @@ const fs = require("fs");
 const path = require("path");
 
 const API_BASE = "https://api.smallest.ai/waves/v1";
+const MODEL = "lightning-v3.1";
 const SAMPLE_RATE = 24000;
 
 const LANGUAGES = {
-  english: { code: "en", model: "lightning-v3.1", voice: "sophia" },
-  hindi:   { code: "hi", model: "lightning-v3.1", voice: "advika" },
-  spanish: { code: "es", model: "lightning-v3.1", voice: "camilla" },
-  tamil:   { code: "ta", model: "lightning-v3.1", voice: "anitha" },
-  french:  { code: "fr", model: "lightning-v2",   voice: "claire" },
-  german:  { code: "de", model: "lightning-v2",   voice: "leon" },
-  italian: { code: "it", model: "lightning-v2",   voice: "maria" },
-  arabic:  { code: "ar", model: "lightning-v2",   voice: "yasmin" },
-  bengali: { code: "bn", model: "lightning-v2",   voice: "biswa" },
-  russian: { code: "ru", model: "lightning-v2",   voice: "dmitry" },
-  dutch:   { code: "nl", model: "lightning-v2",   voice: "adriana" },
-  polish:  { code: "pl", model: "lightning-v2",   voice: "lukas" },
+  english: { code: "en", voice: "sophia" },
+  hindi:   { code: "hi", voice: "advika" },
+  spanish: { code: "es", voice: "camilla" },
+  tamil:   { code: "ta", voice: "anitha" },
 };
 
-const DEFAULT_LANGUAGES = ["english", "hindi", "spanish", "french", "german"];
+const DEFAULT_LANGUAGES = Object.keys(LANGUAGES);
 
 async function synthesize(text, langConfig, apiKey) {
-  const response = await fetch(`${API_BASE}/${langConfig.model}/get_speech`, {
+  const response = await fetch(`${API_BASE}/${MODEL}/get_speech`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -64,7 +57,7 @@ async function main() {
   const text = args[0];
 
   if (!text || text === "--help" || text === "-h") {
-    console.log('Usage: node translate.js "Text to translate" [--languages hindi spanish french ...]');
+    console.log('Usage: node translate.js "Text to translate" [--languages hindi spanish ...]');
     console.log(`\nAvailable: ${Object.keys(LANGUAGES).join(", ")}`);
     process.exit(0);
   }
@@ -95,7 +88,7 @@ async function main() {
 
   for (const langName of selected) {
     const config = LANGUAGES[langName];
-    process.stdout.write(`  ${langName.padEnd(12)} (${config.model}, ${config.voice})... `);
+    process.stdout.write(`  ${langName.padEnd(12)} (${config.voice})... `);
 
     try {
       const audio = await synthesize(text, config, apiKey);

@@ -7,7 +7,7 @@ The simplest way to generate speech from text using Smallest AI's Lightning TTS 
 - Generate speech from text with a single API call
 - Save output as WAV file
 - Choose voice, speed, and language
-- Supports both Lightning v3.1 (highest quality) and v2 (multilingual)
+- Uses Lightning v3.1 for highest quality output
 
 ## Requirements
 
@@ -40,17 +40,16 @@ Output is saved to `output.wav` in the current directory.
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `MODEL` | TTS model (`lightning-v3.1` or `lightning-v2`) | `lightning-v3.1` |
+| `MODEL` | TTS model | `lightning-v3.1` |
 | `VOICE_ID` | Voice to use (see [Voices](../voices/)) | `sophia` |
 | `SPEED` | Playback speed (0.5 to 2.0) | `1.0` |
 | `SAMPLE_RATE` | Audio sample rate in Hz | `24000` |
-| `LANGUAGE` | Language code (`en`, `hi`, `es`, `ta`, or `auto`) | `en` |
+| `LANGUAGE` | Language code (`en`, `hi`, `es`, `ta`) | `en` |
 | `OUTPUT_FORMAT` | Output format (`wav`, `pcm`, `mp3`, `mulaw`) | `wav` |
 
 ## API Reference
 
 - [Lightning v3.1 API](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1)
-- [Lightning v2 API](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v2)
 
 ## Next Steps
 

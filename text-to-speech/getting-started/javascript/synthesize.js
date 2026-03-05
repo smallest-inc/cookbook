@@ -13,11 +13,11 @@
 const fs = require("fs");
 
 // Configuration
-const MODEL = "lightning-v3.1"; // or "lightning-v2" for multilingual
+const MODEL = "lightning-v3.1";
 const VOICE_ID = "sophia";
 const SPEED = 1.0;
 const SAMPLE_RATE = 24000;
-const LANGUAGE = "en"; // en, hi, es, ta (v3.1) — v2 supports 18+ languages
+const LANGUAGE = "en"; // en, hi, es, ta
 const OUTPUT_FORMAT = "wav";
 
 const API_BASE = "https://api.smallest.ai/waves/v1";

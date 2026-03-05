@@ -18,11 +18,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuration
-MODEL = "lightning-v3.1"  # or "lightning-v2" for multilingual
+MODEL = "lightning-v3.1"
 VOICE_ID = "sophia"
 SPEED = 1.0
 SAMPLE_RATE = 24000
-LANGUAGE = "en"  # en, hi, es, ta (v3.1) — v2 supports 18+ languages
+LANGUAGE = "en"  # en, hi, es, ta
 OUTPUT_FORMAT = "wav"
 
 API_BASE = "https://api.smallest.ai/waves/v1"

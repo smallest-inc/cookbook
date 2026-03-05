@@ -3,11 +3,11 @@
 Smallest AI Text-to-Speech - Multilingual Translator
 
 Generate speech in multiple languages from a single input text.
-Uses v3.1 for supported languages (highest quality) and falls back to v2.
+Uses Lightning v3.1 for all supported languages.
 
 Usage:
   python translate.py "Hello world"
-  python translate.py "Hello world" --languages hindi spanish french
+  python translate.py "Hello world" --languages hindi spanish
 
 Output:
 - One WAV file per language in a translations/ folder
@@ -22,29 +22,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 API_BASE = "https://api.smallest.ai/waves/v1"
+MODEL = "lightning-v3.1"
 SAMPLE_RATE = 24000
 
 LANGUAGES = {
-    "english":  {"code": "en", "model": "lightning-v3.1", "voice": "sophia"},
-    "hindi":    {"code": "hi", "model": "lightning-v3.1", "voice": "advika"},
-    "spanish":  {"code": "es", "model": "lightning-v3.1", "voice": "camilla"},
-    "tamil":    {"code": "ta", "model": "lightning-v3.1", "voice": "anitha"},
-    "french":   {"code": "fr", "model": "lightning-v2",   "voice": "claire"},
-    "german":   {"code": "de", "model": "lightning-v2",   "voice": "leon"},
-    "italian":  {"code": "it", "model": "lightning-v2",   "voice": "maria"},
-    "arabic":   {"code": "ar", "model": "lightning-v2",   "voice": "yasmin"},
-    "bengali":  {"code": "bn", "model": "lightning-v2",   "voice": "biswa"},
-    "russian":  {"code": "ru", "model": "lightning-v2",   "voice": "dmitry"},
-    "dutch":    {"code": "nl", "model": "lightning-v2",   "voice": "adriana"},
-    "polish":   {"code": "pl", "model": "lightning-v2",   "voice": "lukas"},
+    "english": {"code": "en", "voice": "sophia"},
+    "hindi":   {"code": "hi", "voice": "advika"},
+    "spanish": {"code": "es", "voice": "camilla"},
+    "tamil":   {"code": "ta", "voice": "anitha"},
 }
 
-DEFAULT_LANGUAGES = ["english", "hindi", "spanish", "french", "german"]
+DEFAULT_LANGUAGES = list(LANGUAGES.keys())
 
 
 def synthesize(text: str, lang_config: dict, api_key: str) -> bytes:
     response = requests.post(
-        f"{API_BASE}/{lang_config['model']}/get_speech",
+        f"{API_BASE}/{MODEL}/get_speech",
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -66,7 +59,7 @@ def synthesize(text: str, lang_config: dict, api_key: str) -> bytes:
 
 def main():
     if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
-        print('Usage: python translate.py "Text to translate" [--languages hindi spanish french ...]')
+        print('Usage: python translate.py "Text to translate" [--languages hindi spanish ...]')
         print(f"\nAvailable: {', '.join(LANGUAGES.keys())}")
         sys.exit(0)
 
@@ -95,7 +88,7 @@ def main():
 
     for lang_name in selected:
         config = LANGUAGES[lang_name]
-        print(f"  {lang_name:<12} ({config['model']}, {config['voice']})...", end=" ", flush=True)
+        print(f"  {lang_name:<12} ({config['voice']})...", end=" ", flush=True)
 
         try:
             audio = synthesize(text, config, api_key)

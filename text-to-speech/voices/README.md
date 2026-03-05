@@ -47,7 +47,6 @@ node javascript/voices.js --preview sophia
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `MODEL` | TTS model to list voices for | `lightning-v3.1` |
 | `--language` | Filter by language (e.g. `english`, `hindi`) | All |
 | `--gender` | Filter by gender (`male` or `female`) | All |
 | `--accent` | Filter by accent (e.g. `american`, `british`, `indian`) | All |
