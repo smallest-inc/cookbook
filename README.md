@@ -129,6 +129,8 @@ Generate natural-sounding speech from text with real-time latency. 80+ voices ac
 - [Podcast Generator](./text-to-speech/podcast-generator/) — AI podcast from a topic — LLM writes the script, TTS voices the hosts
 - [Audiobook Generator](./text-to-speech/audiobook-generator/) — Convert any text file into a narrated, chaptered audiobook
 - [Voice Gallery App](./text-to-speech/voice-gallery-app/) — Web app to browse & preview all voices — [deploy to Vercel](./text-to-speech/voice-gallery-app/)
+- [Expressive TTS](./text-to-speech/expressive-tts/) — Control emotion, pitch, volume, accent (v3.2) + auto-detect with LLM
+- [Chinese Whispers](./text-to-speech/voice-chinese-whispers/) — Same sentence, 5 characters, wildly different emotions — viral demo
 
 **[See all Text-to-Speech examples &rarr;](./text-to-speech/)**
 

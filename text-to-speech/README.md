@@ -40,6 +40,13 @@ python text-to-speech/quickstart/quickstart.py
 | [SDK Usage](./sdk-usage/) | Python SDK patterns *(coming soon — SDK does not yet support v3.1)* |
 | [Voice Cloning](./voice-cloning/) | Instant voice cloning from a short audio sample *(coming soon)* |
 
+### Expressive TTS (v3.2)
+
+| Example | Description |
+|---------|-------------|
+| [Expressive TTS](./expressive-tts/) | Control emotion, pitch, volume, accent — make the same voice happy, angry, whispering, sarcastic |
+| [Chinese Whispers Game](./voice-chinese-whispers/) | Same sentence through 5 characters with different emotions/accents — viral shareable demo |
+
 ### Web Apps (Deploy to Vercel)
 
 | Example | Description |
