@@ -139,9 +139,12 @@ async def speech_to_text(
     language: str = "en",
     file: UploadFile = File(..., description="Audio file (WAV)"),
 ):
-    """Transcribe audio to text using Pulse STT. Only Pulse + Lightning compatible languages."""
+    """Transcribe audio to text using Pulse STT. Only Pulse-compatible languages."""
     if language not in SPEECH_LANGUAGES:
-        language = "en"
+        raise HTTPException(
+            400,
+            f"Speech input not supported for '{language}'. Use one of: {', '.join(SPEECH_LANGUAGES.keys())}",
+        )
     try:
         audio_bytes = await file.read()
         if not audio_bytes:
