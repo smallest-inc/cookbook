@@ -1,0 +1,9 @@
+# Extra dependencies for language-translation-app
+# Base deps from root requirements.txt; install with: uv pip install -r requirements.txt
+
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+deep-translator>=1.11.0
+httpx>=0.28.0
+python-multipart>=0.0.17
+aiosqlite>=0.20.0

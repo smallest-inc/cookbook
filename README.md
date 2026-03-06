@@ -97,6 +97,7 @@ Convert audio and video to text with industry-leading accuracy. Supports 30+ lan
 - [Online Meeting Notetaker](./speech-to-text/online-meeting-notetaking-bot/) — Join Google Meet / Zoom / Teams via Recall.ai, auto-identify speakers by name, generate structured notes
 - [Podcast Summarizer](./speech-to-text/podcast-summarizer/) — Transcribe and summarize podcasts with key takeaways using GPT
 - [Emotion Analyzer](./speech-to-text/emotion-analyzer/) — Visualize speaker emotions across a conversation with interactive charts
+- [Language Translation App](./speech-to-text/language-translation-app/) — Translate text between 40+ languages with TTS and STT; type or speak input
 
 **[See all Speech-to-Text examples &rarr;](./speech-to-text/)**
 

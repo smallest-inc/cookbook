@@ -15,6 +15,7 @@ Convert audio to text using Smallest AI's Pulse Speech-to-Text API. Supports 30+
 | [Podcast Summarizer](./podcast-summarizer/) | Transcribe and summarize podcasts with GPT-4o |
 | [File Transcription](./file-transcription/) | Transcribe files with all advanced features |
 | [Emotion Analyzer](./emotion-analyzer/) | Visualize speaker emotions across a conversation with interactive charts |
+| [Language Translation App](./language-translation-app/) | Translate text between 40+ languages with TTS and STT — type or speak input |
 
 ### WebSocket Examples
 
