@@ -18,7 +18,7 @@ Translate text between 40+ languages and hear results spoken aloud. Type or spea
 Extra dependencies:
 
 ```bash
-cd speech-to-text/language-translation-app
+cd text-to-speech/language-translation-app
 uv pip install -r requirements.txt
 ```
 
@@ -27,7 +27,7 @@ uv pip install -r requirements.txt
 ### 1. Backend
 
 ```bash
-cd speech-to-text/language-translation-app
+cd text-to-speech/language-translation-app
 cp .env.sample .env
 # Add your SMALLEST_API_KEY to .env
 
@@ -39,7 +39,7 @@ uv run uvicorn app.main:app --reload --port 8000 --app-dir backend
 In a separate terminal:
 
 ```bash
-cd speech-to-text/language-translation-app/frontend
+cd text-to-speech/language-translation-app/frontend
 npm install
 npm run dev
 ```
@@ -50,7 +50,7 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 - Learning pronunciation of translated phrases in your target language
 - Quick translation with audio feedback for language learners
-- For real-time streaming transcription, see [Realtime Microphone](../websocket/realtime-microphone-transcription/)
+- For real-time streaming transcription, see [Realtime Microphone](../../speech-to-text/websocket/realtime-microphone-transcription/)
 
 ## Structure
 
@@ -90,5 +90,5 @@ language-translation-app/
 
 ## Next Steps
 
-- [Jarvis Voice Assistant](../websocket/jarvis/) — Always-on assistant with wake word, LLM, and TTS
-- [Emotion Analyzer](../emotion-analyzer/) — Visualize speaker emotions in conversations
+- [Jarvis Voice Assistant](../../speech-to-text/websocket/jarvis/) — Always-on assistant with wake word, LLM, and TTS
+- [Emotion Analyzer](../../speech-to-text/emotion-analyzer/) — Visualize speaker emotions in conversations
