@@ -108,10 +108,13 @@ export class AudioStreamPlayer {
  * Audio starts playing from the FIRST chunk (~0.2-0.5s TTFB).
  * Returns a Promise that resolves when ALL audio finishes playing.
  */
-export async function streamAndPlay(text, voiceId, voiceParams, player, signal) {
+export async function streamAndPlay(text, voiceId, voiceParams, player, signal, apiKeys) {
+  const headers = { "Content-Type": "application/json" };
+  if (apiKeys?.smallestKey) headers["x-smallest-key"] = apiKeys.smallestKey;
+
   const res = await fetch("/api/debate/speak-stream", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ text, voice_id: voiceId, ...voiceParams }),
     signal,
   });
@@ -157,10 +160,13 @@ export async function streamAndPlay(text, voiceId, voiceParams, player, signal) 
  * Buffer TTS via SSE without playing. Returns array of base64 chunks.
  * Use this to pre-fetch the second speaker while the first plays.
  */
-export async function bufferSpeech(text, voiceId, voiceParams, signal) {
+export async function bufferSpeech(text, voiceId, voiceParams, signal, apiKeys) {
+  const headers = { "Content-Type": "application/json" };
+  if (apiKeys?.smallestKey) headers["x-smallest-key"] = apiKeys.smallestKey;
+
   const res = await fetch("/api/debate/speak-stream", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ text, voice_id: voiceId, ...voiceParams }),
     signal,
   });

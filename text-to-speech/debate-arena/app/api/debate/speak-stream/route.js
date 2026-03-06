@@ -17,7 +17,9 @@ export async function POST(request) {
     );
   }
 
-  const apiKey = process.env.SMALLEST_API_KEY;
+  // BYOK: accept user-provided key via header, fall back to server env
+  const apiKey =
+    request.headers.get("x-smallest-key") || process.env.SMALLEST_API_KEY;
   const ttsMsg = { text: text.slice(0, 500), voice_id };
   if (emotion) ttsMsg.emotion = emotion;
   if (pitch) ttsMsg.pitch = pitch;

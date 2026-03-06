@@ -80,10 +80,13 @@ This is a comedic roast battle! The philosophers should:
     userPrompt += "\nThis is the opening round. Each philosopher should establish their position.";
   }
 
+  const openaiKey =
+    request.headers.get("x-openai-key") || process.env.OPENAI_API_KEY;
+
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      Authorization: `Bearer ${openaiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({

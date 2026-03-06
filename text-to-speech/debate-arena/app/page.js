@@ -8,6 +8,7 @@ import PhilosopherAvatar from "../components/PhilosopherAvatar";
 import RoundCounter from "../components/RoundCounter";
 import TranscriptPanel from "../components/TranscriptPanel";
 import VotePanel from "../components/VotePanel";
+import ApiKeyInput from "../components/ApiKeyInput";
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -25,14 +26,18 @@ export default function DebateArena() {
   const [socratesEmotion, setSocratesEmotion] = useState(null);
   const [aristotleEmotion, setAristotleEmotion] = useState(null);
   const [mode, setMode] = useState("philosophical");
+  const [apiKeys, setApiKeys] = useState(null); // { smallestKey, openaiKey } or null for server keys
+  const [hasServerKeys, setHasServerKeys] = useState(true);
 
   const abortRef = useRef(false);
   const abortControllerRef = useRef(null);
   const playerRef = useRef(null);
 
-  // Pre-warm: compile API routes on page load so first debate starts faster
+  // Pre-warm routes + check if server has keys configured
   useEffect(() => {
-    fetch("/api/debate/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) }).catch(() => {});
+    fetch("/api/debate/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) })
+      .then((r) => { if (r.status === 401) setHasServerKeys(false); })
+      .catch(() => {});
     fetch("/api/debate/speak-stream", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) }).catch(() => {});
   }, []);
 
@@ -71,7 +76,7 @@ export default function DebateArena() {
             data = await nextRoundPromise;
             nextRoundPromise = null;
           } else {
-            data = await generateRound(selectedTopic, round, rounds, debateHistory, debateMode);
+            data = await generateRound(selectedTopic, round, rounds, debateHistory, debateMode, apiKeys);
           }
           if (data.error) throw new Error(data.error);
         } catch (err) {
@@ -95,12 +100,12 @@ export default function DebateArena() {
         try {
           // 2. Start buffering Aristotle audio in background
           const aristotleBufferPromise = bufferSpeech(
-            data.aristotle.text, ariVoice, ariVoiceParams, ac.signal
+            data.aristotle.text, ariVoice, ariVoiceParams, ac.signal, apiKeys
           );
 
           // 3. Stream + play Socrates immediately (audio starts from first chunk!)
           setSpeaking("socrates");
-          await streamAndPlay(data.socrates.text, socVoice, socVoiceParams, player, ac.signal);
+          await streamAndPlay(data.socrates.text, socVoice, socVoiceParams, player, ac.signal, apiKeys);
           setSpeaking(null);
 
           if (abortRef.current) break;
@@ -108,7 +113,7 @@ export default function DebateArena() {
           // Pre-fetch next round NOW
           if (round < rounds) {
             nextRoundPromise = generateRound(
-              selectedTopic, round + 1, rounds, debateHistory, debateMode
+              selectedTopic, round + 1, rounds, debateHistory, debateMode, apiKeys
             );
           }
 
@@ -145,9 +150,11 @@ export default function DebateArena() {
       // Judge
       setPhase("judging");
       try {
+        const judgeHeaders = { "Content-Type": "application/json" };
+        if (apiKeys?.openaiKey) judgeHeaders["x-openai-key"] = apiKeys.openaiKey;
         const res = await fetch("/api/debate/judge", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: judgeHeaders,
           body: JSON.stringify({ topic: selectedTopic, rounds: debateHistory }),
         });
         if (!res.ok) throw new Error(`Judge failed: ${res.status}`);
@@ -201,7 +208,17 @@ export default function DebateArena() {
         )}
       </AnimatePresence>
 
-      {phase === "setup" && <TopicInput onStart={startDebate} disabled={false} />}
+      {phase === "setup" && (
+        <>
+          <TopicInput onStart={startDebate} disabled={false} />
+          <div className="mt-6">
+            <ApiKeyInput
+              hasServerKeys={hasServerKeys}
+              onKeysSet={setApiKeys}
+            />
+          </div>
+        </>
+      )}
 
       {phase !== "setup" && (
         <div className="w-full max-w-4xl space-y-8">
@@ -268,10 +285,13 @@ export default function DebateArena() {
   );
 }
 
-async function generateRound(topic, round, totalRounds, history, mode) {
+async function generateRound(topic, round, totalRounds, history, mode, apiKeys) {
+  const headers = { "Content-Type": "application/json" };
+  if (apiKeys?.openaiKey) headers["x-openai-key"] = apiKeys.openaiKey;
+
   const res = await fetch("/api/debate/generate", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ topic, round, totalRounds, history, mode: mode === "roast" ? "roast" : undefined }),
   });
   if (!res.ok) throw new Error(`Generate failed: ${res.status}`);
