@@ -209,15 +209,13 @@ export default function DebateArena() {
       </AnimatePresence>
 
       {phase === "setup" && (
-        <>
-          <TopicInput onStart={startDebate} disabled={false} />
-          <div className="mt-6">
-            <ApiKeyInput
-              hasServerKeys={hasServerKeys}
-              onKeysSet={setApiKeys}
-            />
-          </div>
-        </>
+        <div className="w-full max-w-2xl mx-auto space-y-8">
+          <TopicInput onStart={startDebate} disabled={!apiKeys && !hasServerKeys} />
+          <ApiKeyInput
+            hasServerKeys={hasServerKeys}
+            onKeysSet={setApiKeys}
+          />
+        </div>
       )}
 
       {phase !== "setup" && (
