@@ -28,8 +28,8 @@ export default function DebateArena() {
   const [mode, setMode] = useState("philosophical");
   const [apiKeys, setApiKeys] = useState(null);
   const [hasServerKeys, setHasServerKeys] = useState(true);
-  const [debatesUsed, setDebatesUsed] = useState(0);
-  const FREE_LIMIT = 3;
+  const [ttsUsed, setTtsUsed] = useState(0);
+  const FREE_TTS_LIMIT = 6; // 3 rounds × 2 speakers = 6 generations
 
   const abortRef = useRef(false);
   const abortControllerRef = useRef(null);
@@ -45,11 +45,6 @@ export default function DebateArena() {
 
   const startDebate = useCallback(
     async (selectedTopic, rounds, socVoice, ariVoice, debateMode) => {
-      // Gate: require own keys after free limit (only when using server keys)
-      if (!apiKeys && hasServerKeys) {
-        setDebatesUsed((prev) => prev + 1);
-      }
-
       setTopic(selectedTopic);
       setTotalRounds(rounds);
       setHistory([]);
@@ -111,6 +106,7 @@ export default function DebateArena() {
           );
 
           // 3. Stream + play Socrates immediately (audio starts from first chunk!)
+          if (!apiKeys) setTtsUsed((p) => p + 2); // count both TTS calls
           setSpeaking("socrates");
           await streamAndPlay(data.socrates.text, socVoice, socVoiceParams, player, ac.signal, apiKeys);
           setSpeaking(null);
@@ -218,13 +214,13 @@ export default function DebateArena() {
       {phase === "setup" && (
         <div className="w-full max-w-2xl mx-auto space-y-6">
           {(() => {
-            const freeLeft = FREE_LIMIT - debatesUsed;
+            const freeLeft = FREE_TTS_LIMIT - ttsUsed;
             const needsKeys = !apiKeys && (!hasServerKeys || freeLeft <= 0);
             return (
               <>
                 <TopicInput onStart={startDebate} disabled={needsKeys} />
                 <ApiKeyInput
-                  freeDebatesLeft={hasServerKeys ? freeLeft : 0}
+                  freeDebatesLeft={hasServerKeys ? Math.max(0, freeLeft) : 0}
                   onKeysSet={setApiKeys}
                 />
               </>

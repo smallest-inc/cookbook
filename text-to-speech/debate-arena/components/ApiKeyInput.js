@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function ApiKeyInput({ onKeysSet, freeDebatesLeft }) {
+export default function ApiKeyInput({ onKeysSet, freeDebatesLeft: freeGenerationsLeft }) {
   const [expanded, setExpanded] = useState(false);
   const [smallestKey, setSmallestKey] = useState("");
   const [openaiKey, setOpenaiKey] = useState("");
   const [saved, setSaved] = useState(false);
 
-  const mustEnterKeys = freeDebatesLeft <= 0;
+  const mustEnterKeys = freeGenerationsLeft <= 0;
 
   const handleSave = () => {
     if (smallestKey.trim() && openaiKey.trim()) {
@@ -36,7 +36,14 @@ export default function ApiKeyInput({ onKeysSet, freeDebatesLeft }) {
                 Enter your API keys to continue &darr;
               </button>
               <p className="text-[10px] text-terracotta/60">
-                Free debates used up — enter your own keys to keep debating
+                Free generations used up — sign up for keys to keep debating
+              </p>
+              <p className="text-[10px] text-gold/40 mt-1">
+                Join our{" "}
+                <a href="https://discord.gg/2VcvUyB2DD" target="_blank" rel="noopener noreferrer" className="text-gold/60 hover:text-gold underline">
+                  Discord
+                </a>{" "}
+                and get $20 in free credits!
               </p>
             </>
           ) : (
@@ -48,7 +55,7 @@ export default function ApiKeyInput({ onKeysSet, freeDebatesLeft }) {
                 Enter your API keys &darr;
               </button>
               <p className="text-[9px] text-cream/15">
-                {freeDebatesLeft} free debate{freeDebatesLeft !== 1 ? "s" : ""} remaining
+                {freeGenerationsLeft} free generation{freeGenerationsLeft !== 1 ? "s" : ""} remaining
               </p>
             </>
           )}
@@ -153,9 +160,18 @@ export default function ApiKeyInput({ onKeysSet, freeDebatesLeft }) {
                 Save Keys
               </button>
 
-              <p className="text-[9px] text-cream/15 text-center leading-relaxed">
-                Keys stay in your browser only. Never stored on any server.
-              </p>
+              <div className="text-center space-y-1">
+                <p className="text-[9px] text-cream/15 leading-relaxed">
+                  Keys stay in your browser only. Never stored on any server.
+                </p>
+                <p className="text-[10px] text-gold/40">
+                  Join our{" "}
+                  <a href="https://discord.gg/2VcvUyB2DD" target="_blank" rel="noopener noreferrer" className="text-gold/60 hover:text-gold underline">
+                    Discord
+                  </a>{" "}
+                  and get $20 in free credits!
+                </p>
+              </div>
             </div>
           </motion.div>
         )}
