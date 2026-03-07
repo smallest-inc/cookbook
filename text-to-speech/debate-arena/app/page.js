@@ -26,8 +26,10 @@ export default function DebateArena() {
   const [socratesEmotion, setSocratesEmotion] = useState(null);
   const [aristotleEmotion, setAristotleEmotion] = useState(null);
   const [mode, setMode] = useState("philosophical");
-  const [apiKeys, setApiKeys] = useState(null); // { smallestKey, openaiKey } or null for server keys
+  const [apiKeys, setApiKeys] = useState(null);
   const [hasServerKeys, setHasServerKeys] = useState(true);
+  const [debatesUsed, setDebatesUsed] = useState(0);
+  const FREE_LIMIT = 3;
 
   const abortRef = useRef(false);
   const abortControllerRef = useRef(null);
@@ -43,6 +45,11 @@ export default function DebateArena() {
 
   const startDebate = useCallback(
     async (selectedTopic, rounds, socVoice, ariVoice, debateMode) => {
+      // Gate: require own keys after free limit (only when using server keys)
+      if (!apiKeys && hasServerKeys) {
+        setDebatesUsed((prev) => prev + 1);
+      }
+
       setTopic(selectedTopic);
       setTotalRounds(rounds);
       setHistory([]);
@@ -209,12 +216,20 @@ export default function DebateArena() {
       </AnimatePresence>
 
       {phase === "setup" && (
-        <div className="w-full max-w-2xl mx-auto space-y-8">
-          <TopicInput onStart={startDebate} disabled={!apiKeys && !hasServerKeys} />
-          <ApiKeyInput
-            hasServerKeys={hasServerKeys}
-            onKeysSet={setApiKeys}
-          />
+        <div className="w-full max-w-2xl mx-auto space-y-6">
+          {(() => {
+            const freeLeft = FREE_LIMIT - debatesUsed;
+            const needsKeys = !apiKeys && (!hasServerKeys || freeLeft <= 0);
+            return (
+              <>
+                <TopicInput onStart={startDebate} disabled={needsKeys} />
+                <ApiKeyInput
+                  freeDebatesLeft={hasServerKeys ? freeLeft : 0}
+                  onKeysSet={setApiKeys}
+                />
+              </>
+            );
+          })()}
         </div>
       )}
 
