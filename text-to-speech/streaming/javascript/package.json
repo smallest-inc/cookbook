@@ -1,0 +1,8 @@
+{
+  "name": "tts-streaming",
+  "private": true,
+  "description": "Smallest AI TTS streaming examples",
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

@@ -25,13 +25,27 @@ This cookbook contains practical examples and tutorials for building with Smalle
 
 ---
 
+## Try It Now (30 Seconds)
+
+```bash
+curl -X POST https://api.smallest.ai/waves/v1/lightning-v3.1/get_speech \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Hello from Smallest AI!", "voice_id": "sophia", "sample_rate": 24000, "output_format": "wav"}' \
+  --output hello.wav
+```
+
+Replace `YOUR_API_KEY` with your key from [app.smallest.ai](https://app.smallest.ai/dashboard/settings/apikeys). That's it — you'll have audio in 2 seconds.
+
+---
+
 ## Usage
 
 ### Prerequisites
 
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
 - Python >= 3.10 (install via `uv python install 3.13` if needed)
-- A Smallest AI API key — get one at [smallest.ai/console](https://smallest.ai/console)
+- A Smallest AI API key — get one at [app.smallest.ai](https://app.smallest.ai/dashboard/settings/apikeys)
 
 ### Quick Start
 
@@ -81,7 +95,7 @@ uv run voice-agents/bank_csr/app.py
 
 ### API Keys
 
-- `SMALLEST_API_KEY` — [smallest.ai/console](https://smallest.ai/console) — Required by all examples
+- `SMALLEST_API_KEY` — [app.smallest.ai](https://app.smallest.ai/dashboard/settings/apikeys) — Required by all examples
 - `OPENAI_API_KEY` — [platform.openai.com](https://platform.openai.com/api-keys) — Podcast Summarizer, Meeting Notes, Voice Agents
 - `GROQ_API_KEY` — [console.groq.com](https://console.groq.com) — YouTube Summarizer, Jarvis
 - `RECALL_API_KEY` — [recall.ai](https://recall.ai) — Meeting Notes
@@ -104,9 +118,19 @@ Convert audio and video to text with industry-leading accuracy. Supports 30+ lan
 
 ## Text-to-Speech Examples
 
-Convert text to natural-sounding speech with Lightning TTS. Supports 16+ languages with language-specific voices.
+Generate natural-sounding speech from text with real-time latency. 80+ voices across 4 languages (en, hi, es, ta) with 44.1 kHz quality and ~200ms latency. Powered by [Lightning TTS v3.1](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1).
 
-- [Language Translation App](./text-to-speech/language-translation-app/) — Translate text between 40+ languages with TTS and STT; type or speak input, hear results spoken aloud
+- [Quickstart](./text-to-speech/quickstart/) — Generate speech in 5 lines of code, under 2 minutes
+- [Getting Started](./text-to-speech/getting-started/) — Configurable synthesis with voice, speed, language, output format
+- [Voices](./text-to-speech/voices/) — List and preview 80+ voices, filter by language, gender, and accent
+- [Streaming](./text-to-speech/streaming/) — Real-time audio streaming via SSE and WebSocket
+- [Pronunciation Dicts](./text-to-speech/pronunciation-dicts/) — Custom pronunciation for names, acronyms, and domain terms
+- [Multilingual Translator](./text-to-speech/multilingual-translator/) — Hear text spoken in English, Hindi, Spanish, and Tamil side by side
+- [Podcast Generator](./text-to-speech/podcast-generator/) — AI podcast from a topic — LLM writes the script, TTS voices the hosts
+- [Audiobook Generator](./text-to-speech/audiobook-generator/) — Convert any text file into a narrated, chaptered audiobook
+- [Voice Gallery App](./text-to-speech/voice-gallery-app/) — Web app to browse & preview all voices — [deploy to Vercel](./text-to-speech/voice-gallery-app/)
+- [Expressive TTS](./text-to-speech/expressive-tts/) — Control emotion, pitch, volume, accent (v3.2) + auto-detect with LLM
+- [Chinese Whispers](./text-to-speech/voice-chinese-whispers/) — Same sentence, 5 characters, wildly different emotions — viral demo
 
 **[See all Text-to-Speech examples &rarr;](./text-to-speech/)**
 
