@@ -131,6 +131,7 @@ Generate natural-sounding speech from text with real-time latency. 80+ voices ac
 - [Voice Gallery App](./text-to-speech/voice-gallery-app/) — Web app to browse & preview all voices — [deploy to Vercel](./text-to-speech/voice-gallery-app/)
 - [Expressive TTS](./text-to-speech/expressive-tts/) — Control emotion, pitch, volume, accent (v3.2) + auto-detect with LLM
 - [Chinese Whispers](./text-to-speech/voice-chinese-whispers/) — Same sentence, 5 characters, wildly different emotions — viral demo
+- [Language Translation App](./text-to-speech/language-translation-app/) — Translate text between 40+ languages with TTS and STT — type or speak, hear results
 
 **[See all Text-to-Speech examples &rarr;](./text-to-speech/)**
 
