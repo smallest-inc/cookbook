@@ -80,7 +80,7 @@ export function CommunityPage() {
         </div>
         <div className="mt-6">
           <a
-            href="https://github.com/smallest-inc/cookbook/tree/main/community"
+            href="https://github.com/smallest-inc/cookbook/fork"
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackSubmitProjectClick("community_page")}

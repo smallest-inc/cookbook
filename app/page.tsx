@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import Image from "next/image";
 import Fuse from "fuse.js";
+import Link from "next/link";
 import { ArrowRight, Plus, ArrowUpRight } from "lucide-react";
 import { projects, getFeaturedProjects } from "@/lib/projects";
 import { trackSearch, trackSubmitProjectClick } from "@/lib/analytics";
@@ -68,9 +69,9 @@ export default function HomePage() {
               className="mx-auto mb-8 rounded-xl"
             />
             <h1 className="text-[clamp(2rem,5vw,3.5rem)] font-semibold tracking-tight leading-[1.1]">
-              Explore what developers
+              Explore what developers are
               <br />
-              are building
+              building with Smallest AI
             </h1>
             <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
               A curated gallery of voice and audio experiences powered by
@@ -86,16 +87,14 @@ export default function HomePage() {
                 Get API Key
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </a>
-              <a
-                href="https://github.com/smallest-inc/cookbook"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/community"
                 onClick={() => trackSubmitProjectClick("hero")}
                 className="group inline-flex items-center gap-2 rounded-full border border-border px-6 py-2.5 text-sm font-medium text-foreground transition-all hover:bg-muted"
               >
                 Submit Project
                 <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </a>
+              </Link>
             </div>
             <p className="mt-6 text-xs text-muted-foreground/70 tracking-wide uppercase">
               {projects.length} projects &middot; STT &middot; TTS &middot; Voice Agents

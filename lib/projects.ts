@@ -6,6 +6,60 @@ const GITHUB_BASE =
 export const projects: Project[] = [
   // ─── FEATURED ─────────────────────────────────────────
   {
+    slug: "debate-arena",
+    title: "The Agora — AI Debate Arena",
+    description:
+      "Socrates vs Aristotle debate any topic with expressive AI voices, scoring, and audience voting.",
+    longDescription:
+      "Socrates argues FOR and Aristotle argues AGAINST any modern topic with AI-generated voices powered by Lightning TTS v3.2 WebSocket streaming. Each philosopher has a distinct voice with expressive parameters (emotion, pitch, volume, prosody) predicted by the LLM each round. Features philosophical and roast battle modes, escalating arguments, and an ancient Athenian judge.",
+    category: "text-to-speech",
+    tags: ["debate", "expressive", "websocket", "next.js", "interactive"],
+    difficulty: "advanced",
+    status: "demo",
+    featured: true,
+    cookbookPath: "text-to-speech/debate-arena",
+    githubUrl: `${GITHUB_BASE}/text-to-speech/debate-arena`,
+    demoUrl: "https://debate-arena-smallest-tts.vercel.app",
+    thumbnailUrl: "/thumbnails/debate-arena.png",
+    techStack: ["Next.js", "Lightning TTS v3.2", "OpenAI GPT-4o-mini", "WebSocket"],
+    apiProducts: ["lightning-tts"],
+    features: [
+      "Socrates vs Aristotle AI debate",
+      "Expressive v3.2 WebSocket TTS streaming",
+      "Two modes: Philosophical and Roast Battle",
+      "LLM-predicted voice parameters per round",
+      "Ancient Athenian judge scoring",
+      "Audience voting system",
+      "Deploy to Vercel in one click",
+    ],
+  },
+  {
+    slug: "calendar-receptionist",
+    title: "Calendar Receptionist",
+    description:
+      "Voice receptionist that schedules meetings via phone with Google Calendar integration.",
+    longDescription:
+      "A voice receptionist that schedules meetings via phone. Callers speak to an Atoms agent, which checks Google Calendar availability and books meetings through webhook APIs. Includes a React web client with the Atoms widget and one-command agent duplication.",
+    category: "voice-agents",
+    tags: ["calendar", "scheduling", "google-calendar", "webhooks", "react"],
+    difficulty: "intermediate",
+    status: "demo",
+    featured: true,
+    cookbookPath: "voice-agents/calendar_receptionist",
+    githubUrl: `${GITHUB_BASE}/voice-agents/calendar_receptionist`,
+    thumbnailUrl: "/thumbnails/calendar-receptionist.png",
+    techStack: ["Node.js", "React", "Atoms SDK", "Google Calendar API"],
+    apiProducts: ["atoms"],
+    features: [
+      "Google Calendar live availability",
+      "Voice-driven meeting booking",
+      "React web client with Atoms widget",
+      "One-command agent duplication",
+      "Webhook APIs for availability and booking",
+      "Optional email confirmations",
+    ],
+  },
+  {
     slug: "jarvis-voice-assistant",
     title: "Jarvis Voice Assistant",
     description:
@@ -19,6 +73,7 @@ export const projects: Project[] = [
     featured: true,
     cookbookPath: "speech-to-text/websocket/jarvis",
     githubUrl: `${GITHUB_BASE}/speech-to-text/websocket/jarvis`,
+    thumbnailUrl: "/thumbnails/jarvis.png",
     techStack: ["Python", "WebSocket", "Groq", "Lightning TTS"],
     apiProducts: ["pulse-stt", "lightning-tts"],
     features: [
@@ -44,7 +99,7 @@ export const projects: Project[] = [
     featured: true,
     cookbookPath: "speech-to-text/emotion-analyzer",
     githubUrl: `${GITHUB_BASE}/speech-to-text/emotion-analyzer`,
-    // gifUrl available when demo is deployed
+    thumbnailUrl: "/thumbnails/emotion.png",
     techStack: ["Python", "Flask", "JavaScript", "Chart.js"],
     apiProducts: ["pulse-stt"],
     features: [
@@ -69,7 +124,7 @@ export const projects: Project[] = [
     cookbookPath: "voice-agents/atoms_sdk_web_agent",
     githubUrl: `${GITHUB_BASE}/voice-agents/atoms_sdk_web_agent`,
     demoUrl: "https://agent-smallest-ai.vercel.app",
-    thumbnailUrl: "/thumbnails/voice-agent-dashboard.jpg",
+    thumbnailUrl: "/thumbnails/multi-agent.png",
     techStack: ["Next.js", "TypeScript", "Atoms SDK", "Tailwind CSS"],
     apiProducts: ["atoms"],
     features: [
@@ -98,6 +153,7 @@ export const projects: Project[] = [
     featured: true,
     cookbookPath: "voice-agents/bank_csr",
     githubUrl: `${GITHUB_BASE}/voice-agents/bank_csr`,
+    thumbnailUrl: "/thumbnails/banking.png",
     techStack: ["Python", "Atoms SDK", "SQLite", "Loguru"],
     apiProducts: ["atoms"],
     features: [
@@ -152,6 +208,7 @@ export const projects: Project[] = [
     featured: true,
     cookbookPath: "text-to-speech/multi-voice-showcase",
     githubUrl: `${GITHUB_BASE}/text-to-speech/multi-voice-showcase`,
+    thumbnailUrl: "/thumbnails/multi-voice.png",
     techStack: ["Python", "Smallest SDK", "asyncio"],
     apiProducts: ["lightning-tts"],
     features: [
@@ -183,7 +240,7 @@ export const projects: Project[] = [
     featured: true,
     cookbookPath: "text-to-speech/getting-started",
     githubUrl: `${GITHUB_BASE}/text-to-speech/getting-started`,
-    thumbnailUrl: "/thumbnails/tts-playground.jpg",
+    thumbnailUrl: "/thumbnails/playground.png",
     techStack: ["Lightning v2", "90+ Voices", "16 Languages", "REST API"],
     apiProducts: ["lightning-tts"],
     features: [
@@ -412,6 +469,7 @@ export const projects: Project[] = [
     featured: true,
     cookbookPath: "voice-agents/agent_with_tools",
     githubUrl: `${GITHUB_BASE}/voice-agents/agent_with_tools`,
+    thumbnailUrl: "/thumbnails/tools.png",
     techStack: ["Python", "Atoms SDK"],
     apiProducts: ["atoms"],
     features: [
@@ -637,6 +695,128 @@ export const projects: Project[] = [
       "Voice-driven form filling",
       "Dynamic question flow",
       "Automatic form submission",
+    ],
+  },
+  // ─── TEXT-TO-SPEECH (additional) ───────────────────
+  {
+    slug: "audiobook-generator",
+    title: "Audiobook Generator",
+    description:
+      "Convert any text file into a narrated audiobook — splits into chapters and combines into a single file.",
+    category: "text-to-speech",
+    tags: ["audiobook", "chapters", "narration", "batch"],
+    difficulty: "beginner",
+    status: "code-only",
+    cookbookPath: "text-to-speech/audiobook-generator",
+    githubUrl: `${GITHUB_BASE}/text-to-speech/audiobook-generator`,
+    techStack: ["Python", "Smallest SDK"],
+    apiProducts: ["lightning-tts"],
+    features: [
+      "Text file to audiobook conversion",
+      "Automatic chapter splitting",
+      "Audio file concatenation",
+      "Configurable voice and speed",
+    ],
+  },
+  {
+    slug: "expressive-tts",
+    title: "Expressive TTS (v3.2)",
+    description:
+      "Control emotion, pitch, volume, rate, and accent — make the same voice sound happy, angry, or sarcastic.",
+    category: "text-to-speech",
+    tags: ["expressive", "emotion", "v3.2", "pitch", "accent"],
+    difficulty: "intermediate",
+    status: "code-only",
+    cookbookPath: "text-to-speech/expressive-tts",
+    githubUrl: `${GITHUB_BASE}/text-to-speech/expressive-tts`,
+    techStack: ["Python", "Lightning TTS v3.2", "WebSocket"],
+    apiProducts: ["lightning-tts"],
+    features: [
+      "Emotion control (happy, angry, sad, sarcastic)",
+      "Pitch and volume adjustment",
+      "Speaking rate control",
+      "Accent customization",
+      "WebSocket streaming",
+    ],
+  },
+  {
+    slug: "multilingual-translator",
+    title: "Multilingual Translator",
+    description:
+      "Type text and hear it spoken in multiple languages side by side — compare voices and accents.",
+    category: "text-to-speech",
+    tags: ["multilingual", "translation", "comparison", "languages"],
+    difficulty: "beginner",
+    status: "code-only",
+    cookbookPath: "text-to-speech/multilingual-translator",
+    githubUrl: `${GITHUB_BASE}/text-to-speech/multilingual-translator`,
+    techStack: ["Python", "Smallest SDK"],
+    apiProducts: ["lightning-tts"],
+    features: [
+      "Multi-language speech generation",
+      "Side-by-side voice comparison",
+      "Multiple accent support",
+      "Batch audio generation",
+    ],
+  },
+  {
+    slug: "podcast-generator",
+    title: "Podcast Generator",
+    description:
+      "Give it a topic and get a full AI-generated podcast with two hosts having a natural conversation.",
+    category: "text-to-speech",
+    tags: ["podcast", "ai-generated", "two-hosts", "conversation"],
+    difficulty: "intermediate",
+    status: "code-only",
+    cookbookPath: "text-to-speech/podcast-generator",
+    githubUrl: `${GITHUB_BASE}/text-to-speech/podcast-generator`,
+    techStack: ["Python", "Smallest SDK", "LLM"],
+    apiProducts: ["lightning-tts"],
+    features: [
+      "AI-generated podcast scripts",
+      "Two-host natural conversation",
+      "Topic-based generation",
+      "Full audio output",
+    ],
+  },
+  {
+    slug: "voice-gallery-app",
+    title: "Voice Gallery Web App",
+    description:
+      "Browse, filter, and preview all Smallest AI voices — type any text, pick a voice, hear it instantly.",
+    category: "text-to-speech",
+    tags: ["gallery", "voices", "web-app", "vercel", "preview"],
+    difficulty: "beginner",
+    status: "demo",
+    cookbookPath: "text-to-speech/voice-gallery-app",
+    githubUrl: `${GITHUB_BASE}/text-to-speech/voice-gallery-app`,
+    techStack: ["Next.js", "Smallest SDK", "Vercel"],
+    apiProducts: ["lightning-tts"],
+    features: [
+      "Browse all Smallest AI voices",
+      "Filter by language and style",
+      "Live voice preview",
+      "Deploy to Vercel in 30 seconds",
+    ],
+  },
+  {
+    slug: "voice-chinese-whispers",
+    title: "Voice Chinese Whispers",
+    description:
+      "A viral voice AI demo — the same sentence spoken by characters with wildly different emotions and accents.",
+    category: "text-to-speech",
+    tags: ["viral", "social-media", "emotions", "accents", "fun"],
+    difficulty: "beginner",
+    status: "code-only",
+    cookbookPath: "text-to-speech/voice-chinese-whispers",
+    githubUrl: `${GITHUB_BASE}/text-to-speech/voice-chinese-whispers`,
+    techStack: ["Python", "Smallest SDK"],
+    apiProducts: ["lightning-tts"],
+    features: [
+      "Same sentence, different character styles",
+      "Multiple emotions and accents",
+      "Social media shareable output",
+      "Customizable character pipeline",
     ],
   },
 ];
