@@ -347,7 +347,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                 Source Code
               </a>
               <a
-                href="https://docs.smallest.ai"
+                href="https://docs.smallest.ai?utm_source=showcase&utm_medium=project_sidebar&utm_campaign=docs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -356,7 +356,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                 API Documentation
               </a>
               <a
-                href="https://app.smallest.ai/dashboard/settings/apikeys"
+                href="https://app.smallest.ai/dashboard/settings/apikeys?utm_source=showcase&utm_medium=project_sidebar&utm_campaign=get-api-key"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"

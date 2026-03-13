@@ -273,7 +273,7 @@ export function TryTTS({ projectSlug }: { projectSlug: string }) {
         <p className="mt-2 text-[10px] text-muted-foreground">
           Get your API key at{" "}
           <a
-            href="https://app.smallest.ai/dashboard/settings/apikeys"
+            href="https://app.smallest.ai/dashboard/settings/apikeys?utm_source=showcase&utm_medium=tts_playground&utm_campaign=get-api-key"
             target="_blank"
             rel="noopener noreferrer"
             className="text-teal hover:underline"

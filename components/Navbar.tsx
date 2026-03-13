@@ -62,7 +62,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-1">
           <a
-            href="https://github.com/smallest-inc/cookbook"
+            href="https://github.com/smallest-inc/cookbook?utm_source=showcase&utm_medium=navbar&utm_campaign=github"
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-lg p-2 text-muted-foreground hover:text-foreground transition-colors"

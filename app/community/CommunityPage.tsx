@@ -46,7 +46,7 @@ export function CommunityPage() {
             <p className="text-sm text-muted-foreground">
               Fork the{" "}
               <a
-                href="https://github.com/smallest-inc/cookbook"
+                href="https://github.com/smallest-inc/cookbook?utm_source=showcase&utm_medium=community&utm_campaign=fork-repo"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-teal hover:underline"
@@ -80,7 +80,7 @@ export function CommunityPage() {
         </div>
         <div className="mt-6">
           <a
-            href="https://github.com/smallest-inc/cookbook/fork"
+            href="https://github.com/smallest-inc/cookbook/fork?utm_source=showcase&utm_medium=community&utm_campaign=submit-project"
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackSubmitProjectClick("community_page")}
