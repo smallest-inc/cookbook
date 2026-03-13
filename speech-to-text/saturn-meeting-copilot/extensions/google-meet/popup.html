@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saturn</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        width: 280px;
+        background: #09090b;
+        color: #fff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 13px;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 16px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #7c3aed, #4f46e5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .header-text h1 {
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .header-text p {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.35);
+        margin-top: 1px;
+      }
+
+      .body {
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .status-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 10px;
+        padding: 10px 12px;
+      }
+
+      .status-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 12px;
+      }
+
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #6b7280;
+        flex-shrink: 0;
+      }
+
+      .dot.connected {
+        background: #34d399;
+        box-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+        animation: pulse 2s infinite;
+      }
+
+      .dot.captions {
+        background: #818cf8;
+        box-shadow: 0 0 6px rgba(129, 140, 248, 0.5);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+      }
+
+      /* Toggle switch */
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2px 0;
+      }
+
+      .toggle-row span {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .toggle {
+        position: relative;
+        width: 36px;
+        height: 20px;
+        cursor: pointer;
+      }
+
+      .toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+      }
+
+      .slider {
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        transition: background 0.2s;
+      }
+
+      .slider::before {
+        content: "";
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        left: 3px;
+        top: 3px;
+        background: #fff;
+        border-radius: 50%;
+        transition: transform 0.2s;
+      }
+
+      .toggle input:checked + .slider {
+        background: #7c3aed;
+      }
+
+      .toggle input:checked + .slider::before {
+        transform: translateX(16px);
+      }
+
+      .hint {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.25);
+        line-height: 1.5;
+        padding: 2px 0 0;
+      }
+
+      .hint strong {
+        color: rgba(255, 255, 255, 0.45);
+        font-weight: 500;
+      }
+
+      .divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.06);
+        margin: 0 -16px;
+      }
+
+      .btn-row {
+        display: flex;
+        gap: 8px;
+      }
+
+      .open-saturn {
+        flex: 1;
+        padding: 9px;
+        background: rgba(124, 58, 237, 0.15);
+        border: 1px solid rgba(124, 58, 237, 0.3);
+        border-radius: 8px;
+        color: #a78bfa;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s;
+        text-align: center;
+      }
+
+      .open-saturn:hover {
+        background: rgba(124, 58, 237, 0.25);
+      }
+
+      .open-panel {
+        flex: 1;
+        padding: 9px;
+        background: rgba(52, 211, 153, 0.1);
+        border: 1px solid rgba(52, 211, 153, 0.25);
+        border-radius: 8px;
+        color: #34d399;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s;
+        text-align: center;
+      }
+
+      .open-panel:hover {
+        background: rgba(52, 211, 153, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo">⬡</div>
+      <div class="header-text">
+        <h1>Saturn</h1>
+        <p>Google Meet integration</p>
+      </div>
+    </div>
+
+    <div class="body">
+      <!-- Connection statuses -->
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div class="status-row">
+          <div class="status-label">
+            <div class="dot" id="dot-saturn"></div>
+            <span>Saturn app</span>
+          </div>
+          <span id="label-saturn" style="font-size:11px; color: rgba(255,255,255,0.3);">checking…</span>
+        </div>
+        <div class="status-row">
+          <div class="status-label">
+            <div class="dot" id="dot-captions"></div>
+            <span>Live captions</span>
+          </div>
+          <span id="label-captions" style="font-size:11px; color: rgba(255,255,255,0.3);">waiting for CC</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Enable toggle -->
+      <div class="toggle-row">
+        <span>Stream captions to Saturn</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-enabled" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <p class="hint">
+        Enable <strong>CC (captions)</strong> in Google Meet for streaming to work.
+        Then open Saturn and click <strong>Start Meeting (Google Meet)</strong>.
+      </p>
+
+      <div class="divider"></div>
+
+      <div class="btn-row">
+        <button class="open-panel" id="btn-panel">Side Panel ⊞</button>
+        <button class="open-saturn" id="btn-open">Open Tab ↗</button>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saturn</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #09090b; }
+
+      #frame { width: 100%; height: 100%; border: none; display: block; }
+
+      #offline {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        gap: 12px;
+        color: rgba(255,255,255,0.5);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 13px;
+        text-align: center;
+        padding: 24px;
+      }
+      #offline .icon { font-size: 32px; opacity: 0.4; }
+      #offline p { line-height: 1.6; }
+      #offline strong { color: rgba(255,255,255,0.75); }
+      #offline button {
+        margin-top: 8px;
+        padding: 8px 20px;
+        background: rgba(124,58,237,0.2);
+        border: 1px solid rgba(124,58,237,0.4);
+        border-radius: 8px;
+        color: #a78bfa;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="frame" src="http://localhost:3000" allow="microphone; autoplay"></iframe>
+    <div id="offline">
+      <div class="icon">⬡</div>
+      <p>Saturn is not running.<br/><strong>Start it with <code>npm run dev</code></strong><br/>then click Retry.</p>
+      <button onclick="retry()">Retry</button>
+    </div>
+    <script>
+      const frame = document.getElementById('frame');
+      const offline = document.getElementById('offline');
+
+      frame.addEventListener('error', () => {
+        frame.style.display = 'none';
+        offline.style.display = 'flex';
+      });
+
+      function retry() {
+        offline.style.display = 'none';
+        frame.style.display = 'block';
+        frame.src = 'http://localhost:3000?' + Date.now();
+      }
+    </script>
+  </body>
+</html>
