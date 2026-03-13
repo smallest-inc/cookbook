@@ -110,12 +110,20 @@ function Footer() {
               Atoms Platform
             </a>
             <a
-              href={`https://docs.smallest.ai?${UTM}`}
+              href={`https://waves-docs.smallest.ai?${UTM}`}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"
             >
-              Docs
+              Waves Docs
+            </a>
+            <a
+              href={`https://atoms-docs.smallest.ai?${UTM}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors"
+            >
+              Atoms Docs
             </a>
             <a
               href={`https://github.com/smallest-inc/cookbook?${UTM}`}

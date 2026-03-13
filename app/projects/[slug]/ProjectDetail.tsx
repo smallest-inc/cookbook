@@ -347,13 +347,22 @@ export function ProjectDetail({ project }: { project: Project }) {
                 Source Code
               </a>
               <a
-                href="https://docs.smallest.ai?utm_source=showcase&utm_medium=project_sidebar&utm_campaign=docs"
+                href="https://waves-docs.smallest.ai?utm_source=showcase&utm_medium=project_sidebar&utm_campaign=docs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
-                API Documentation
+                Waves API Docs
+              </a>
+              <a
+                href="https://atoms-docs.smallest.ai?utm_source=showcase&utm_medium=project_sidebar&utm_campaign=docs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Atoms Agent Docs
               </a>
               <a
                 href="https://app.smallest.ai/dashboard/settings/apikeys?utm_source=showcase&utm_medium=project_sidebar&utm_campaign=get-api-key"
