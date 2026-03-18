@@ -36,23 +36,23 @@ export function MeetingSummaryModal({ isOpen, onClose }: Props) {
             transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
             className="fixed inset-0 z-50 flex items-center justify-center p-6"
           >
-            <div className="w-full max-w-2xl bg-zinc-950 border border-slate-200 rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+            <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
               {/* Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
                 <div>
                   <h2 className="text-base font-semibold text-slate-900">{summary.title}</h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Duration: {summary.duration}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-slate-600 text-xs transition-all">
+                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-800 text-xs transition-all">
                     <Download className="w-3.5 h-3.5" />
                     Export
                   </button>
                   <button
                     onClick={onClose}
-                    className="p-2 rounded-lg hover:bg-white/[0.06] text-slate-400 hover:text-slate-500 transition-all"
+                    className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-all"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -82,40 +82,48 @@ export function MeetingSummaryModal({ isOpen, onClose }: Props) {
 
                 {/* Key decisions */}
                 <Section icon={<CheckSquare className="w-4 h-4 text-emerald-400" />} title="Key Decisions">
-                  <ul className="space-y-2">
-                    {summary.decisions.map((decision, i) => (
-                      <motion.li
-                        key={i}
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="flex gap-2.5"
-                      >
-                        <div className="w-1 h-1 rounded-full bg-emerald-400 mt-2 flex-shrink-0" />
-                        <span className="text-sm text-slate-600">{decision}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
+                  {summary.decisions.length === 0 ? (
+                    <p className="text-sm text-slate-400 italic">No decisions recorded.</p>
+                  ) : (
+                    <ul className="space-y-2">
+                      {summary.decisions.map((decision, i) => (
+                        <motion.li
+                          key={i}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className="flex gap-2.5"
+                        >
+                          <div className="w-1 h-1 rounded-full bg-emerald-400 mt-2 flex-shrink-0" />
+                          <span className="text-sm text-slate-700">{decision}</span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  )}
                 </Section>
 
                 {/* Action items */}
                 <Section icon={<CheckSquare className="w-4 h-4 text-blue-400" />} title="Action Items">
-                  <div className="space-y-2">
-                    {actionItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200"
-                      >
-                        <div className="w-4 h-4 rounded border border-white/20 flex-shrink-0" />
-                        <span className="text-sm text-slate-600 flex-1">{item.text}</span>
-                        {item.assignee && (
-                          <span className="text-xs text-slate-400 bg-white px-2 py-0.5 rounded-full">
-                            {item.assignee}
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                  {actionItems.length === 0 ? (
+                    <p className="text-sm text-slate-400 italic">No action items recorded.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {actionItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200"
+                        >
+                          <div className="w-4 h-4 rounded border border-slate-300 flex-shrink-0" />
+                          <span className="text-sm text-slate-700 flex-1">{item.text}</span>
+                          {item.assignee && (
+                            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                              {item.assignee}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </Section>
               </div>
             </div>
@@ -139,7 +147,7 @@ function Section({
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         {icon}
-        <h3 className="text-sm font-semibold text-slate-700">{title}</h3>
+        <h3 className="text-sm font-semibold text-slate-800">{title}</h3>
       </div>
       {children}
     </div>

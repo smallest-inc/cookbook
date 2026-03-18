@@ -146,7 +146,7 @@ export function useGoogleMeetTranscript() {
   useEffect(() => {
     if (status !== "listening") {
       stopRef.current = true;
-      audioCtxRef.current?.close();
+      if (audioCtxRef.current?.state !== "closed") audioCtxRef.current?.close();
       audioCtxRef.current = null;
       esRef.current?.close();
       esRef.current = null;
@@ -259,7 +259,7 @@ registerProcessor('saturn-pcm-collector', PCMCollector);
       worklet.disconnect();
       source.disconnect();
       stream.getTracks().forEach((t) => t.stop());
-      await audioCtx.close();
+      if (audioCtx.state !== "closed") await audioCtx.close();
       setSttStatus("idle");
     }
 
@@ -267,7 +267,7 @@ registerProcessor('saturn-pcm-collector', PCMCollector);
 
     return () => {
       stopRef.current = true;
-      audioCtxRef.current?.close();
+      if (audioCtxRef.current?.state !== "closed") audioCtxRef.current?.close();
       audioCtxRef.current = null;
       esRef.current?.close();
       esRef.current = null;
