@@ -1,6 +1,6 @@
 /**
  * POST /api/research
- * Runs a research job: searches Exa and summarizes with OpenAI.
+ * Runs a research job: searches Exa and summarizes with Claude.
  *
  * Body: { query: string, segmentId?: string }
  * Returns: Insight object
@@ -15,7 +15,7 @@ const anthropic = new Anthropic();
 async function summarizeWithClaude(query: string, snippets: string[]): Promise<string[]> {
   const context = snippets.join("\n\n---\n\n");
   const message = await anthropic.messages.create({
-    model: "claude-opus-4-6",
+    model: "claude-sonnet-4-20250514",
     max_tokens: 256,
     messages: [
       {

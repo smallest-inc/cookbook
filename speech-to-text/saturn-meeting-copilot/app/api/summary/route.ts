@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const now = new Date().toLocaleTimeString("en-US", { hour12: false });
 
     const message = await anthropic.messages.create({
-      model: "claude-opus-4-6",
+      model: "claude-sonnet-4-20250514",
       max_tokens: 1024,
       messages: [
         {

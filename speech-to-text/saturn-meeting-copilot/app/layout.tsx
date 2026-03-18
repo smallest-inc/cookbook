@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Saturn — Saturn for Meetings",
+  title: "Saturn — AI Meeting Intelligence",
   description: "Real-time AI meeting copilot with live transcription, web research, and voice insights",
 };
 

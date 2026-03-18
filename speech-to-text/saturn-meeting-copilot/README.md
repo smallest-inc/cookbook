@@ -137,3 +137,9 @@ Saturn/
 - Node.js 18+
 - Chrome (for the extension)
 - Microphone access
+
+---
+
+## Production Notes
+
+This demo uses open CORS and no auth on API routes (required for the Chrome extension on localhost). For production, add authentication, restrict CORS origins, and update `SATURN_URL` in the extension.
