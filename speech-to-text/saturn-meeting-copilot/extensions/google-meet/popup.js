@@ -1,4 +1,4 @@
-const SATURN_URL = "http://localhost:3000";
+let SATURN_URL = "http://localhost:3000";
 
 const dotSaturn = document.getElementById("dot-saturn");
 const labelSaturn = document.getElementById("label-saturn");
@@ -79,9 +79,32 @@ btnPanel.addEventListener("click", () => {
   });
 });
 
+// ─── Saturn URL + token config ────────────────────────────────────────────────
+
+const urlInput = document.getElementById("saturn-url-input");
+const tokenInput = document.getElementById("saturn-token-input");
+
+chrome.storage.local.get(["saturn_url", "saturn_token"], (res) => {
+  SATURN_URL = res.saturn_url || "http://localhost:3000";
+  if (urlInput) urlInput.value = SATURN_URL;
+  if (tokenInput) tokenInput.value = res.saturn_token || "";
+  checkSaturn();
+});
+
+urlInput?.addEventListener("change", () => {
+  const val = urlInput.value.trim().replace(/\/$/, "");
+  if (val) {
+    SATURN_URL = val;
+    chrome.storage.local.set({ saturn_url: val });
+  }
+});
+
+tokenInput?.addEventListener("change", () => {
+  chrome.storage.local.set({ saturn_token: tokenInput.value.trim() });
+});
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
-checkSaturn();
 checkCaptions();
 setInterval(checkSaturn, 5000);
 setInterval(checkCaptions, 3000);

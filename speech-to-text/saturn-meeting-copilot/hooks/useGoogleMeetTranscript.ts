@@ -12,35 +12,12 @@
 
 import { useEffect, useRef } from "react";
 import { useMeetingStore } from "@/store/meetingStore";
+import { makeSegment } from "@/lib/segment";
 import type { TranscriptSegment, SttStatus } from "@/types";
 
 const SAMPLE_RATE = 16_000;      // Hz — optimal for STT
 const CHUNK_SECONDS = 5;         // seconds of audio per request
 const SILENCE_RMS = 0.002;       // skip chunks that are nearly silent
-
-const SPEAKER_COLORS = ["#818cf8", "#34d399", "#fb923c", "#f472b6", "#38bdf8", "#a3e635"];
-
-// ── Helpers ────────────────────────────────────────────────────────────────
-
-function speakerColor(speaker: string): string {
-  let hash = 0;
-  for (let i = 0; i < speaker.length; i++) hash = speaker.charCodeAt(i) + ((hash << 5) - hash);
-  return SPEAKER_COLORS[Math.abs(hash) % SPEAKER_COLORS.length];
-}
-
-function makeSegment(text: string, rawSpeaker?: string): TranscriptSegment {
-  const speaker = rawSpeaker ?? "You";
-  return {
-    id: `seg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-    speaker,
-    speakerColor: speakerColor(speaker),
-    text: text.trim(),
-    timestamp: new Date().toLocaleTimeString("en-US", { hour12: false }),
-    isQuestion: text.trimEnd().endsWith("?"),
-    isHighlighted: false,
-    words: [],
-  };
-}
 
 // ── WAV encoder (16-bit PCM mono) ──────────────────────────────────────────
 
@@ -83,7 +60,8 @@ function startWebSpeechFallback(
   addSegment: (s: TranscriptSegment) => void,
   mkSeg: (text: string, speaker?: string) => TranscriptSegment,
   setStatus: (s: SttStatus, e?: string | null) => void,
-  stopRef: { current: boolean }
+  stopRef: { current: boolean },
+  recRef: { current: unknown }
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Ctor = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
@@ -105,6 +83,7 @@ function startWebSpeechFallback(
   };
   rec.onend = () => { if (!stopRef.current) try { rec.start(); } catch { /* already running */ } };
   rec.start();
+  recRef.current = rec;
   setStatus("listening");
 }
 
@@ -115,12 +94,17 @@ export function useGoogleMeetTranscript() {
   const stopRef = useRef(false);
   const esRef = useRef<EventSource | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const webSpeechRef = useRef<unknown>(null);
 
   // ── Always-on SSE: auto-start meeting when extension sends first segment ──
   // This runs regardless of meeting status so the Chrome extension can drive
   // Saturn without the user manually pressing "Start Meeting".
   useEffect(() => {
     const es = new EventSource("/api/transcript/stream");
+
+    es.onerror = () => {
+      console.warn("[Saturn] SSE connection lost, will reconnect…");
+    };
 
     es.onmessage = (e) => {
       if (!e.data || e.data === "{}") return;
@@ -224,7 +208,7 @@ registerProcessor('saturn-pcm-collector', PCMCollector);
             const msg: string = body?.error ?? `STT error ${res.status}`;
             // 402/403 = no STT credits — fall back to Web Speech API silently
             if (res.status === 402 || res.status === 403) {
-              startWebSpeechFallback(addTranscriptSegment, makeSegment, setSttStatus, stopRef);
+              startWebSpeechFallback(addTranscriptSegment, makeSegment, setSttStatus, stopRef, webSpeechRef);
               return;
             }
             // 503 = Smallest.ai temporarily down — skip chunk, keep trying
@@ -236,9 +220,13 @@ registerProcessor('saturn-pcm-collector', PCMCollector);
             return;
           }
 
-          const { fullText, segments } = await res.json();
-          if (fullText?.trim()) {
-            addTranscriptSegment(makeSegment(fullText, segments?.[0]?.speaker));
+          const { segments } = await res.json();
+          // Push one transcript entry per diarized utterance.
+          // Fall back to "You" if no speaker label (mic-only capture is always the local user).
+          for (const seg of (segments ?? [])) {
+            if (seg.text?.trim()) {
+              addTranscriptSegment(makeSegment(seg.text, seg.speaker ?? "You"));
+            }
           }
         } catch (err) {
           console.warn("[Saturn] STT chunk error:", err);
@@ -271,6 +259,9 @@ registerProcessor('saturn-pcm-collector', PCMCollector);
       audioCtxRef.current = null;
       esRef.current?.close();
       esRef.current = null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (webSpeechRef.current as any)?.abort();
+      webSpeechRef.current = null;
       setSttStatus("idle");
     };
   }, [status, addTranscriptSegment, setSttStatus]);

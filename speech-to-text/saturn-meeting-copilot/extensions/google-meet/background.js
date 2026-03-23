@@ -14,6 +14,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "GET_STREAM_ID") {
     // Returns a stream ID the content script can use with getUserMedia
     // to capture the tab's audio output (all remote participants' voices)
+    if (!sender.tab?.id) {
+      sendResponse({ error: "No tab context" });
+      return true;
+    }
     chrome.tabCapture.getMediaStreamId(
       { targetTabId: sender.tab.id },
       (streamId) => {

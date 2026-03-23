@@ -37,6 +37,10 @@ export interface ActionItem {
   id: string;
   text: string;
   assignee?: string;
+  priority: "high" | "medium" | "low";
+  deadline?: string;
+  context?: string;
+  steps?: string[];
   detectedAt: string;
   status: "open" | "done";
 }

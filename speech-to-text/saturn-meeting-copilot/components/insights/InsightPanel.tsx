@@ -256,7 +256,7 @@ function InsightCard({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 + i * 0.05 }}
-                    href={source.url}
+                    href={/^https?:\/\//i.test(source.url) ? source.url : "#"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 p-3 rounded-xl bg-white/70 backdrop-blur-md border border-slate-200/60 shadow-sm shadow-slate-200/30 hover:bg-white hover:border-slate-300 hover:shadow-md transition-all group"

@@ -34,7 +34,14 @@ export async function POST(req: NextRequest) {
   "summary": "<2-4 sentence prose summary of what the meeting covered>",
   "decisions": ["<decision 1>", "<decision 2>"],
   "actionItems": [
-    { "text": "<what needs to be done>", "assignee": "<name or null>" }
+    {
+      "text": "<what needs to be done — specific and actionable>",
+      "assignee": "<name or null>",
+      "priority": "<high|medium|low>",
+      "deadline": "<deadline if mentioned, e.g. 'by Friday' or 'next sprint', else null>",
+      "context": "<one sentence explaining why this task matters based on the meeting>",
+      "steps": ["<step 1>", "<step 2>", "<step 3>"]
+    }
   ],
   "topics": ["<topic 1>", "<topic 2>", "<topic 3>"]
 }
@@ -42,7 +49,10 @@ export async function POST(req: NextRequest) {
 Rules:
 - summary: concise narrative, past tense, max 4 sentences
 - decisions: things agreed/decided/confirmed, max 6. If none, return []
-- actionItems: concrete follow-up tasks, include owner if mentioned, max 8. If none, return []
+- actionItems: concrete follow-up tasks, max 8. If none, return []
+  - priority: "high" if blocking/urgent, "medium" if important but not blocking, "low" otherwise
+  - steps: 2-4 concrete sub-steps needed to complete the task (infer from transcript context)
+  - context: ground the task in what was actually discussed
 - topics: 3-5 key subjects discussed, 1-3 words each
 - Return ONLY valid JSON — no markdown fences, no explanation
 
@@ -67,10 +77,21 @@ ${transcript.slice(0, 14000)}`,
     const parsed = JSON.parse(json);
 
     const actionItems: ActionItem[] = (parsed.actionItems ?? []).map(
-      (item: { text: string; assignee?: string | null }, i: number) => ({
+      (item: {
+        text: string;
+        assignee?: string | null;
+        priority?: string;
+        deadline?: string | null;
+        context?: string;
+        steps?: string[];
+      }, i: number) => ({
         id: `action-${Date.now()}-${i}`,
         text: item.text,
         assignee: item.assignee ?? undefined,
+        priority: (["high", "medium", "low"].includes(item.priority ?? "") ? item.priority : "medium") as ActionItem["priority"],
+        deadline: item.deadline ?? undefined,
+        context: item.context ?? undefined,
+        steps: item.steps?.filter((s) => typeof s === "string" && s.trim()) ?? undefined,
         detectedAt: now,
         status: "open" as const,
       })

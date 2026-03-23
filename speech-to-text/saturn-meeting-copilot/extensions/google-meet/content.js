@@ -15,8 +15,14 @@
  * while audio mode is running.
  */
 
-const SATURN_URL = "http://localhost:3000";
+let SATURN_URL = "http://localhost:3000";
+let SATURN_TOKEN = "";
 const CHUNK_MS = 5000;
+
+chrome.storage.local.get(["saturn_url", "saturn_token"], (res) => {
+  if (res.saturn_url) SATURN_URL = res.saturn_url;
+  if (res.saturn_token) SATURN_TOKEN = res.saturn_token;
+});
 
 let isCapturing = false;
 let captureMode = null; // 'caption' | 'audio'
@@ -318,20 +324,26 @@ async function transcribeAndPush(blob) {
     return;
   }
 
-  const { fullText, segments } = await res.json();
-  if (!fullText?.trim()) return;
+  const { segments } = await res.json();
+  if (!segments?.length) return;
 
-  const speaker = segments?.[0]?.speaker ?? "You";
-  await pushText(fullText, speaker);
+  // Push each diarized utterance separately so each speaker gets their own row
+  for (const seg of segments) {
+    if (seg.text?.trim()) {
+      await pushText(seg.text, seg.speaker ?? "You");
+    }
+  }
 }
 
 // ─── Push to Saturn ───────────────────────────────────────────────────────────
 
 async function pushText(text, speaker = "You") {
   try {
+    const headers = { "Content-Type": "application/json" };
+    if (SATURN_TOKEN) headers["x-saturn-token"] = SATURN_TOKEN;
     await fetch(`${SATURN_URL}/api/transcript/push`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({
         text,
         segments: [{ speaker, startTime: 0, endTime: 0, confidence: 0.95 }],

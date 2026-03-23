@@ -169,6 +169,34 @@
         font-weight: 500;
       }
 
+      .config-row {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .config-row label {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 500;
+      }
+
+      .config-row input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+        font-family: inherit;
+        padding: 6px 8px;
+        outline: none;
+        width: 100%;
+      }
+
+      .config-row input:focus {
+        border-color: rgba(124, 58, 237, 0.5);
+      }
+
       .divider {
         height: 1px;
         background: rgba(255, 255, 255, 0.06);
@@ -243,6 +271,18 @@
           </div>
           <span id="label-captions" style="font-size:11px; color: rgba(255,255,255,0.3);">waiting for CC</span>
         </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Saturn URL + token config -->
+      <div class="config-row">
+        <label for="saturn-url-input">Saturn URL</label>
+        <input id="saturn-url-input" type="url" placeholder="http://localhost:3000" />
+      </div>
+      <div class="config-row">
+        <label for="saturn-token-input">Push token (optional)</label>
+        <input id="saturn-token-input" type="password" placeholder="SATURN_PUSH_TOKEN" />
       </div>
 
       <div class="divider"></div>

@@ -107,21 +107,60 @@ export function MeetingSummaryModal({ isOpen, onClose }: Props) {
                   {actionItems.length === 0 ? (
                     <p className="text-sm text-slate-400 italic">No action items recorded.</p>
                   ) : (
-                    <div className="space-y-2">
-                      {actionItems.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200"
-                        >
-                          <div className="w-4 h-4 rounded border border-slate-300 flex-shrink-0" />
-                          <span className="text-sm text-slate-700 flex-1">{item.text}</span>
-                          {item.assignee && (
-                            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-                              {item.assignee}
-                            </span>
-                          )}
-                        </div>
-                      ))}
+                    <div className="space-y-3">
+                      {actionItems.map((item) => {
+                        const priorityStyles = {
+                          high: "bg-red-50 text-red-600 border-red-200",
+                          medium: "bg-amber-50 text-amber-600 border-amber-200",
+                          low: "bg-slate-50 text-slate-500 border-slate-200",
+                        };
+                        return (
+                          <div
+                            key={item.id}
+                            className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5"
+                          >
+                            {/* Title row */}
+                            <div className="flex items-start gap-3">
+                              <div className="w-4 h-4 rounded border border-slate-300 flex-shrink-0 mt-0.5" />
+                              <span className="text-sm font-medium text-slate-800 flex-1">{item.text}</span>
+                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border flex-shrink-0 uppercase tracking-wide ${priorityStyles[item.priority ?? "medium"]}`}>
+                                {item.priority ?? "medium"}
+                              </span>
+                            </div>
+
+                            {/* Context */}
+                            {item.context && (
+                              <p className="text-xs text-slate-500 leading-relaxed pl-7">{item.context}</p>
+                            )}
+
+                            {/* Steps */}
+                            {item.steps && item.steps.length > 0 && (
+                              <ol className="pl-7 space-y-1">
+                                {item.steps.map((step, i) => (
+                                  <li key={i} className="flex gap-2 text-xs text-slate-600">
+                                    <span className="text-slate-400 flex-shrink-0 font-mono">{i + 1}.</span>
+                                    {step}
+                                  </li>
+                                ))}
+                              </ol>
+                            )}
+
+                            {/* Footer row: assignee + deadline */}
+                            {(item.assignee || item.deadline) && (
+                              <div className="flex items-center gap-2 pl-7">
+                                {item.assignee && (
+                                  <span className="text-xs text-slate-500 bg-white border border-slate-200 px-2 py-0.5 rounded-full">
+                                    {item.assignee}
+                                  </span>
+                                )}
+                                {item.deadline && (
+                                  <span className="text-xs text-slate-400">· {item.deadline}</span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </Section>
