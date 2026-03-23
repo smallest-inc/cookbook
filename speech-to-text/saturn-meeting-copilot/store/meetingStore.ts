@@ -20,6 +20,7 @@ interface MeetingActions {
   updateTranscriptSegment: (id: string, updates: Partial<TranscriptSegment>) => void;
   addInsight: (insight: Insight) => void;
   updateInsight: (id: string, updates: Partial<Insight>) => void;
+  removeInsight: (id: string) => void;
   setActiveInsight: (id: string | null) => void;
   addActionItem: (item: ActionItem) => void;
   updateActionItem: (id: string, updates: Partial<ActionItem>) => void;
@@ -97,6 +98,9 @@ export const useMeetingStore = create<MeetingState & MeetingActions>((set) => ({
         ins.id === id ? { ...ins, ...updates } : ins
       ),
     })),
+
+  removeInsight: (id) =>
+    set((state) => ({ insights: state.insights.filter((ins) => ins.id !== id) })),
 
   setActiveInsight: (id) => set({ activeInsightId: id }),
 

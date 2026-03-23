@@ -15,7 +15,6 @@
 
 import { useEffect, useRef } from "react";
 import { useMeetingStore } from "@/store/meetingStore";
-import { detectQuestion } from "@/services/researchAgent";
 import type { Insight } from "@/types";
 
 export function useExaBot() {
@@ -24,83 +23,89 @@ export function useExaBot() {
 
   // Track which segment IDs have already been processed
   const processedIds = useRef(new Set<string>());
+  // Track segment IDs that were part of a question window that already fired research
+  const questionWindowIds = useRef(new Set<string>());
 
   // Reset when meeting resets
   useEffect(() => {
     if (status === "idle") {
       processedIds.current.clear();
+      questionWindowIds.current.clear();
     }
   }, [status]);
+
+  // How many consecutive same-speaker segments to combine before question detection
+  const SPEAKER_WINDOW = 5;
 
   useEffect(() => {
     // Only run while the meeting is active
     if (status !== "listening" && status !== "paused") return;
 
-    // Find segments we haven't processed yet.
-    // Wait for a sentence-ending character so we have the full text before detecting questions.
     const newSegments = transcript.filter(
       (seg) =>
         !processedIds.current.has(seg.id) &&
-        seg.text.trim().length > 15
+        seg.text.trim().length > 5
     );
 
     for (const segment of newSegments) {
       // Mark immediately so concurrent renders don't double-process
       processedIds.current.add(segment.id);
 
+      const segIdx = transcript.indexOf(segment);
+
+      // Build a sliding window of the last SPEAKER_WINDOW segments from the same speaker
+      const window = transcript
+        .slice(0, segIdx + 1)
+        .filter((s) => s.speaker === segment.speaker)
+        .slice(-SPEAKER_WINDOW);
+
+      // Skip if any segment in this window already triggered a research job
+      if (window.some((s) => questionWindowIds.current.has(s.id))) continue;
+
+      const combinedText = window.map((s) => s.text).join(" ");
+
       (async () => {
-        const query = await detectQuestion(segment.text);
-        if (!query) return;
-
         const store = useMeetingStore.getState();
-
-        // Mark the transcript segment as a question
-        store.updateTranscriptSegment(segment.id, { isQuestion: true });
         store.incrementResearch();
-        store.updateCreditBalance(-2);
-
-        // Insert a placeholder insight while research runs
-        const insightId = `insight-bot-${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2)}`;
-
-        const topicPreview = query.charAt(0).toUpperCase() + query.slice(1);
-
-        store.addInsight({
-          id: insightId,
-          topic: topicPreview,
-          query,
-          bullets: [],
-          sources: [],
-          confidence: 0,
-          timestamp: new Date().toLocaleTimeString("en-US", { hour12: false }),
-          status: "researching",
-          triggerSegmentId: segment.id,
-        });
 
         try {
           const res = await fetch("/api/research", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query, segmentId: segment.id }),
+            body: JSON.stringify({ text: combinedText, segmentId: segment.id }),
           });
 
           if (!res.ok) throw new Error(`Research API ${res.status}`);
 
-          const { insight } = (await res.json()) as { insight: Insight };
+          const body = await res.json();
 
-          store.updateInsight(insightId, {
+          if (body.skip) return;
+
+          const { insight } = body as { insight: Insight };
+
+          // Mark window only after confirmed research — prevents race condition where
+          // an in-flight skip would block a concurrent different question in the same window
+          window.forEach((s) => questionWindowIds.current.add(s.id));
+          window.forEach((s) => store.updateTranscriptSegment(s.id, { isQuestion: true }));
+          store.updateCreditBalance(-2);
+
+          const insightId = `insight-bot-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+          store.addInsight({
+            id: insightId,
             topic: insight.topic,
+            query: insight.query,
             bullets: insight.bullets,
             sources: insight.sources,
             confidence: insight.confidence,
+            timestamp: new Date().toLocaleTimeString("en-US", { hour12: false }),
             status: "ready",
+            triggerSegmentId: segment.id,
           });
 
           store.setActiveInsight(insightId);
         } catch (err) {
           console.error("[ExaBot] Research failed:", err);
-          store.updateInsight(insightId, { status: "error" });
         } finally {
           store.decrementResearch();
         }

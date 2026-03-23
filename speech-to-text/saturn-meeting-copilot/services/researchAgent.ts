@@ -16,17 +16,30 @@ export interface ResearchResult {
 const QUESTION_STARTERS =
   /^\s*(what|when|where|who|why|how|which|is|are|was|were|do|does|did|can|could|would|should|will|whom|whose)\b/i;
 
+// Short social/delegation phrases that are never worth researching
+const SOCIAL_PATTERNS =
+  /^\s*(hey|hi|hello|how are you|how's it going|how are things|can you (ask|tell|send|email|message|let|ping|check with|follow up)|could you (ask|tell|send)|would you (mind|be able)|do you have a (minute|second|moment)|are you (free|available|there|okay|good)|is (everyone|anybody|someone) (ready|there|on)|what do you think|how about you|how was your)/i;
+
 
 /**
- * Detect whether a sentence is a question or research trigger.
- * Returns the full natural-language query for Exa (useAutoprompt handles semantics).
+ * Detect whether a segment contains a question and return just that question.
+ * Splits on sentence boundaries so "We did great. But what is the budget?"
+ * returns "what is the budget" rather than the full segment text.
  */
 export async function detectQuestion(text: string): Promise<string | null> {
-  const hasQuestionMark = text.trimEnd().endsWith("?");
-  if (!hasQuestionMark && !QUESTION_STARTERS.test(text)) return null;
+  // Split on sentence-ending punctuation, keeping each fragment with its delimiter
+  const sentences = text.match(/[^.!?]+[.!?]*/g) ?? [text];
 
-  const query = text.replace(/[?!]+$/, "").trim();
-  return query.length > 0 ? query : null;
+  for (const sentence of sentences) {
+    const s = sentence.trim();
+    if (s.length < 8) continue;
+    if ((s.endsWith("?") || QUESTION_STARTERS.test(s)) && !SOCIAL_PATTERNS.test(s)) {
+      const query = s.replace(/[?!]+$/, "").trim();
+      if (query.length > 0) return query;
+    }
+  }
+
+  return null;
 }
 
 /**
