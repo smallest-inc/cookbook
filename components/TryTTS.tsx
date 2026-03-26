@@ -13,7 +13,7 @@ import {
   ChevronDown,
   Sparkles,
 } from "lucide-react";
-import { trackTryItInteraction, trackDemoLaunch } from "@/lib/analytics";
+import { trackTryItInteraction, trackDemoLaunch, trackGetApiKeyClick } from "@/lib/analytics";
 
 interface Voice {
   voiceId: string;
@@ -273,9 +273,10 @@ export function TryTTS({ projectSlug }: { projectSlug: string }) {
         <p className="mt-2 text-[10px] text-muted-foreground">
           Get your API key at{" "}
           <a
-            href="https://app.smallest.ai/dashboard/settings/apikeys?utm_source=showcase&utm_medium=tts_playground&utm_campaign=get-api-key"
+            href="https://app.smallest.ai/dashboard/settings/apikeys"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackGetApiKeyClick("tts_playground")}
             className="text-teal hover:underline"
           >
             app.smallest.ai

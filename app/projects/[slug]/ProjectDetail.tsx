@@ -32,6 +32,9 @@ import {
   trackCodeView,
   trackVideoPlay,
   trackShareClick,
+  trackGetApiKeyClick,
+  trackCodeCopied,
+  trackExternalLinkClick,
 } from "@/lib/analytics";
 
 export function ProjectDetail({ project }: { project: Project }) {
@@ -272,7 +275,7 @@ export function ProjectDetail({ project }: { project: Project }) {
             <div className="rounded-xl border border-border bg-secondary/50 p-4 font-mono text-sm">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-muted-foreground">terminal</span>
-                <CopyButton text={cloneCommand} />
+                <CopyButton text={cloneCommand} projectSlug={project.slug} />
               </div>
               <code className="text-secondary-foreground whitespace-pre-wrap break-all">
                 {cloneCommand}
@@ -341,33 +344,37 @@ export function ProjectDetail({ project }: { project: Project }) {
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackExternalLinkClick("github", project.githubUrl, "project_sidebar")}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <Github className="h-4 w-4" />
                 Source Code
               </a>
               <a
-                href="https://waves-docs.smallest.ai?utm_source=showcase&utm_medium=project_sidebar&utm_campaign=docs"
+                href="https://waves-docs.smallest.ai"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackExternalLinkClick("waves_docs", "https://waves-docs.smallest.ai", "project_sidebar")}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
                 Waves API Docs
               </a>
               <a
-                href="https://atoms-docs.smallest.ai?utm_source=showcase&utm_medium=project_sidebar&utm_campaign=docs"
+                href="https://atoms-docs.smallest.ai"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackExternalLinkClick("atoms_docs", "https://atoms-docs.smallest.ai", "project_sidebar")}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
                 Atoms Agent Docs
               </a>
               <a
-                href="https://app.smallest.ai/dashboard/settings/apikeys?utm_source=showcase&utm_medium=project_sidebar&utm_campaign=get-api-key"
+                href="https://app.smallest.ai/dashboard/settings/apikeys"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackGetApiKeyClick("project_sidebar")}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
@@ -461,12 +468,13 @@ function ProjectCover({ project }: { project: Project }) {
   );
 }
 
-function CopyButton({ text }: { text: string }) {
+function CopyButton({ text, projectSlug }: { text: string; projectSlug?: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(text);
     setCopied(true);
+    if (projectSlug) trackCodeCopied(projectSlug, "quick_start");
     setTimeout(() => setCopied(false), 2000);
   };
 

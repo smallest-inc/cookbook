@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Key, Eye, EyeOff, Check } from "lucide-react";
-import { trackApiKeyEntered } from "@/lib/analytics";
+import { trackApiKeyEntered, trackGetApiKeyClick } from "@/lib/analytics";
 
 interface ApiKeyInputProps {
   projectSlug: string;
@@ -79,9 +79,10 @@ export function ApiKeyInput({ projectSlug, onKeyChange }: ApiKeyInputProps) {
       <p className="mt-2 text-[10px] text-muted-foreground">
         Get your API key at{" "}
         <a
-          href="https://app.smallest.ai/dashboard/settings/apikeys?utm_source=showcase&utm_medium=api_key_input&utm_campaign=get-api-key"
+          href="https://app.smallest.ai/dashboard/settings/apikeys"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackGetApiKeyClick("api_key_input")}
           className="text-teal hover:underline"
         >
           app.smallest.ai

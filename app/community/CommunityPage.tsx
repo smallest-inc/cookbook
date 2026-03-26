@@ -5,7 +5,7 @@ import { GitPullRequest, Plus, ArrowRight, Users } from "lucide-react";
 import { projects } from "@/lib/projects";
 import { ProjectCard } from "@/components/ProjectCard";
 import { SearchBar } from "@/components/SearchBar";
-import { trackSubmitProjectClick } from "@/lib/analytics";
+import { trackSubmitProjectClick, trackExternalLinkClick } from "@/lib/analytics";
 
 export function CommunityPage() {
   const communityProjects = useMemo(
@@ -49,6 +49,7 @@ export function CommunityPage() {
                 href="https://github.com/smallest-inc/cookbook?utm_source=showcase&utm_medium=community&utm_campaign=fork-repo"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackExternalLinkClick("github", "https://github.com/smallest-inc/cookbook", "community_fork")}
                 className="text-teal hover:underline"
               >
                 cookbook repo

@@ -89,3 +89,15 @@ export function trackShareClick(slug: string, platform: string) {
 export function trackSubmitProjectClick(source: string) {
   track("Showcase: Submit Project Clicked", { source });
 }
+
+export function trackGetApiKeyClick(source: string) {
+  track("Showcase: Get API Key Clicked", { source });
+}
+
+export function trackCodeCopied(slug: string, section: string) {
+  track("Showcase: Code Copied", { project: slug, section });
+}
+
+export function trackExternalLinkClick(destination: string, url: string, source: string) {
+  track("Showcase: External Link Clicked", { destination, url, source });
+}

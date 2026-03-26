@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Sun, Moon, Github, Menu, X } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import { useState } from "react";
+import { trackExternalLinkClick } from "@/lib/analytics";
 
 const navLinks = [
   { href: "/", label: "Explore" },
@@ -65,6 +66,7 @@ export function Navbar() {
             href="https://github.com/smallest-inc/cookbook?utm_source=showcase&utm_medium=navbar&utm_campaign=github"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackExternalLinkClick("github", "https://github.com/smallest-inc/cookbook", "navbar")}
             className="rounded-lg p-2 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="GitHub"
           >
