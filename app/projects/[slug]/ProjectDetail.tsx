@@ -371,7 +371,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                 Atoms Agent Docs
               </a>
               <a
-                href="https://app.smallest.ai/dashboard/settings/apikeys"
+                href="https://app.smallest.ai/dashboard/api-keys"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackGetApiKeyClick("project_sidebar")}

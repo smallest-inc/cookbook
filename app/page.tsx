@@ -79,7 +79,7 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <a
-                href="https://app.smallest.ai/dashboard/settings/apikeys"
+                href="https://app.smallest.ai/dashboard/api-keys"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackGetApiKeyClick("hero")}
