@@ -91,7 +91,11 @@ export function trackAudioPlay(slug: string, sampleId: string) {
 
 export function trackShareClick(slug: string, platform: string) {
   track("Showcase: Share Clicked", { project: slug, platform });
-  gtm("Button_ShowcaseProject_ShareButton", { project: slug, platform });
+  if (platform === "copy_link") {
+    gtm("Button_ShowcaseProject_CopyButton", { project: slug });
+  } else {
+    gtm("Button_ShowcaseProject_ShareButton", { project: slug, platform });
+  }
 }
 
 export function trackCodeCopied(slug: string, section: string) {
@@ -121,7 +125,11 @@ export function trackTryItInteraction(slug: string, interactionType: string) {
 
 export function trackSubmitProjectClick(source: string) {
   track("Showcase: Submit Project Clicked", { source });
-  gtm("Button_Showcase_SubmitProject", { source });
+  if (source === "community_page") {
+    gtm("Button_ShowcaseCommunity_SubmitProject", { source });
+  } else {
+    gtm("Button_Showcase_SubmitProject", { source });
+  }
 }
 
 // --- External ---
