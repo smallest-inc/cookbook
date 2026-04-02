@@ -708,6 +708,7 @@ export const projects: Project[] = [
     tags: ["pipecat", "webrtc", "browser", "interruptions", "open-source", "real-time"],
     difficulty: "intermediate",
     status: "code-only",
+    thumbnailUrl: "/thumbnails/pipecat-voice-agent.png",
     cookbookPath: "voice-agents/pipecat-voice-agent",
     githubUrl: `${GITHUB_BASE}/voice-agents/pipecat-voice-agent`,
     techStack: ["Python", "Pipecat", "FastAPI", "Smallest AI STT", "Smallest AI TTS", "OpenAI", "WebRTC"],
