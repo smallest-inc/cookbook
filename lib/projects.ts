@@ -697,6 +697,32 @@ export const projects: Project[] = [
       "Automatic form submission",
     ],
   },
+  {
+    slug: "pipecat-voice-agent",
+    title: "Pipecat Voice Agent",
+    description:
+      "Browser-based voice agent using Pipecat with Smallest AI STT + TTS — native interruption, zero custom code.",
+    longDescription:
+      "Smallest AI's STT and TTS are natively integrated into Pipecat, the open-source framework for real-time voice + AI pipelines. This example wires them into a fully working voice agent that runs in your browser via WebRTC. Speak, and the agent responds using Smallest AI's low-latency sophia voice. Start speaking while it's talking — the response stops mid-sentence and the agent picks up your new input immediately. Interruption is handled automatically by Pipecat's SileroVADAnalyzer; no custom logic needed.",
+    category: "voice-agents",
+    tags: ["pipecat", "webrtc", "browser", "interruptions", "open-source", "real-time"],
+    difficulty: "intermediate",
+    status: "code-only",
+    cookbookPath: "voice-agents/pipecat-voice-agent",
+    githubUrl: `${GITHUB_BASE}/voice-agents/pipecat-voice-agent`,
+    techStack: ["Python", "Pipecat", "FastAPI", "Smallest AI STT", "Smallest AI TTS", "OpenAI", "WebRTC"],
+    apiProducts: ["pulse-stt", "lightning-tts"],
+    features: [
+      "Browser-based voice agent via WebRTC",
+      "Smallest AI STT (Pulse) for real-time transcription",
+      "Smallest AI TTS (Lightning) with sophia voice",
+      "Native interruption — zero custom code",
+      "Silero VAD for end-of-turn detection",
+      "OpenAI LLM reasoning",
+      "Seven-stage Pipecat pipeline",
+    ],
+  },
+
   // ─── TEXT-TO-SPEECH (additional) ───────────────────
   {
     slug: "audiobook-generator",
