@@ -7,11 +7,8 @@ import {
   Square,
   Play,
   Pause,
-  Volume2,
-  VolumeX,
   Settings,
   FileText,
-  Gauge,
   Loader2,
 } from "lucide-react";
 import { useMeetingStore } from "@/store/meetingStore";
@@ -19,25 +16,20 @@ import { useDirectSearch } from "@/hooks/useDirectSearch";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AudioWaveform } from "@/components/controls/AudioWaveform";
+import { SettingsModal } from "@/components/settings/SettingsModal";
 
 export function BottomBar() {
   const {
     status,
-    isVoiceEnabled,
-    isSpeaking,
-    voiceSpeed,
     sttStatus,
     sttError,
     startMeeting,
     pauseMeeting,
     endMeeting,
-    setVoiceEnabled,
-    setVoiceSpeed,
-    setIsSpeaking,
   } = useMeetingStore();
 
   const { directSearchStatus } = useDirectSearch();
-  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const isActive = status === "listening";
   const isPaused = status === "paused";
@@ -50,6 +42,7 @@ export function BottomBar() {
   };
 
   return (
+    <>
     <div className="h-16 border-t border-white/60 bg-white/50 backdrop-blur-2xl flex items-center px-6 gap-4 relative z-20 shadow-[0_-4px_24px_-12px_rgba(0,0,0,0.1)]">
       {/* Waveform visualization */}
       <div className="w-32 h-8 flex items-center bg-white/40 rounded-lg p-2 shadow-inner shadow-slate-200 border border-white/60">
@@ -214,96 +207,6 @@ export function BottomBar() {
         )}
       </AnimatePresence>
 
-      <div className="w-px h-6 bg-slate-300/50 mx-1" />
-
-      {/* Voice controls */}
-      <div className="flex items-center gap-2">
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <button
-                onClick={() => setVoiceEnabled(!isVoiceEnabled)}
-                className={`p-2 rounded-xl transition-all shadow-sm ${
-                  isVoiceEnabled
-                    ? "bg-emerald-50 border border-emerald-200 text-emerald-600 shadow-emerald-100"
-                    : "bg-white/60 border border-slate-200 text-slate-500 hover:bg-white hover:text-slate-700"
-                }`}
-              >
-                {isVoiceEnabled ? (
-                  <Volume2 className="w-4 h-4" />
-                ) : (
-                  <VolumeX className="w-4 h-4" />
-                )}
-              </button>
-            }
-          />
-          <TooltipContent>
-            {isVoiceEnabled ? "Disable voice responses" : "Enable voice responses"}
-          </TooltipContent>
-        </Tooltip>
-
-        {/* Stop speaking */}
-        <AnimatePresence>
-          {isSpeaking && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              onClick={() => setIsSpeaking(false)}
-              className="px-3 py-1.5 text-xs rounded-xl bg-orange-50 border border-orange-200 text-orange-600 hover:bg-orange-100 transition-all font-medium"
-            >
-              Stop Speaking
-            </motion.button>
-          )}
-        </AnimatePresence>
-
-        {/* Speed control */}
-        <div className="relative">
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <button
-                  onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-                  className="flex items-center gap-1.5 p-2 rounded-xl bg-white/60 border border-slate-200 text-slate-500 hover:bg-white hover:text-slate-700 transition-all text-xs shadow-sm"
-                >
-                  <Gauge className="w-4 h-4" />
-                  <span className="font-mono font-medium">{voiceSpeed}x</span>
-                </button>
-              }
-            />
-            <TooltipContent>Voice speed</TooltipContent>
-          </Tooltip>
-
-          <AnimatePresence>
-            {showSpeedMenu && (
-              <motion.div
-                initial={{ opacity: 0, y: 5, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                className="absolute bottom-full mb-2 left-0 bg-white/80 backdrop-blur-xl border border-white/60 rounded-xl p-1.5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)] z-50 min-w-[80px]"
-              >
-                {[0.75, 1.0, 1.25, 1.5].map((speed) => (
-                  <button
-                    key={speed}
-                    onClick={() => {
-                      setVoiceSpeed(speed);
-                      setShowSpeedMenu(false);
-                    }}
-                    className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
-                      voiceSpeed === speed
-                        ? "bg-violet-100 text-violet-700"
-                        : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
-                    }`}
-                  >
-                    {speed}x
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-
       {/* Spacer */}
       <div className="flex-1" />
 
@@ -323,7 +226,9 @@ export function BottomBar() {
         <Tooltip>
           <TooltipTrigger
             render={
-              <button className="p-2 rounded-xl bg-white/60 border border-slate-200 text-slate-500 hover:bg-white hover:text-slate-700 transition-all shadow-sm">
+              <button
+                onClick={() => setShowSettings(true)}
+                className="p-2 rounded-xl bg-white/60 border border-slate-200 text-slate-500 hover:bg-white hover:text-slate-700 transition-all shadow-sm">
                 <Settings className="w-4 h-4" />
               </button>
             }
@@ -332,5 +237,8 @@ export function BottomBar() {
         </Tooltip>
       </div>
     </div>
+
+      <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
+    </>
   );
 }

@@ -16,38 +16,49 @@ export interface ResearchResult {
 const QUESTION_STARTERS =
   /^\s*(what|when|where|who|why|how|which|is|are|was|were|do|does|did|can|could|would|should|will|whom|whose)\b/i;
 
-// Short social/delegation phrases that are never worth researching
-const SOCIAL_PATTERNS =
-  /^\s*(hey|hi|hello|how are you|how's it going|how are things|can you (ask|tell|send|email|message|let|ping|check with|follow up)|could you (ask|tell|send)|would you (mind|be able)|do you have a (minute|second|moment)|are you (free|available|there|okay|good)|is (everyone|anybody|someone) (ready|there|on)|what do you think|how about you|how was your)/i;
+const NON_RESEARCH_PATTERNS = [
+  /^(yes,?\s*)?(can|could|may) i ask you (something|a question|one thing)$/i,
+  /^(can|could) i ask (you )?(something|a question|one thing)$/i,
+  /^(are you there|can you hear me|am i audible|you there)$/i,
+  /^(hi|hello|hey|yo|okay|ok|right|cool|sure)$/i,
+];
+
+const NON_RESEARCH_PHRASES = [
+  "ask you something",
+  "ask you a question",
+  "question for you",
+  "can i ask",
+  "are you there",
+  "can you hear me",
+  "am i audible",
+];
 
 
 /**
- * Detect whether a segment contains a question and return just that question.
- * Splits on sentence boundaries so "We did great. But what is the budget?"
- * returns "what is the budget" rather than the full segment text.
+ * Detect whether a sentence is a question or research trigger.
+ * Returns the full natural-language query for Exa (useAutoprompt handles semantics).
  */
 export async function detectQuestion(text: string): Promise<string | null> {
-  // Split on sentence-ending punctuation, keeping each fragment with its delimiter
-  const sentences = text.match(/[^.!?]+[.!?]*/g) ?? [text];
+  const hasQuestionMark = text.trimEnd().endsWith("?");
+  if (!hasQuestionMark && !QUESTION_STARTERS.test(text)) return null;
 
-  for (const sentence of sentences) {
-    const s = sentence.trim();
-    if (s.length < 8) continue;
-    if ((s.endsWith("?") || QUESTION_STARTERS.test(s)) && !SOCIAL_PATTERNS.test(s)) {
-      const query = s.replace(/[?!]+$/, "").trim();
-      if (query.length > 0) return query;
-    }
-  }
+  const query = text.replace(/[?!]+$/, "").trim();
+  if (query.length < 10) return null;
 
-  return null;
+  if (NON_RESEARCH_PATTERNS.some((pattern) => pattern.test(query))) return null;
+
+  const lowered = query.toLowerCase();
+  if (NON_RESEARCH_PHRASES.some((phrase) => lowered.includes(phrase))) return null;
+
+  return query;
 }
 
 /**
  * Run the full research pipeline: fetch Exa results.
  * Summarization is handled server-side in the API route.
  */
-export async function runResearch(query: string): Promise<ResearchResult> {
-  const { results } = await searchExa(query, 5);
+export async function runResearch(query: string, numResults = 5): Promise<ResearchResult> {
+  const { results } = await searchExa(query, numResults);
 
   if (results.length === 0) {
     return {

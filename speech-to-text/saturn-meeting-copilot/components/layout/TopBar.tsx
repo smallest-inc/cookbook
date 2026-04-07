@@ -1,12 +1,12 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, MicOff, Clock, Zap, CreditCard } from "lucide-react";
+import { Mic, MicOff, Clock, Zap } from "lucide-react";
 import { useMeetingStore } from "@/store/meetingStore";
 import { useEffect, useState } from "react";
 
 export function TopBar() {
-  const { status, title, startTime, activeResearchCount, creditBalance, setTitle } =
+  const { status, title, startTime, activeResearchCount, setTitle } =
     useMeetingStore();
   const [elapsed, setElapsed] = useState("00:00");
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -115,14 +115,6 @@ export function TopBar() {
 
       {/* Spacer */}
       <div className="flex-1" />
-
-      {/* Credit balance */}
-      <div className="flex items-center gap-1.5 bg-white/[0.04] border border-white/[0.08] rounded-full px-3 py-1.5">
-        <CreditCard className="w-3.5 h-3.5 text-emerald-400" />
-        <span className="text-xs font-medium text-white/70">
-          <span className="text-emerald-400 font-semibold">{creditBalance}</span> credits
-        </span>
-      </div>
 
       {/* Mic status */}
       <div

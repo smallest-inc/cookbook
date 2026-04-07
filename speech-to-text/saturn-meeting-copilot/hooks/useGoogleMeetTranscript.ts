@@ -12,12 +12,36 @@
 
 import { useEffect, useRef } from "react";
 import { useMeetingStore } from "@/store/meetingStore";
-import { makeSegment } from "@/lib/segment";
 import type { TranscriptSegment, SttStatus } from "@/types";
 
 const SAMPLE_RATE = 16_000;      // Hz — optimal for STT
 const CHUNK_SECONDS = 5;         // seconds of audio per request
 const SILENCE_RMS = 0.002;       // skip chunks that are nearly silent
+
+const SPEAKER_COLORS = ["#818cf8", "#34d399", "#fb923c", "#f472b6", "#38bdf8", "#a3e635"];
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function speakerColor(speaker: string): string {
+  let hash = 0;
+  for (let i = 0; i < speaker.length; i++) hash = speaker.charCodeAt(i) + ((hash << 5) - hash);
+  return SPEAKER_COLORS[Math.abs(hash) % SPEAKER_COLORS.length];
+}
+
+function makeSegment(text: string, rawSpeaker?: string): TranscriptSegment {
+  const speaker = rawSpeaker ?? "You";
+  return {
+    id: `seg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    speaker,
+    speakerColor: speakerColor(speaker),
+    text: text.trim(),
+    timestamp: new Date().toLocaleTimeString("en-US", { hour12: false }),
+    // Only set this when research is actually triggered (LLM gate + fetch start).
+    isQuestion: false,
+    isHighlighted: false,
+    words: [],
+  };
+}
 
 // ── WAV encoder (16-bit PCM mono) ──────────────────────────────────────────
 
@@ -60,8 +84,7 @@ function startWebSpeechFallback(
   addSegment: (s: TranscriptSegment) => void,
   mkSeg: (text: string, speaker?: string) => TranscriptSegment,
   setStatus: (s: SttStatus, e?: string | null) => void,
-  stopRef: { current: boolean },
-  recRef: { current: unknown }
+  stopRef: { current: boolean }
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Ctor = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
@@ -83,28 +106,22 @@ function startWebSpeechFallback(
   };
   rec.onend = () => { if (!stopRef.current) try { rec.start(); } catch { /* already running */ } };
   rec.start();
-  recRef.current = rec;
   setStatus("listening");
 }
 
 // ── Hook ───────────────────────────────────────────────────────────────────
 
 export function useGoogleMeetTranscript() {
-  const { status, addTranscriptSegment, setSttStatus } = useMeetingStore();
+  const { status, addTranscriptSegment, setSttStatus, sttLanguage } = useMeetingStore();
   const stopRef = useRef(false);
   const esRef = useRef<EventSource | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const webSpeechRef = useRef<unknown>(null);
 
   // ── Always-on SSE: auto-start meeting when extension sends first segment ──
   // This runs regardless of meeting status so the Chrome extension can drive
   // Saturn without the user manually pressing "Start Meeting".
   useEffect(() => {
     const es = new EventSource("/api/transcript/stream");
-
-    es.onerror = () => {
-      console.warn("[Saturn] SSE connection lost, will reconnect…");
-    };
 
     es.onmessage = (e) => {
       if (!e.data || e.data === "{}") return;
@@ -130,7 +147,7 @@ export function useGoogleMeetTranscript() {
   useEffect(() => {
     if (status !== "listening") {
       stopRef.current = true;
-      if (audioCtxRef.current?.state !== "closed") audioCtxRef.current?.close();
+      audioCtxRef.current?.close();
       audioCtxRef.current = null;
       esRef.current?.close();
       esRef.current = null;
@@ -201,6 +218,7 @@ registerProcessor('saturn-pcm-collector', PCMCollector);
           const wav = encodeWAV(merged, SAMPLE_RATE);
           const formData = new FormData();
           formData.append("audio", wav, "chunk.wav");
+          formData.append("language", useMeetingStore.getState().sttLanguage);
 
           const res = await fetch("/api/transcribe", { method: "POST", body: formData });
           if (!res.ok) {
@@ -208,7 +226,7 @@ registerProcessor('saturn-pcm-collector', PCMCollector);
             const msg: string = body?.error ?? `STT error ${res.status}`;
             // 402/403 = no STT credits — fall back to Web Speech API silently
             if (res.status === 402 || res.status === 403) {
-              startWebSpeechFallback(addTranscriptSegment, makeSegment, setSttStatus, stopRef, webSpeechRef);
+              startWebSpeechFallback(addTranscriptSegment, makeSegment, setSttStatus, stopRef);
               return;
             }
             // 503 = Smallest.ai temporarily down — skip chunk, keep trying
@@ -220,13 +238,9 @@ registerProcessor('saturn-pcm-collector', PCMCollector);
             return;
           }
 
-          const { segments } = await res.json();
-          // Push one transcript entry per diarized utterance.
-          // Fall back to "You" if no speaker label (mic-only capture is always the local user).
-          for (const seg of (segments ?? [])) {
-            if (seg.text?.trim()) {
-              addTranscriptSegment(makeSegment(seg.text, seg.speaker ?? "You"));
-            }
+          const { fullText, segments } = await res.json();
+          if (fullText?.trim()) {
+            addTranscriptSegment(makeSegment(fullText, segments?.[0]?.speaker));
           }
         } catch (err) {
           console.warn("[Saturn] STT chunk error:", err);
@@ -247,7 +261,7 @@ registerProcessor('saturn-pcm-collector', PCMCollector);
       worklet.disconnect();
       source.disconnect();
       stream.getTracks().forEach((t) => t.stop());
-      if (audioCtx.state !== "closed") await audioCtx.close();
+      await audioCtx.close();
       setSttStatus("idle");
     }
 
@@ -255,13 +269,10 @@ registerProcessor('saturn-pcm-collector', PCMCollector);
 
     return () => {
       stopRef.current = true;
-      if (audioCtxRef.current?.state !== "closed") audioCtxRef.current?.close();
+      audioCtxRef.current?.close();
       audioCtxRef.current = null;
       esRef.current?.close();
       esRef.current = null;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (webSpeechRef.current as any)?.abort();
-      webSpeechRef.current = null;
       setSttStatus("idle");
     };
   }, [status, addTranscriptSegment, setSttStatus]);

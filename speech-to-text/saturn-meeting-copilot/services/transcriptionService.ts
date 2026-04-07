@@ -24,13 +24,14 @@ export interface TranscriptionResponse {
  */
 export async function transcribeAudio(
   audioBuffer: Buffer,
-  mimeType = "audio/webm"
+  mimeType = "audio/webm",
+  language = "en"
 ): Promise<TranscriptionResponse> {
   const apiKey = process.env.SMALLEST_API_KEY;
   if (!apiKey) throw new Error("SMALLEST_API_KEY is not set");
 
   const response = await fetch(
-    "https://api.smallest.ai/waves/v1/pulse/get_text?language=en&word_timestamps=true&diarize=true",
+    `https://api.smallest.ai/waves/v1/pulse/get_text?language=${encodeURIComponent(language)}&word_timestamps=true`,
     {
       method: "POST",
       headers: {
@@ -54,20 +55,13 @@ export async function transcribeAudio(
   const data = await response.json();
   console.log("[transcriptionService] raw response:", JSON.stringify(data));
 
-  // Response: { status, transcription, words: [{start,end,word}], utterances: [{start,end,text,speaker?}] }
-  const utterances: Array<{ start: number; end: number; text: string; speaker?: string }> =
+  // Response: { status, transcription, words: [{start,end,word}], utterances: [{start,end,text}] }
+  const utterances: Array<{ start: number; end: number; text: string }> =
     data.utterances ?? [];
-
-  // Map SPEAKER_00 / SPEAKER_01 … to "Speaker 1" / "Speaker 2" …
-  function labelSpeaker(raw: string | undefined): string | undefined {
-    if (!raw) return undefined;
-    return raw.replace(/^SPEAKER_(\d+)$/i, (_, n) => `Speaker ${+n + 1}`);
-  }
 
   const segments: TranscriptionSegment[] = utterances.length
     ? utterances.map((u) => ({
         text: u.text.trim(),
-        speaker: labelSpeaker(u.speaker),
         startTime: u.start,
         endTime: u.end,
         confidence: 0.9,

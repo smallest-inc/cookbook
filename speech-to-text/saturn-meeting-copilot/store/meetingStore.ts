@@ -20,7 +20,6 @@ interface MeetingActions {
   updateTranscriptSegment: (id: string, updates: Partial<TranscriptSegment>) => void;
   addInsight: (insight: Insight) => void;
   updateInsight: (id: string, updates: Partial<Insight>) => void;
-  removeInsight: (id: string) => void;
   setActiveInsight: (id: string | null) => void;
   addActionItem: (item: ActionItem) => void;
   updateActionItem: (id: string, updates: Partial<ActionItem>) => void;
@@ -28,9 +27,12 @@ interface MeetingActions {
   updateTopic: (id: string, updates: Partial<TopicEvent>) => void;
   setSummary: (summary: MeetingSummary) => void;
   setVoiceEnabled: (enabled: boolean) => void;
+  setVoiceId: (id: string) => void;
   setVoiceSpeed: (speed: number) => void;
   setIsSpeaking: (speaking: boolean) => void;
   setSttStatus: (status: SttStatus, error?: string | null) => void;
+  setSttLanguage: (language: string) => void;
+  setResearchResultCount: (count: number) => void;
   incrementResearch: () => void;
   decrementResearch: () => void;
   updateCreditBalance: (amount: number) => void;
@@ -48,6 +50,7 @@ const initialState: MeetingState = {
   topics: [],
   summary: null,
   isVoiceEnabled: false,
+  voiceId: "emily",
   voiceSpeed: 1.0,
   isSpeaking: false,
   activeInsightId: null,
@@ -55,6 +58,8 @@ const initialState: MeetingState = {
   creditBalance: 250,
   sttStatus: "idle",
   sttError: null,
+  sttLanguage: "en",
+  researchResultCount: 5,
 };
 
 export const useMeetingStore = create<MeetingState & MeetingActions>((set) => ({
@@ -99,9 +104,6 @@ export const useMeetingStore = create<MeetingState & MeetingActions>((set) => ({
       ),
     })),
 
-  removeInsight: (id) =>
-    set((state) => ({ insights: state.insights.filter((ins) => ins.id !== id) })),
-
   setActiveInsight: (id) => set({ activeInsightId: id }),
 
   addActionItem: (item) =>
@@ -126,11 +128,17 @@ export const useMeetingStore = create<MeetingState & MeetingActions>((set) => ({
 
   setVoiceEnabled: (enabled) => set({ isVoiceEnabled: enabled }),
 
+  setVoiceId: (id) => set({ voiceId: id }),
+
   setVoiceSpeed: (speed) => set({ voiceSpeed: speed }),
 
   setIsSpeaking: (speaking) => set({ isSpeaking: speaking }),
 
   setSttStatus: (status, error = null) => set({ sttStatus: status, sttError: error ?? null }),
+
+  setSttLanguage: (language) => set({ sttLanguage: language }),
+
+  setResearchResultCount: (count) => set({ researchResultCount: count }),
 
   incrementResearch: () =>
     set((state) => ({ activeResearchCount: state.activeResearchCount + 1 })),

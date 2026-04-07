@@ -37,10 +37,6 @@ export interface ActionItem {
   id: string;
   text: string;
   assignee?: string;
-  priority: "high" | "medium" | "low";
-  deadline?: string;
-  context?: string;
-  steps?: string[];
   detectedAt: string;
   status: "open" | "done";
 }
@@ -76,6 +72,7 @@ export interface MeetingState {
   topics: TopicEvent[];
   summary: MeetingSummary | null;
   isVoiceEnabled: boolean;
+  voiceId: string;
   voiceSpeed: number;
   isSpeaking: boolean;
   activeInsightId: string | null;
@@ -83,4 +80,6 @@ export interface MeetingState {
   creditBalance: number;
   sttStatus: SttStatus;
   sttError: string | null;
+  sttLanguage: string;
+  researchResultCount: number;
 }

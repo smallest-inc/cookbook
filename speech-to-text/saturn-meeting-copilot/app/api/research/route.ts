@@ -1,6 +1,6 @@
 /**
  * POST /api/research
- * Runs a research job: searches Exa and summarizes with Claude.
+ * Runs a research job: searches Exa and summarizes with OpenAI.
  *
  * Body: { query: string, segmentId?: string }
  * Returns: Insight object
@@ -12,60 +12,42 @@ import { runResearch, buildInsight } from "@/services/researchAgent";
 
 const anthropic = new Anthropic();
 
-/**
- * Use Claude to decide if the transcript text contains a research-worthy question,
- * and if so, return the clean search query. Returns null if not worth searching.
- */
-async function extractResearchQuery(text: string): Promise<string | null> {
+async function classifyResearchIntent(text: string): Promise<string | null> {
   const message = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 64,
+    model: "claude-opus-4-6",
+    max_tokens: 80,
     messages: [
       {
         role: "user",
-        content: [
-          {
-            type: "text" as const,
-            text: `You are a strict filter for a meeting research assistant. Read this transcript excerpt and decide if it contains a question that someone would literally Google to get an answer.
-
-If yes, respond with JSON: {"search":true,"query":"<concise search query>"}
-If no, respond with JSON: {"search":false}
-
-Only return search:true if the question asks for an objective fact, definition, statistic, or technical explanation that exists on the web.
-
-Always return search:false for:
-- Any question directed at a person (contains you, your, me, my, we, us, her, him, they, their)
-- Greetings or social questions (how are you, how are you doing, how are you still X)
-- Emotional or personal questions (are you upset, do you like me)
-- Task delegation (can you ask her, can you send, can you check with)
-- Rhetorical questions or statements phrased as questions
-- Meeting logistics, scheduling, or coordination
-- Anything with no factual answer you could look up
-
-Transcript: ${JSON.stringify(text)}
-
-Respond with JSON only.`,
-          },
-        ],
+        content:
+          `You are classifying transcript utterances for web research triggering.\n` +
+          `Input sentence: "${text}"\n\n` +
+          `Rules:\n` +
+          `1) Trigger only if this is an actual information-seeking question.\n` +
+          `2) Do NOT trigger for conversational/meta prompts like: "can I ask you something", "are you there", greetings, confirmations.\n` +
+          `3) Do NOT trigger if the sentence is not a question.\n` +
+          `4) If triggering, return a concise cleaned query.\n\n` +
+          `Respond in EXACTLY one of these formats:\n` +
+          `TRIGGER|<clean query>\n` +
+          `SKIP`,
       },
     ],
   });
-  const raw = message.content.find((b): b is Anthropic.TextBlock => b.type === "text")?.text ?? "";
-  // Strip markdown code fences if the model wraps the JSON
-  const cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
-  try {
-    const parsed = JSON.parse(cleaned);
-    return parsed.search === true && typeof parsed.query === "string" ? parsed.query : null;
-  } catch {
-    console.warn("[/api/research] extractResearchQuery failed to parse:", raw);
-    return null;
-  }
+
+  const textOut =
+    message.content.find((b): b is Anthropic.TextBlock => b.type === "text")?.text?.trim() ??
+    "";
+
+  if (!textOut.toUpperCase().startsWith("TRIGGER|")) return null;
+
+  const query = textOut.slice("TRIGGER|".length).trim();
+  return query.length > 0 ? query : null;
 }
 
 async function summarizeWithClaude(query: string, snippets: string[]): Promise<string[]> {
   const context = snippets.join("\n\n---\n\n");
   const message = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-opus-4-6",
     max_tokens: 256,
     messages: [
       {
@@ -84,25 +66,21 @@ async function summarizeWithClaude(query: string, snippets: string[]): Promise<s
 
 export async function POST(req: NextRequest) {
   try {
-    const { text, query: rawQuery, segmentId } = await req.json();
+    const { query, segmentId, numResults, detectOnly } = await req.json();
 
-    // `text` = raw transcript window (auto-detect mode); `query` = explicit search (direct search)
-    let query: string;
-    if (rawQuery && typeof rawQuery === "string") {
-      // Direct search — skip LLM validation, use the query as-is
-      query = rawQuery.trim();
-    } else if (text && typeof text === "string") {
-      // Auto-detect mode — let Claude decide if it's worth searching and extract the query
-      const extracted = await extractResearchQuery(text.trim());
-      if (!extracted) {
-        return NextResponse.json({ skip: true });
-      }
-      query = extracted;
-    } else {
-      return NextResponse.json({ error: "text or query is required" }, { status: 400 });
+    if (!query || typeof query !== "string") {
+      return NextResponse.json({ error: "query is required" }, { status: 400 });
     }
 
-    const result = await runResearch(query);
+    if (detectOnly) {
+      const classified = await classifyResearchIntent(query.trim());
+      return NextResponse.json({
+        shouldResearch: Boolean(classified),
+        query: classified,
+      });
+    }
+
+    const result = await runResearch(query.trim(), typeof numResults === "number" ? Math.min(10, Math.max(1, numResults)) : 5);
 
     // Summarize raw snippets with Claude (server-side only)
     try {

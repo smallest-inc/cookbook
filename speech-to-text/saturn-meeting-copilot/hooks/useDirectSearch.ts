@@ -65,7 +65,7 @@ export function useDirectSearch() {
       const res = await fetch("/api/research", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query, numResults: useMeetingStore.getState().researchResultCount }),
       });
       if (!res.ok) throw new Error(`Research API ${res.status}`);
 

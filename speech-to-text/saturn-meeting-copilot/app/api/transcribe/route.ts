@@ -31,8 +31,9 @@ export async function POST(req: NextRequest) {
     const mimeType = audioFile.type || "audio/wav";
     const arrayBuffer = await audioFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+    const language = typeof formData.get("language") === "string" ? (formData.get("language") as string) : "en";
 
-    const result = await transcribeAudio(buffer, mimeType);
+    const result = await transcribeAudio(buffer, mimeType, language);
 
     return NextResponse.json(result, { headers: CORS });
   } catch (err) {
