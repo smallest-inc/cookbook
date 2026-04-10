@@ -43,19 +43,19 @@ export function Footer() {
               Atoms Platform
             </a>
             <a
-              href="https://waves-docs.smallest.ai"
+              href="https://docs.smallest.ai/waves"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => trackExternalLinkClick("waves_docs", "https://waves-docs.smallest.ai", "footer")}
+              onClick={() => trackExternalLinkClick("waves_docs", "https://docs.smallest.ai/waves", "footer")}
               className="hover:text-foreground transition-colors"
             >
               Waves Docs
             </a>
             <a
-              href="https://atoms-docs.smallest.ai"
+              href="https://docs.smallest.ai/atoms"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => trackExternalLinkClick("atoms_docs", "https://atoms-docs.smallest.ai", "footer")}
+              onClick={() => trackExternalLinkClick("atoms_docs", "https://docs.smallest.ai/atoms", "footer")}
               className="hover:text-foreground transition-colors"
             >
               Atoms Docs

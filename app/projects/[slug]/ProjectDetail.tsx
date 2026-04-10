@@ -351,20 +351,20 @@ export function ProjectDetail({ project }: { project: Project }) {
                 Source Code
               </a>
               <a
-                href="https://waves-docs.smallest.ai"
+                href="https://docs.smallest.ai/waves"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackExternalLinkClick("waves_docs", "https://waves-docs.smallest.ai", "project_sidebar")}
+                onClick={() => trackExternalLinkClick("waves_docs", "https://docs.smallest.ai/waves", "project_sidebar")}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
                 Waves API Docs
               </a>
               <a
-                href="https://atoms-docs.smallest.ai"
+                href="https://docs.smallest.ai/atoms"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackExternalLinkClick("atoms_docs", "https://atoms-docs.smallest.ai", "project_sidebar")}
+                onClick={() => trackExternalLinkClick("atoms_docs", "https://docs.smallest.ai/atoms", "project_sidebar")}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
