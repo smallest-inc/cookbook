@@ -42,7 +42,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ENV_PATH = PROJECT_ROOT / ".env"
 
 DEFAULT_AGENT_NAME = "Hearthside Narrator"
-DEFAULT_VOICE_ID   = "nyah"            # waves_lightning_large catalog
+DEFAULT_VOICE_ID   = "magnus"          # waves_lightning_large catalog, verified in dashboard
 DEFAULT_VOICE_MODEL = "waves_lightning_large"
 DEFAULT_SLM        = "gpt-4o"          # "electron" is the cheaper alternative
 DEFAULT_LANGUAGE   = "en"
@@ -188,7 +188,11 @@ def create_agent(api_key: str, name: str, voice_id: str, voice_model: str,
     body = {
         "name": name,
         "description": "Voice-told Victorian mystery narrator for the Hearthside cookbook sample.",
-        "language": {"enabled": language},
+        "language": {
+            "default": language,
+            "supported": [language],
+            "switching": {"isEnabled": False},
+        },
         "synthesizer": {
             "voiceConfig": {"model": voice_model, "voiceId": voice_id},
             "speed": 1.0,
@@ -243,7 +247,11 @@ def patch_draft_config(api_key: str, agent_id: str, draft_id: str, *,
                        voice_id: str, voice_model: str, slm: str, language: str,
                        prompt: str) -> None:
     body = {
-        "language": {"enabled": language},
+        "language": {
+            "default": language,
+            "supported": [language],
+            "switching": {"isEnabled": False},
+        },
         "synthesizer": {
             "voiceConfig": {"model": voice_model, "voiceId": voice_id},
             "speed": 1.0,
