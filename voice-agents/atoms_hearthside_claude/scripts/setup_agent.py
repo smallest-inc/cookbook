@@ -184,12 +184,12 @@ def find_agent_by_name(api_key: str, name: str) -> Optional[str]:
     return None
 
 
-def create_agent(api_key: str, name: str, slm: str, language: str) -> str:
-    # Synthesizer is omitted on purpose. The backend auto-selects a default
-    # voice/model (currently resolves to the catalog the dashboard renders
-    # against), which keeps the agent usable without the script needing to
-    # pin any specific model id. Users tune voice in the dashboard.
-    body = {
+def create_agent(api_key: str, name: str, slm: str, language: str,
+                 voice_id: Optional[str], voice_model: Optional[str]) -> str:
+    # If voice_id is None, synthesizer is omitted so the backend picks a
+    # default — the safest choice for readers who don't know the voice
+    # catalog. Callers who want a specific voice pass --voice.
+    body: dict[str, Any] = {
         "name": name,
         "description": "Voice-told Victorian mystery narrator for the Hearthside cookbook sample.",
         "language": {
@@ -200,6 +200,14 @@ def create_agent(api_key: str, name: str, slm: str, language: str) -> str:
         "slmModel": slm,
         "workflowType": "single_prompt",
     }
+    if voice_id:
+        body["synthesizer"] = {
+            "voiceConfig": {
+                "model":   voice_model or "waves_lightning_v3_1",
+                "voiceId": voice_id,
+            },
+            "speed": 1.0,
+        }
     resp = api_request("POST", "/agent", api_key, body)
     agent_id = unwrap_data(resp)
     if not isinstance(agent_id, str) or len(agent_id) < 8:
@@ -244,10 +252,9 @@ def fetch_or_create_draft(api_key: str, agent_id: str, source_version_id: Option
 
 
 def patch_draft_config(api_key: str, agent_id: str, draft_id: str, *,
-                       slm: str, language: str, prompt: str) -> None:
-    # We do not patch synthesizer — the agent keeps whatever voice the
-    # backend default (or the dashboard) has already assigned.
-    body = {
+                       slm: str, language: str, prompt: str,
+                       voice_id: Optional[str], voice_model: Optional[str]) -> None:
+    body: dict[str, Any] = {
         "language": {
             "default": language,
             "supported": [language],
@@ -259,6 +266,14 @@ def patch_draft_config(api_key: str, agent_id: str, draft_id: str, *,
             "tools": [],
         },
     }
+    if voice_id:
+        body["synthesizer"] = {
+            "voiceConfig": {
+                "model":   voice_model or "waves_lightning_v3_1",
+                "voiceId": voice_id,
+            },
+            "speed": 1.0,
+        }
     api_request("PATCH", f"/agent/{agent_id}/drafts/{draft_id}/config", api_key, body)
 
 
@@ -296,6 +311,13 @@ def main() -> int:
                         help="slmModel (LLM driving the agent)")
     parser.add_argument("--language", default=DEFAULT_LANGUAGE, choices=["en", "hi", "ta"],
                         help="primary language")
+    parser.add_argument("--voice",    default=None,
+                        help="voiceId to pin (example: magnus, daniel, nyah). "
+                             "Omit to let the backend pick a default voice that "
+                             "renders correctly in the dashboard.")
+    parser.add_argument("--voice-model", default=None,
+                        help="Synthesizer model to pair with --voice. Defaults to "
+                             "waves_lightning_v3_1 when --voice is passed.")
     parser.add_argument("--force-create", action="store_true",
                         help="ignore existing AGENT_ID in .env and run the full create flow")
     args = parser.parse_args()
@@ -328,7 +350,8 @@ def main() -> int:
         print(f"  found existing agent: {agent_id}. Will update its config in place.")
     else:
         print("  not found. Creating...")
-        agent_id = create_agent(api_key, args.name, args.model, args.language)
+        agent_id = create_agent(api_key, args.name, args.model, args.language,
+                                args.voice, args.voice_model)
         print(f"  created agent: {agent_id}")
 
     print("Opening draft for config edit...")
@@ -339,7 +362,8 @@ def main() -> int:
     print("Writing prompt, LLM, and language into draft...")
     patch_draft_config(api_key, agent_id, draft_id,
                        slm=args.model, language=args.language,
-                       prompt=NARRATOR_PROMPT)
+                       prompt=NARRATOR_PROMPT,
+                       voice_id=args.voice, voice_model=args.voice_model)
 
     print("Publishing draft...")
     new_version_id = publish_draft(api_key, agent_id, draft_id)
