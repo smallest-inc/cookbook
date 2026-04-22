@@ -20,18 +20,48 @@ The app is deliberately narrow. Every feature here matters to the experience: a 
 - **Xcode** 26 or newer for iOS builds, or **Android Studio** with SDK 34+ for Android builds
 - A Smallest AI account and an API key from [app.smallest.ai/dashboard/api-keys](https://app.smallest.ai/dashboard/api-keys)
 
-## Setup (from a fresh clone)
+## Setup
+
+Two paths depending on whether you want the app to create the agent for you or you already have one.
+
+### A. Let the script create the narrator agent
 
 ```bash
 cd voice-agents/atoms_hearthside_rn
 
 cp .env.example .env
-# open .env and paste your SMALLEST_API_KEY
+# paste your SMALLEST_API_KEY into .env
 
-python scripts/setup_agent.py        # creates the narrator agent, writes AGENT_ID to .env
+python3 scripts/setup_agent.py       # creates (or updates) the narrator, writes AGENT_ID to .env
 npm install
 npx expo prebuild                    # generates ios/ and android/ projects
 ```
+
+`scripts/setup_agent.py` walks the full REST flow behind the scenes: `POST /agent` → open a draft → `PATCH /drafts/.../config` with the prompt, voice, and LLM model → `POST /drafts/.../publish`. It is idempotent — re-running updates the existing agent in place instead of creating duplicates.
+
+Flags:
+
+```bash
+python3 scripts/setup_agent.py --voice jasmine    # different voice
+python3 scripts/setup_agent.py --model electron   # different LLM (electron or gpt-4o)
+python3 scripts/setup_agent.py --name "Mystery Narrator"   # different agent name
+python3 scripts/setup_agent.py --force-create     # ignore existing AGENT_ID in .env
+```
+
+### B. Use an agent you already built in the dashboard
+
+```bash
+cd voice-agents/atoms_hearthside_rn
+
+cp .env.example .env
+# paste SMALLEST_API_KEY and AGENT_ID into .env
+
+python3 scripts/setup_agent.py       # sees AGENT_ID present, verifies, exits
+npm install
+npx expo prebuild
+```
+
+The script detects that `AGENT_ID` is already set and exits without calling any write APIs. Use this path when you already tuned the narrator persona in the dashboard and just want to wire the mobile client up to it.
 
 **Run on iOS** (simulator or device):
 

@@ -1,60 +1,80 @@
 #!/usr/bin/env python3
 """
-Create (or look up) the Hearthside narrator agent on Smallest Atoms.
+Provision the Hearthside narrator agent on Smallest Atoms.
 
-Reads SMALLEST_API_KEY from .env or environment, finds an existing agent
-named "Hearthside Narrator" if one exists (idempotent), otherwise creates
-it via POST /agent. Writes the resulting AGENT_ID into .env at the
-project root.
+Two modes, chosen automatically from .env:
+
+  1. Existing agent  — If AGENT_ID is already set in .env, this script
+     prints a confirmation and exits. No API key required. Use this when
+     you created the agent in the dashboard and just want to wire it up.
+
+  2. Create-or-update — If AGENT_ID is missing, requires SMALLEST_API_KEY.
+     Looks up an existing agent by name; if found, updates its config in
+     place. Otherwise creates a fresh agent. In both cases: opens a draft,
+     writes the full single-prompt config (prompt, voice, language,
+     model), and publishes the draft as a new version. Writes AGENT_ID
+     (and EXPO_PUBLIC_* mirrors for Metro bundle inlining) into .env.
 
 Usage:
     cd voice-agents/atoms_hearthside_rn
-    python scripts/setup_agent.py
+    python scripts/setup_agent.py                 # default narrator
+    python scripts/setup_agent.py --voice jasmine # override voice
+    python scripts/setup_agent.py --model gpt-4o  # override LLM
+    python scripts/setup_agent.py --name "My Narrator"   # override agent name
+
+Reference: https://docs.smallest.ai/atoms/api-reference
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
+import re
 import sys
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
-AGENT_NAME = "Hearthside Narrator"
 API_BASE = "https://api.smallest.ai/atoms/v1"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ENV_PATH = PROJECT_ROOT / ".env"
 
-NARRATOR_SYSTEM_PROMPT = """\
+DEFAULT_AGENT_NAME = "Hearthside Narrator"
+DEFAULT_VOICE_ID   = "nyah"            # waves_lightning_large catalog
+DEFAULT_VOICE_MODEL = "waves_lightning_large"
+DEFAULT_SLM        = "gpt-4o"          # "electron" is the cheaper alternative
+DEFAULT_LANGUAGE   = "en"
+
+NARRATOR_PROMPT = """\
 You are the narrator of Hearthside, a voice-told story the listener
 experiences in real time. Your voice is evocative, measured, and warm
-without becoming sentimental. You do not address the listener as "you";
-you narrate events in the second person only when a choice must be
-resolved.
+without becoming sentimental. You narrate events in prose.
 
 Genre: Victorian mystery. The listener is a detective in 1890s London,
 called to investigate the disappearance of a clockmaker from Marylebone.
 
-Opening scene (begin here): a narrow room above the clockmaker's shop,
-a half-finished pendulum on the workbench, rain on the skylight, a
-wet footprint at the foot of the stairs.
+Opening scene (begin here as soon as the session starts): a narrow room
+above the clockmaker's shop, a half-finished pendulum on the workbench,
+rain on the skylight, a wet footprint at the foot of the stairs.
 
 There are three branch points. At each, pause and invite a spoken
 choice from the listener:
+
   1. Examine the workbench, or descend the stairs to the street?
   2. Follow the footprints north into the rookery, or south toward
      the railway?
   3. Confront the suspect alone, or return to summon a constable?
 
 Rules of the narration:
+
  - Keep each narrator turn under forty seconds of speech. Short
-   sentences. Concrete sensory detail. No rhetorical questions except
-   the three branch prompts.
+   sentences. Concrete sensory detail.
  - When the listener says "wait" or asks to repeat, rewind to the
    previous branch and offer the same choice again, phrased slightly
    differently.
- - When the listener says "end the story" or "I'm done", resolve the
+ - When the listener says "end the story" or "I am done", resolve the
    current branch in two or three sentences and close with a single
    line of coda.
  - Treat silence of more than ten seconds as hesitation; gently offer
@@ -68,9 +88,9 @@ Resolve the mystery in your final branch in at most three sentences,
 and close with the line: "And the clock kept its own time, after all."
 """
 
+# ───────────────────────── env file helpers ─────────────────────────
 
 def load_dotenv(path: Path) -> dict[str, str]:
-    """Minimal .env reader. Ignores quoting quirks; this is single-user config."""
     if not path.exists():
         return {}
     out: dict[str, str] = {}
@@ -84,18 +104,15 @@ def load_dotenv(path: Path) -> dict[str, str]:
 
 
 def write_env(path: Path, updates: dict[str, str]) -> None:
-    """Rewrite .env preserving existing keys and line order."""
-    if path.exists():
-        lines = path.read_text().splitlines()
-    else:
-        lines = []
+    lines = path.read_text().splitlines() if path.exists() else []
     seen: set[str] = set()
     out_lines: list[str] = []
     for line in lines:
-        if line.strip().startswith("#") or "=" not in line:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
             out_lines.append(line)
             continue
-        key = line.split("=", 1)[0].strip()
+        key = stripped.split("=", 1)[0].strip()
         if key in updates:
             out_lines.append(f"{key}={updates[key]}")
             seen.add(key)
@@ -107,7 +124,16 @@ def write_env(path: Path, updates: dict[str, str]) -> None:
     path.write_text("\n".join(out_lines) + "\n")
 
 
-def api_request(method: str, path: str, api_key: str, body: Optional[dict] = None) -> dict:
+# ───────────────────────── HTTP layer ─────────────────────────
+
+class ApiError(RuntimeError):
+    def __init__(self, method: str, path: str, status: int, body: str):
+        super().__init__(f"{method} {path} -> {status}: {body[:500]}")
+        self.status = status
+        self.body = body
+
+
+def api_request(method: str, path: str, api_key: str, body: Optional[dict[str, Any]] = None) -> Any:
     url = f"{API_BASE}{path}"
     payload = json.dumps(body).encode() if body is not None else None
     req = urllib.request.Request(
@@ -121,83 +147,228 @@ def api_request(method: str, path: str, api_key: str, body: Optional[dict] = Non
         },
     )
     try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=30) as resp:
             raw = resp.read().decode("utf-8") or "{}"
-            return json.loads(raw)
+            parsed = json.loads(raw) if raw.strip().startswith("{") or raw.strip().startswith("[") else raw
+            return parsed
     except urllib.error.HTTPError as e:
         detail = e.read().decode("utf-8", errors="replace")
-        raise SystemExit(f"API error on {method} {path}: {e.code} {detail}")
+        raise ApiError(method, path, e.code, detail)
     except urllib.error.URLError as e:
         raise SystemExit(f"Network error on {method} {path}: {e.reason}")
 
 
-def find_existing_agent(api_key: str, name: str) -> Optional[str]:
-    """Best-effort idempotency check. Returns agent_id if one with this
-    name is already owned by the caller, otherwise None."""
+def unwrap_data(resp: Any) -> Any:
+    """Atoms responses wrap payloads in `{status, data}`. Some endpoints
+    return a bare string as `data`. Accept both shapes."""
+    if isinstance(resp, dict) and "data" in resp:
+        return resp["data"]
+    return resp
+
+
+# ───────────────────────── agent lifecycle ─────────────────────────
+
+def find_agent_by_name(api_key: str, name: str) -> Optional[str]:
     try:
-        resp = api_request("GET", "/agent", api_key)
-    except SystemExit:
+        resp = api_request("GET", "/agent?offset=100", api_key)
+    except ApiError:
         return None
-    items = resp.get("data") or resp.get("agents") or resp.get("items") or []
-    if not isinstance(items, list):
+    data = unwrap_data(resp)
+    agents = data.get("agents") if isinstance(data, dict) else None
+    if not isinstance(agents, list):
         return None
-    for a in items:
-        if not isinstance(a, dict):
-            continue
-        if a.get("name") == name:
-            return a.get("id") or a.get("agent_id") or a.get("_id")
+    for a in agents:
+        if isinstance(a, dict) and a.get("name") == name:
+            return a.get("_id") or a.get("id")
     return None
 
 
-def create_agent(api_key: str) -> str:
+def create_agent(api_key: str, name: str, voice_id: str, voice_model: str,
+                 slm: str, language: str) -> str:
     body = {
-        "name": AGENT_NAME,
+        "name": name,
         "description": "Voice-told Victorian mystery narrator for the Hearthside cookbook sample.",
-        "system_prompt": NARRATOR_SYSTEM_PROMPT,
-        "model": "gpt-4.1",
-        "language": "en",
-        # Voice id is picked by the user. Any narration-leaning voice id from
-        # the catalogue works; substitute the id you prefer.
-        "voice_id": "emily",
-        "temperature": 0.4,
+        "language": {"enabled": language},
+        "synthesizer": {
+            "voiceConfig": {"model": voice_model, "voiceId": voice_id},
+            "speed": 1.0,
+        },
+        "slmModel": slm,
+        "workflowType": "single_prompt",
     }
     resp = api_request("POST", "/agent", api_key, body)
-    agent_id = resp.get("id") or resp.get("agent_id") or resp.get("_id")
-    if not agent_id:
+    agent_id = unwrap_data(resp)
+    if not isinstance(agent_id, str) or len(agent_id) < 8:
         raise SystemExit(f"Unexpected /agent response: {json.dumps(resp)[:400]}")
-    return str(agent_id)
+    return agent_id
 
+
+def fetch_published_version_id(api_key: str, agent_id: str) -> Optional[str]:
+    resp = api_request("GET", f"/agent/{agent_id}/versions?limit=1", api_key)
+    data = unwrap_data(resp)
+    items = data.get("versions") if isinstance(data, dict) else data
+    if isinstance(items, list) and items:
+        v = items[0]
+        return v.get("_id") or v.get("id") or v.get("versionId")
+    return None
+
+
+def fetch_or_create_draft(api_key: str, agent_id: str, source_version_id: Optional[str]) -> str:
+    # AgentVersion has two id fields: _id (mongo record id) and draftId
+    # (the routing identifier used on PATCH/PUBLISH paths). We must use
+    # draftId for API routes, not _id.
+    try:
+        resp = api_request("GET", f"/agent/{agent_id}/drafts", api_key)
+        drafts = unwrap_data(resp)
+        if isinstance(drafts, list) and drafts:
+            d = drafts[0]
+            draft_id = d.get("draftId")
+            if draft_id:
+                return draft_id
+    except ApiError:
+        pass
+
+    body: dict[str, Any] = {"draftName": "hearthside-setup"}
+    if source_version_id:
+        body["sourceVersionId"] = source_version_id
+    resp = api_request("POST", f"/agent/{agent_id}/drafts", api_key, body)
+    data = unwrap_data(resp)
+    draft_id = data.get("draftId") if isinstance(data, dict) else None
+    if not draft_id:
+        raise SystemExit(f"Unexpected /drafts response (no draftId): {json.dumps(resp)[:400]}")
+    return draft_id
+
+
+def patch_draft_config(api_key: str, agent_id: str, draft_id: str, *,
+                       voice_id: str, voice_model: str, slm: str, language: str,
+                       prompt: str) -> None:
+    body = {
+        "language": {"enabled": language},
+        "synthesizer": {
+            "voiceConfig": {"model": voice_model, "voiceId": voice_id},
+            "speed": 1.0,
+        },
+        "slmModel": slm,
+        "singlePromptConfig": {
+            "prompt": prompt,
+            "tools": [],
+        },
+    }
+    api_request("PATCH", f"/agent/{agent_id}/drafts/{draft_id}/config", api_key, body)
+
+
+def publish_draft(api_key: str, agent_id: str, draft_id: str) -> str:
+    """Publish a draft; returns the new version id (needed for activation)."""
+    resp = api_request("POST", f"/agent/{agent_id}/drafts/{draft_id}/publish", api_key,
+                       {"label": f"hearthside-{int(time.time())}"})
+    data = unwrap_data(resp)
+    version_id = data.get("_id") if isinstance(data, dict) else None
+    if not version_id:
+        raise SystemExit(f"Publish did not return a version id: {json.dumps(resp)[:400]}")
+    return version_id
+
+
+def activate_version(api_key: str, agent_id: str, version_id: str) -> None:
+    api_request("PATCH", f"/agent/{agent_id}/versions/{version_id}/activate", api_key)
+
+
+def verify_agent_exists(api_key: str, agent_id: str) -> bool:
+    try:
+        api_request("GET", f"/agent/{agent_id}", api_key)
+        return True
+    except ApiError as e:
+        if e.status == 404:
+            return False
+        raise
+
+
+# ───────────────────────── entry point ─────────────────────────
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--name",  default=DEFAULT_AGENT_NAME, help="agent name")
+    parser.add_argument("--voice", default=DEFAULT_VOICE_ID,   help="voiceId from the waves_lightning_large catalog")
+    parser.add_argument("--voice-model", default=DEFAULT_VOICE_MODEL,
+                        choices=["waves", "waves_lightning_large"],
+                        help="synthesizer model")
+    parser.add_argument("--model",    default=DEFAULT_SLM, choices=["electron", "gpt-4o"],
+                        help="slmModel (LLM driving the agent)")
+    parser.add_argument("--language", default=DEFAULT_LANGUAGE, choices=["en", "hi", "ta"],
+                        help="primary language")
+    parser.add_argument("--force-create", action="store_true",
+                        help="ignore existing AGENT_ID in .env and run the full create flow")
+    args = parser.parse_args()
+
     env = load_dotenv(ENV_PATH)
     api_key = env.get("SMALLEST_API_KEY") or os.environ.get("SMALLEST_API_KEY")
-    if not api_key or not api_key.startswith("sk_"):
-        print(
-            "SMALLEST_API_KEY not set. Copy .env.example to .env and paste your key\n"
-            "from https://app.smallest.ai/dashboard/api-keys.",
-            file=sys.stderr,
-        )
+    existing_id = env.get("AGENT_ID")
+
+    # Mode 1: AGENT_ID already set. Skip creation unless --force-create.
+    if existing_id and not args.force_create:
+        if not api_key:
+            print(f"Using existing AGENT_ID={existing_id} from .env. Skipping creation.")
+            print("No API key needed for this path. Run `npx expo run:ios` next.")
+            return 0
+        if verify_agent_exists(api_key, existing_id):
+            print(f"Found AGENT_ID={existing_id} on your account. Skipping creation.")
+            _mirror_env_for_expo(api_key, existing_id)
+            return 0
+        print(f"AGENT_ID={existing_id} not reachable; running create flow instead.")
+
+    if not api_key or not re.match(r"^sk_", api_key):
+        print("SMALLEST_API_KEY missing or invalid. Copy .env.example to .env and paste your\n"
+              "key from https://app.smallest.ai/dashboard/api-keys.", file=sys.stderr)
         return 1
 
-    existing = find_existing_agent(api_key, AGENT_NAME)
-    if existing:
-        print(f"Found existing agent '{AGENT_NAME}' -> {existing}")
-        agent_id = existing
+    # Mode 2: create or update by name.
+    print(f"Looking up agent '{args.name}'...")
+    agent_id = find_agent_by_name(api_key, args.name)
+    if agent_id:
+        print(f"  found existing agent: {agent_id}. Will update its config in place.")
     else:
-        print(f"Creating agent '{AGENT_NAME}'...")
-        agent_id = create_agent(api_key)
-        print(f"Created -> {agent_id}")
+        print("  not found. Creating...")
+        agent_id = create_agent(api_key, args.name, args.voice, args.voice_model,
+                                args.model, args.language)
+        print(f"  created agent: {agent_id}")
 
-    # Write EXPO_PUBLIC_* too so the values are visible at Metro bundle time.
+    print("Opening draft for config edit...")
+    version_id = fetch_published_version_id(api_key, agent_id)
+    draft_id = fetch_or_create_draft(api_key, agent_id, version_id)
+    print(f"  draft: {draft_id}")
+
+    print("Writing prompt, voice, and model into draft...")
+    patch_draft_config(api_key, agent_id, draft_id,
+                       voice_id=args.voice, voice_model=args.voice_model,
+                       slm=args.model, language=args.language,
+                       prompt=NARRATOR_PROMPT)
+
+    print("Publishing draft...")
+    new_version_id = publish_draft(api_key, agent_id, draft_id)
+    print(f"  published as version {new_version_id}.")
+
+    print("Activating new version...")
+    activate_version(api_key, agent_id, new_version_id)
+    print("  activated (new config is live).")
+
+    _mirror_env_for_expo(api_key, agent_id)
+    print(f"\nDone. Agent ID -> {agent_id}")
+    print("Next: `npx expo prebuild && npx expo run:ios` (or run:android).")
+    return 0
+
+
+def _mirror_env_for_expo(api_key: str, agent_id: str) -> None:
     write_env(ENV_PATH, {
         "SMALLEST_API_KEY": api_key,
         "AGENT_ID": agent_id,
         "EXPO_PUBLIC_SMALLEST_API_KEY": api_key,
         "EXPO_PUBLIC_AGENT_ID": agent_id,
     })
-    print(f"Wrote {ENV_PATH}. Next: `npx expo prebuild && npx expo run:ios` (or run:android).")
-    return 0
+    print(f"Wrote {ENV_PATH}.")
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except ApiError as e:
+        print(f"API error: {e}", file=sys.stderr)
+        raise SystemExit(2)
