@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "Hearthside",
+    "slug": "atoms-hearthside-rn",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "scheme": "hearthside",
+    "ios": {
+      "bundleIdentifier": "ai.smallest.atoms.hearthside",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Hearthside needs the microphone so you can speak your choices into the story.",
+        "UIBackgroundModes": ["audio"]
+      }
+    },
+    "android": {
+      "package": "ai.smallest.atoms.hearthside",
+      "adaptiveIcon": {
+        "backgroundColor": "#0E0B08"
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.INTERNET"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "react-native-permissions",
+        {
+          "iosPermissions": ["Microphone"]
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

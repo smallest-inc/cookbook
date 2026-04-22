@@ -1,0 +1,17 @@
+node_modules/
+.expo/
+dist/
+web-build/
+ios/Pods/
+ios/build/
+android/build/
+android/app/build/
+android/.gradle/
+android/.idea/
+android/local.properties
+__pycache__/
+*.pyc
+.env
+.env.local
+.DS_Store
+*.tsbuildinfo
