@@ -42,8 +42,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ENV_PATH = PROJECT_ROOT / ".env"
 
 DEFAULT_AGENT_NAME = "Hearthside Narrator"
-DEFAULT_VOICE_ID   = "magnus"            # v3.1 catalog
-DEFAULT_VOICE_MODEL = "waves_lightning_v3_1"  # the backend default; dashboard renders this catalog
+DEFAULT_VOICE_ID   = "magnus"
+DEFAULT_VOICE_MODEL = "waves_lightning_large"  # documented in the OpenAPI spec
 DEFAULT_SLM        = "gpt-4o"          # "electron" is the cheaper alternative
 DEFAULT_LANGUAGE   = "en"
 
@@ -297,8 +297,8 @@ def main() -> int:
     parser.add_argument("--name",  default=DEFAULT_AGENT_NAME, help="agent name")
     parser.add_argument("--voice", default=DEFAULT_VOICE_ID,   help="voiceId from the waves_lightning_large catalog")
     parser.add_argument("--voice-model", default=DEFAULT_VOICE_MODEL,
-                        choices=["waves", "waves_lightning_large", "waves_lightning_v3_1"],
-                        help="synthesizer model (v3.1 is the current default; others are legacy)")
+                        choices=["waves", "waves_lightning_large"],
+                        help="synthesizer model (values documented in the Atoms OpenAPI spec)")
     parser.add_argument("--model",    default=DEFAULT_SLM, choices=["electron", "gpt-4o"],
                         help="slmModel (LLM driving the agent)")
     parser.add_argument("--language", default=DEFAULT_LANGUAGE, choices=["en", "hi", "ta"],
