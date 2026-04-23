@@ -31,19 +31,23 @@ function float32ToInt16LE(float32: Float32Array): Uint8Array {
 // so the UI can render a live mic waveform without reading the buffer
 // twice.
 export function startMicCapture(opts: CaptureOptions): CaptureHandle {
-  // iOS audio mode for a hands-free voice agent:
-  //   - voiceChat / videoChat: enable AEC but route via the "phone call"
-  //     audio path, which (a) caps output at receiver-level volume and
-  //     (b) silently ignores defaultToSpeaker. Narrator sounds like it's
-  //     playing through the earpiece near the top notch.
-  //   - voicePrompt (iOS 12+): designed for Siri-style TTS. Keeps
-  //     echo cancellation AND forces output to the loud bottom speaker
-  //     at media volume. This is the right pick for a storytelling app.
+  // iOS audio mode trade-off for a storytelling app with long-running
+  // playback:
+  //   - voiceChat / videoChat: AEC + NS but route via the phone-call
+  //     audio path (receiver, ~50% volume, defaultToSpeaker ignored).
+  //   - voicePrompt: speaker-routed AND AEC, but the audio unit is
+  //     tuned for short Siri-style prompts. Continuous 24 kHz streaming
+  //     for minutes underruns and distorts (muffled, buzzy, choppy).
+  //   - default: no voice processing, but stable continuous playback at
+  //     full media volume on the loud speaker when defaultToSpeaker is
+  //     set. Best overall. The absence of hardware AEC means the
+  //     speaker can echo back into the mic; the mute button in the UI
+  //     and headphone use both kill that loop cleanly.
   // allowBluetoothA2DP lets output prefer stereo BT (AirPods) over mono
   // HFP when both are available.
   AudioManager.setAudioSessionOptions({
     iosCategory: 'playAndRecord',
-    iosMode:     'voicePrompt',
+    iosMode:     'default',
     iosOptions:  ['allowBluetoothHFP', 'allowBluetoothA2DP', 'defaultToSpeaker'],
   });
   AudioManager.setAudioSessionActivity(true).catch(() => {

@@ -15,7 +15,7 @@ The app is deliberately small — under 600 lines of app code — so it reads as
 - Programmatic agent creation and in-app reconfiguration via REST — voice, speed, and language pickers that drive the full `draft → publish → activate` flow.
 - Transport diagnostics in the UI: a live chunk counter so users can verify their voice is actually reaching the server.
 - Mute toggle to suppress mic uploads during narration (stops spurious server-side VAD interruptions).
-- Correct iOS audio session: `voicePrompt` mode with `defaultToSpeaker`, so narration plays through the loud bottom speaker at media volume (not the earpiece) while hardware echo cancellation stays on.
+- Correctly configured iOS audio session: `playAndRecord` + `default` mode + `defaultToSpeaker`, so narration plays through the loud bottom speaker at full media volume, cleanly, without distortion or buffer underruns.
 
 ## Prerequisites
 
@@ -105,21 +105,24 @@ Tap **settings** (top-right, idle screen only) to open the agent configuration s
 |---|---|---|
 | Transport | `src/agent/AtomsClient.ts` | Opens the WebSocket, dispatches server events, handles reconnect with backoff. |
 | REST | `src/agent/atomsRest.ts` | Thin `fetch` wrapper for the agent read + draft-publish-activate flow used by the settings sheet. |
-| Capture | `src/agent/audioCapture.ts` | Configures the iOS audio session (`playAndRecord` + `voicePrompt` + `defaultToSpeaker`), starts an `AudioRecorder`, converts Float32 → Int16 LE, emits RMS for the mic waveform. |
+| Capture | `src/agent/audioCapture.ts` | Configures the iOS audio session (`playAndRecord` + `default` + `defaultToSpeaker`), starts an `AudioRecorder`, converts Float32 → Int16 LE, emits RMS for the mic waveform. |
 | Playback | `src/agent/audioPlayback.ts` | Web Audio `AudioContext` with a `nextPlayTime` pointer for gapless scheduling; `ctx.resume()` after construction (Android starts suspended); `flush()` resets the pointer on `interruption`. |
 | State machine | `src/hooks/useAtomsSession.ts` | `idle → connecting → joined → listening → narrating → error`. Owns permission check, lifecycle, mute gating, mic-chunk counter, error classification. |
 | UI | `app/index.tsx` + `src/ui/*` | Single screen. Title card, status chip, two labelled waveforms (narrator + you), mute pill, send counter, settings sheet, call button, error banner. |
 
 ## iOS audio routing
 
-The correct iOS audio session for a hands-free voice agent is **not** `voiceChat`. Apple's own docs:
+Choosing the iOS audio session for a voice agent is a three-way trade-off between output volume, playback stability, and hardware echo cancellation. We picked `default`. Reasoning, briefly:
 
-> *This setting (`defaultToSpeaker`) only applies to the playAndRecord category and is ignored when other modes like voiceChat or videoChat are active.*
+- `voiceChat` / `videoChat` — hardware AEC and noise suppression are great, but iOS routes output through the phone-call audio path. That means output caps at ~50% media volume and plays through the **receiver near the top notch**, not the loud bottom speaker. Apple's docs are explicit that `defaultToSpeaker` is silently ignored in these modes.
+- `voicePrompt` — routes to the loud speaker and keeps AEC, but the underlying audio unit is tuned for **short** Siri-style prompts. When we feed it continuous 24 kHz streaming audio for minutes, its buffer queue underruns and the output distorts (muffled, buzzy, choppy).
+- `default` — no voice-processing audio unit. Stable continuous playback at full media volume on the loud speaker when `defaultToSpeaker` is set. The absence of hardware AEC means the speaker can echo back into the mic on a hands-free demo, but the mute button and headphone use both kill that loop cleanly.
 
-With `voiceChat` or `videoChat`, iOS routes audio through the phone-call audio path, which caps at receiver-level volume and plays through the earpiece near the top notch — narration sounds faint. The right choice for a storytelling app is `voicePrompt`: iOS 12+ mode designed for Siri-style TTS that enables echo cancellation AND forces output to the loud bottom speaker at full media volume.
+For a storytelling app with long-running playback, `default` is the right pick. For a full-duplex conversational app where speaker use is the norm, revisit and consider enabling `voiceChat` with an explicit `overrideOutputAudioPort(.speaker)` call at the native layer.
 
 ## Known limitations
 
+- **iOS simulator distorts audio.** The Xcode simulator bridges iOS audio through macOS CoreAudio with aggressive resampling at 48 kHz, which produces radio-like crackling on 24 kHz streams. This is an Apple simulator limitation that every RN voice-agent app hits. The same code runs cleanly on a physical iPhone. Validate audio quality on device, not simulator.
 - **Android emulator virtual microphone.** The emulator records silence by default. The *sending · N* counter still climbs (transport works) but the server hears zero audio. Enable *Extended Controls → Microphone → Virtual microphone uses host audio input*, or test on a physical device.
 - **Android emulator audio output on Apple Silicon.** qemu's CoreAudio routing binds the output to whatever device was active at emulator boot. If you plug in headphones mid-session you need to restart the emulator — the built-in speaker path doesn't re-route automatically. Real Android devices are fine.
 - **Background mode.** The session tears down on actual app backgrounding. Notification shade, Control Center, and brief system dialogs keep the session alive. Keeping the socket open across a full suspension needs a foreground service on Android and VoIP entitlements on iOS, neither of which is in scope for a cookbook demo.
