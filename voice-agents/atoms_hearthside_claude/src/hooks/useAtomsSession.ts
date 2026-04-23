@@ -14,6 +14,9 @@ export interface UseAtomsSessionResult {
   error: SessionError | null;
   micLevel: number;
   agentLevel: number;
+  micChunksSent: number;    // increments per outbound chunk — proves transport
+  muted: boolean;
+  toggleMute: () => void;
   start: () => void;
   stop: () => void;
 }
@@ -36,10 +39,23 @@ export function useAtomsSession({ apiKey, agentId }: UseAtomsSessionConfig): Use
   const [error, setError] = useState<SessionError | null>(null);
   const [micLevel, setMicLevel] = useState(0);
   const [agentLevel, setAgentLevel] = useState(0);
+  const [micChunksSent, setMicChunksSent] = useState(0);
+  const [muted, setMuted] = useState(false);
 
   const clientRef = useRef<AtomsClient | null>(null);
   const captureRef = useRef<CaptureHandle | null>(null);
   const playbackRef = useRef<ScheduledPlayback | null>(null);
+  // Ref mirror because the mic onChunk closure is captured once per session;
+  // a stale `muted` value in state wouldn't reach the hot path.
+  const mutedRef = useRef(false);
+
+  const toggleMute = useCallback(() => {
+    setMuted((prev) => {
+      const next = !prev;
+      mutedRef.current = next;
+      return next;
+    });
+  }, []);
 
   const teardown = useCallback(() => {
     captureRef.current?.stop();
@@ -50,6 +66,9 @@ export function useAtomsSession({ apiKey, agentId }: UseAtomsSessionConfig): Use
     clientRef.current = null;
     setMicLevel(0);
     setAgentLevel(0);
+    setMicChunksSent(0);
+    setMuted(false);
+    mutedRef.current = false;
   }, []);
 
   const stop = useCallback(() => {
@@ -66,7 +85,7 @@ export function useAtomsSession({ apiKey, agentId }: UseAtomsSessionConfig): Use
   const handleEvent = useCallback((ev: ServerEvent) => {
     switch (ev.type) {
       case 'session.created':
-        setStatus('listening');
+        setStatus('joined');
         break;
       case 'output_audio.delta':
         if ('audio' in ev && typeof ev.audio === 'string') {
@@ -146,8 +165,13 @@ export function useAtomsSession({ apiKey, agentId }: UseAtomsSessionConfig): Use
           sampleRate: SAMPLE_RATE,
           chunkFrames: CHUNK_FRAMES,
           onChunk: (b64, rms) => {
+            if (mutedRef.current) {
+              setMicLevel(0);
+              return;
+            }
             client.sendMicChunk(b64);
             setMicLevel(rms);
+            setMicChunksSent((n) => n + 1);
           },
           onError: (msg) => {
             fail({ kind: 'unknown', message: msg, retryable: true });
@@ -165,13 +189,14 @@ export function useAtomsSession({ apiKey, agentId }: UseAtomsSessionConfig): Use
     client.start();
   }, [apiKey, agentId, handleEvent, fail]);
 
-  // Tear down on hard background transitions. iOS kills the socket on
-  // suspension anyway; Android revokes mic access without a foreground
-  // service. The UX tradeoff is intentional: ending the story cleanly
-  // beats the user coming back to a broken state.
+  // Tear down only on *real* backgrounding, not on the transient
+  // `inactive` state. iOS fires `inactive` when the user pulls the
+  // notification shade, opens Control Center, answers a brief system
+  // dialog — none of which should kill a story in progress. `background`
+  // means the app actually left the foreground and iOS will suspend us.
   useEffect(() => {
     const sub = AppState.addEventListener('change', (next) => {
-      if (next !== 'active' && clientRef.current) stop();
+      if (next === 'background' && clientRef.current) stop();
     });
     return () => sub.remove();
   }, [stop]);
@@ -180,5 +205,10 @@ export function useAtomsSession({ apiKey, agentId }: UseAtomsSessionConfig): Use
   // zombie state the user can't recover from without a hard reload.
   useEffect(() => () => teardown(), [teardown]);
 
-  return { status, error, micLevel, agentLevel, start, stop };
+  return {
+    status, error,
+    micLevel, agentLevel, micChunksSent,
+    muted, toggleMute,
+    start, stop,
+  };
 }

@@ -11,6 +11,7 @@ export class ScheduledPlayback {
   private ctx: AudioContext | null = null;
   private nextPlayTime = 0;
   private opts: PlaybackOptions;
+  private firstChunkLogged = false;
 
   constructor(opts: PlaybackOptions) {
     this.opts = opts;
@@ -20,6 +21,9 @@ export class ScheduledPlayback {
     const ctx = new AudioContext({ sampleRate: this.opts.sampleRate });
     this.ctx = ctx;
     this.nextPlayTime = ctx.currentTime;
+    // Android AudioContext starts suspended; iOS starts running. Resume is a
+    // no-op where already running, required on Android.
+    ctx.resume?.();
   }
 
   // Decode base64 Int16 LE PCM and schedule it back-to-back on the Web
@@ -31,6 +35,11 @@ export class ScheduledPlayback {
     if (!ctx) return;
     const bytes = Buffer.from(b64, 'base64');
     if (bytes.length < 2) return;
+
+    if (!this.firstChunkLogged) {
+      this.firstChunkLogged = true;
+      console.log(`[playback] first chunk: ${bytes.length} bytes, ctx.state=${(ctx as any).state}, sampleRate=${this.opts.sampleRate}`);
+    }
 
     this.opts.onLevel(rmsInt16(new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength)));
 
@@ -61,5 +70,6 @@ export class ScheduledPlayback {
     this.ctx = null;
     this.nextPlayTime = 0;
     this.opts.onLevel(0);
+    this.firstChunkLogged = false;
   }
 }

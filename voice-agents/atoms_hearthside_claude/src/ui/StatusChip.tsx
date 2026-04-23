@@ -6,6 +6,7 @@ import { typography } from '@/theme/typography';
 const LABELS: Record<SessionStatus, string> = {
   idle:       'ready',
   connecting: 'connecting',
+  joined:     'narrator joined',
   listening:  'listening',
   narrating:  'narrator speaking',
   error:      'error',
@@ -14,6 +15,7 @@ const LABELS: Record<SessionStatus, string> = {
 const DOT_COLORS: Record<SessionStatus, string> = {
   idle:       colors.textMuted,
   connecting: colors.accentAmber,
+  joined:     colors.accentSlate,
   listening:  colors.accentSlate,
   narrating:  colors.accentAmber,
   error:      colors.danger,

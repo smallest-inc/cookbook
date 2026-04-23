@@ -31,10 +31,20 @@ function float32ToInt16LE(float32: Float32Array): Uint8Array {
 // so the UI can render a live mic waveform without reading the buffer
 // twice.
 export function startMicCapture(opts: CaptureOptions): CaptureHandle {
+  // iOS audio mode for a hands-free voice agent:
+  //   - voiceChat / videoChat: enable AEC but route via the "phone call"
+  //     audio path, which (a) caps output at receiver-level volume and
+  //     (b) silently ignores defaultToSpeaker. Narrator sounds like it's
+  //     playing through the earpiece near the top notch.
+  //   - voicePrompt (iOS 12+): designed for Siri-style TTS. Keeps
+  //     echo cancellation AND forces output to the loud bottom speaker
+  //     at media volume. This is the right pick for a storytelling app.
+  // allowBluetoothA2DP lets output prefer stereo BT (AirPods) over mono
+  // HFP when both are available.
   AudioManager.setAudioSessionOptions({
     iosCategory: 'playAndRecord',
-    iosMode:     'voiceChat',
-    iosOptions:  ['allowBluetoothHFP', 'defaultToSpeaker'],
+    iosMode:     'voicePrompt',
+    iosOptions:  ['allowBluetoothHFP', 'allowBluetoothA2DP', 'defaultToSpeaker'],
   });
   AudioManager.setAudioSessionActivity(true).catch(() => {
     // Harmless: setAudioSessionActivity rejects when already active.

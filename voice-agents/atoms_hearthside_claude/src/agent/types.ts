@@ -11,7 +11,8 @@ export type ServerEvent =
 export type SessionStatus =
   | 'idle'
   | 'connecting'
-  | 'listening'    // session open, mic streaming, agent not speaking
+  | 'joined'       // session.created received, narrator is in the room
+  | 'listening'    // mic streaming, agent finished a turn, waiting on user
   | 'narrating'    // agent_start_talking received, output_audio.delta flowing
   | 'error';
 

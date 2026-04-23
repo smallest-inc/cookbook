@@ -1,17 +1,21 @@
 # Hearthside — a voice-told story on Smallest Atoms
 
-A minimal React Native (Expo) sample that opens a real-time voice session with a Smallest Atoms agent and lets the listener steer a short branching Victorian mystery with their voice. Built on the raw WebSocket protocol documented at [docs.smallest.ai/atoms/developer-guide/integrate/mobile/react-native](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/react-native).
+A minimal React Native (Expo) sample that opens a real-time voice session with a Smallest Atoms agent and lets the listener steer a short branching Victorian mystery with their voice. Built on the plain WebSocket protocol documented at [docs.smallest.ai/atoms/developer-guide/integrate/mobile/react-native](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/react-native).
 
-The app is deliberately narrow. Every feature here matters to the experience: a clean narrator persona, natural turn-taking, low latency, interruption handling, and a visible waveform so the user trusts that their voice is being heard. Nothing else is on screen.
+<p align="center"><img src="./assets/hearthside-home.png" alt="Hearthside home screen on Android" width="260"></p>
+
+The app is deliberately small — under 600 lines of app code — so it reads as a reference for anyone wiring an Atoms agent into their own mobile app.
 
 ## What it shows
 
 - Real-time voice session over `wss://api.smallest.ai/atoms/v1/agent/connect` using the built-in `WebSocket` global (no SDK).
 - Microphone capture and gapless PCM playback using [`react-native-audio-api`](https://docs.swmansion.com/react-native-audio-api/).
-- `input_audio_buffer.append` streaming, `output_audio.delta` scheduled playback, `agent_start_talking` / `agent_stop_talking` / `interruption` / `session.closed` handling.
+- Full protocol: `input_audio_buffer.append` streaming, `output_audio.delta` scheduled playback, `agent_start_talking` / `agent_stop_talking` / `interruption` / `session.closed` handling.
 - Exponential-backoff reconnect for transient drops, hard-stop on auth failures.
-- Programmatic agent creation via `POST /agent` so the app is reproducible from a clean clone.
-- Proper teardown on app backgrounding and component unmount.
+- Programmatic agent creation and in-app reconfiguration via REST — voice, speed, and language pickers that drive the full `draft → publish → activate` flow.
+- Transport diagnostics in the UI: a live chunk counter so users can verify their voice is actually reaching the server.
+- Mute toggle to suppress mic uploads during narration (stops spurious server-side VAD interruptions).
+- Correct iOS audio session: `voicePrompt` mode with `defaultToSpeaker`, so narration plays through the loud bottom speaker at media volume (not the earpiece) while hardware echo cancellation stays on.
 
 ## Prerequisites
 
@@ -27,77 +31,99 @@ Two paths depending on whether you want the app to create the agent for you or y
 ### A. Let the script create the narrator agent
 
 ```bash
-cd voice-agents/atoms_hearthside_rn
+cd voice-agents/atoms_hearthside_claude
 
 cp .env.example .env
 # paste your SMALLEST_API_KEY into .env
 
 python3 scripts/setup_agent.py       # creates (or updates) the narrator, writes AGENT_ID to .env
 npm install
-npx expo prebuild                    # generates ios/ and android/ projects
+npx expo prebuild --clean            # regenerates ios/ and android/ projects
 ```
 
-`scripts/setup_agent.py` walks the full REST flow behind the scenes: `POST /agent` → open a draft → `PATCH /drafts/.../config` with the prompt, voice, and LLM model → `POST /drafts/.../publish`. It is idempotent — re-running updates the existing agent in place instead of creating duplicates.
+`scripts/setup_agent.py` walks the full REST flow behind the scenes: `POST /agent` → open a draft → `PATCH /drafts/.../config` with the prompt, voice, and LLM model → `POST /drafts/.../publish` → `PATCH /versions/.../activate`. It is idempotent — re-running updates the existing agent in place instead of creating duplicates.
 
 Flags:
 
 ```bash
-python3 scripts/setup_agent.py --voice jasmine    # different voice
-python3 scripts/setup_agent.py --model electron   # different LLM (electron or gpt-4o)
-python3 scripts/setup_agent.py --name "Mystery Narrator"   # different agent name
-python3 scripts/setup_agent.py --force-create     # ignore existing AGENT_ID in .env
+python3 scripts/setup_agent.py --voice magnus        # different voice
+python3 scripts/setup_agent.py --model electron      # different LLM (electron or gpt-4o)
+python3 scripts/setup_agent.py --name "Mystery Narrator"
+python3 scripts/setup_agent.py --force-create       # ignore existing AGENT_ID in .env
 ```
 
 ### B. Use an agent you already built in the dashboard
 
 ```bash
-cd voice-agents/atoms_hearthside_rn
+cd voice-agents/atoms_hearthside_claude
 
 cp .env.example .env
 # paste SMALLEST_API_KEY and AGENT_ID into .env
 
 python3 scripts/setup_agent.py       # sees AGENT_ID present, verifies, exits
 npm install
-npx expo prebuild
+npx expo prebuild --clean
 ```
 
 The script detects that `AGENT_ID` is already set and exits without calling any write APIs. Use this path when you already tuned the narrator persona in the dashboard and just want to wire the mobile client up to it.
 
-**Run on iOS** (simulator or device):
+## Run
+
+**iOS** (simulator or device):
 
 ```bash
-npx expo run:ios
+npx expo run:ios               # simulator
+npx expo run:ios --device      # physical iPhone over USB
 ```
 
-**Run on Android** (emulator or device):
+**Android** (emulator or device):
 
 ```bash
 npx expo run:android
 ```
 
-On first launch the app requests microphone permission. Tap **Begin story**, let the narrator read the opening scene, then speak your choice when the narrator pauses. Say *"wait"* or *"repeat that"* to back up to the last branch. Say *"end the story"* to wrap up.
+On first launch the app requests microphone permission. Tap **Begin story**. The narrator greets you and begins the opening scene. Speak your choice when it pauses. Tap **End story** to finish.
+
+### In-app settings
+
+Tap **settings** (top-right, idle screen only) to open the agent configuration sheet:
+
+- **Voice** — pick from six curated `lightning-v3.1` voices, or the custom chip shows the currently-active voice (e.g. your own clone).
+- **Speed** — 0.85× / 1.00× / 1.15× / 1.30×.
+- **Language** — English, Hindi, or Multi (auto-detect).
+
+**Apply & publish** runs the five-step REST flow (open draft → PATCH config → publish version → activate version) against your live agent. End the current story and start a new one to hear the change.
+
+### During a session
+
+- **mute / unmute** pill under the *you* waveform — gates the mic-upload path client-side. Muted = zero chunks leave the phone. Useful during long narration when your room has background noise.
+- **sending · N** counter — increments per 20 ms outbound audio chunk (~50/sec). If the number climbs, transport is alive regardless of what your mic is actually capturing.
 
 ## How it works
 
 | Layer | Module | Responsibility |
 |---|---|---|
 | Transport | `src/agent/AtomsClient.ts` | Opens the WebSocket, dispatches server events, handles reconnect with backoff. |
-| Capture | `src/agent/audioCapture.ts` | Configures the iOS audio session, starts an `AudioRecorder`, converts Float32 → Int16 LE, emits RMS for the mic waveform. |
-| Playback | `src/agent/audioPlayback.ts` | Web Audio `AudioContext` with a `nextPlayTime` pointer for gapless scheduling; a `flush()` that resets the pointer on `interruption`. |
-| State machine | `src/hooks/useAtomsSession.ts` | `idle → connecting → listening → narrating → error`. Owns permission check, lifecycle, and error classification. |
-| UI | `app/index.tsx` + `src/ui/*` | Single screen; shows title card, status chip, two waveform bars (mic + narrator), call button, error banner. |
+| REST | `src/agent/atomsRest.ts` | Thin `fetch` wrapper for the agent read + draft-publish-activate flow used by the settings sheet. |
+| Capture | `src/agent/audioCapture.ts` | Configures the iOS audio session (`playAndRecord` + `voicePrompt` + `defaultToSpeaker`), starts an `AudioRecorder`, converts Float32 → Int16 LE, emits RMS for the mic waveform. |
+| Playback | `src/agent/audioPlayback.ts` | Web Audio `AudioContext` with a `nextPlayTime` pointer for gapless scheduling; `ctx.resume()` after construction (Android starts suspended); `flush()` resets the pointer on `interruption`. |
+| State machine | `src/hooks/useAtomsSession.ts` | `idle → connecting → joined → listening → narrating → error`. Owns permission check, lifecycle, mute gating, mic-chunk counter, error classification. |
+| UI | `app/index.tsx` + `src/ui/*` | Single screen. Title card, status chip, two labelled waveforms (narrator + you), mute pill, send counter, settings sheet, call button, error banner. |
 
-## Customising the narrator
+## iOS audio routing
 
-The narrator persona lives in `scripts/setup_agent.py` as a constant string. Edit the `NARRATOR_SYSTEM_PROMPT`, change `voice_id` to any voice you prefer from the Smallest catalogue, and re-run `python scripts/setup_agent.py`. The script is idempotent: it looks up the agent by name and updates the existing record in place.
+The correct iOS audio session for a hands-free voice agent is **not** `voiceChat`. Apple's own docs:
 
-If you want a different story genre entirely, the simplest path is to change `AGENT_NAME` as well so the script creates a fresh agent rather than overwriting the mystery version.
+> *This setting (`defaultToSpeaker`) only applies to the playAndRecord category and is ignored when other modes like voiceChat or videoChat are active.*
+
+With `voiceChat` or `videoChat`, iOS routes audio through the phone-call audio path, which caps at receiver-level volume and plays through the earpiece near the top notch — narration sounds faint. The right choice for a storytelling app is `voicePrompt`: iOS 12+ mode designed for Siri-style TTS that enables echo cancellation AND forces output to the loud bottom speaker at full media volume.
 
 ## Known limitations
 
-- **iOS simulator feedback loop.** The Mac speaker plays the narrator's audio, the Mac microphone picks it up, the server's VAD interprets it as the user interrupting, and the narrator cuts off in a loop. On a real device with earphones or an HFP Bluetooth headset this does not happen. If you are only evaluating in the simulator, plug in wired headphones or use AirPods.
-- **Android emulator virtual microphone.** The emulator's virtual mic records silence by default. Either enable *Extended Controls → Microphone → Virtual microphone uses host audio input*, or run on a physical device.
-- **Background mode.** The session tears down on app background. Keeping the socket alive during suspension needs a proper foreground service on Android and VoIP entitlements on iOS, neither of which is in scope for a showcase app.
+- **Android emulator virtual microphone.** The emulator records silence by default. The *sending · N* counter still climbs (transport works) but the server hears zero audio. Enable *Extended Controls → Microphone → Virtual microphone uses host audio input*, or test on a physical device.
+- **Android emulator audio output on Apple Silicon.** qemu's CoreAudio routing binds the output to whatever device was active at emulator boot. If you plug in headphones mid-session you need to restart the emulator — the built-in speaker path doesn't re-route automatically. Real Android devices are fine.
+- **Background mode.** The session tears down on actual app backgrounding. Notification shade, Control Center, and brief system dialogs keep the session alive. Keeping the socket open across a full suspension needs a foreground service on Android and VoIP entitlements on iOS, neither of which is in scope for a cookbook demo.
+- **Curated voice list.** The settings sheet ships with six shortlisted voices to keep the picker readable. The full `lightning-v3.1` catalogue is 106 voices; if you want the complete list, fetch `GET /waves/v1/voices` at runtime.
 
 ## Reference
 
