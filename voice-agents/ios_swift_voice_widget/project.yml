@@ -1,0 +1,36 @@
+name: AtomsVoiceWidget
+options:
+  deploymentTarget:
+    iOS: "16.0"
+  bundleIdPrefix: ai.smallest
+  createIntermediateGroups: true
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: ""
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    GENERATE_INFOPLIST_FILE: YES
+    INFOPLIST_KEY_NSMicrophoneUsageDescription: "MyClinic uses your microphone so you can ask the assistant questions by voice."
+    INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    INFOPLIST_KEY_UIRequiresFullScreen: NO
+    INFOPLIST_KEY_UIStatusBarStyle: UIStatusBarStyleDefault
+    INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait"
+
+targets:
+  AtomsVoiceWidget:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    info:
+      path: Sources/Info.plist
+      properties:
+        UIBackgroundModes: [audio]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ai.smallest.atoms.voicewidget
+        PRODUCT_NAME: AtomsVoiceWidget
+        TARGETED_DEVICE_FAMILY: "1,2"

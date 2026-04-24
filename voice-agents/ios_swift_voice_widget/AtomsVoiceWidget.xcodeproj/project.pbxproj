@@ -1,0 +1,377 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0AD22BACCD2AE9F466E52794 /* AtomsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66911ED55E221737ECC2FF86 /* AtomsWidget.swift */; };
+		2AAF95B5E811A7DC492FED11 /* BrandColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55166B677E41D20FC53345B7 /* BrandColors.swift */; };
+		36C7D136E15D1C7B40A1B3F8 /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63383C66620835D76061866E /* AudioEngine.swift */; };
+		4766F6D1BDAE97EECE086803 /* AtomsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF916EBBDEE291AEA37BF8C /* AtomsClient.swift */; };
+		8A9227FDCF14EE20D6654E0D /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ADE9FD97331F2195333EBB4 /* App.swift */; };
+		C5A6A7D7A0276016B2F6737F /* SessionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A247501103B0926C3FCDD05C /* SessionState.swift */; };
+		C76504C88F5C60714DB1DA17 /* SessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFDC9459132678E8DBDD629 /* SessionViewModel.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4ADE9FD97331F2195333EBB4 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
+		55166B677E41D20FC53345B7 /* BrandColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandColors.swift; sourceTree = "<group>"; };
+		63383C66620835D76061866E /* AudioEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngine.swift; sourceTree = "<group>"; };
+		66911ED55E221737ECC2FF86 /* AtomsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomsWidget.swift; sourceTree = "<group>"; };
+		8FF916EBBDEE291AEA37BF8C /* AtomsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AtomsClient.swift; sourceTree = "<group>"; };
+		9BFDC9459132678E8DBDD629 /* SessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionViewModel.swift; sourceTree = "<group>"; };
+		A247501103B0926C3FCDD05C /* SessionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionState.swift; sourceTree = "<group>"; };
+		A3DDE9CC4CC346EE2FB03D26 /* AtomsVoiceWidget.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AtomsVoiceWidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DCD9EC14C57AD7D364CCFF89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0273570D0FA05B5DA36B3649 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				66911ED55E221737ECC2FF86 /* AtomsWidget.swift */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		33C0595C4517AA913B6C2659 = {
+			isa = PBXGroup;
+			children = (
+				D4CEF29FBE33B95D013BF725 /* Sources */,
+				CD82855291423E7236992265 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		54F708BD4703769A5FF500C5 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				55166B677E41D20FC53345B7 /* BrandColors.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		77EFE55FAE168ECE52A885E4 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A247501103B0926C3FCDD05C /* SessionState.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		9B87F11E4EEC8F3ECB210B1F /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				9BFDC9459132678E8DBDD629 /* SessionViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		CD82855291423E7236992265 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A3DDE9CC4CC346EE2FB03D26 /* AtomsVoiceWidget.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D4CEF29FBE33B95D013BF725 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				4ADE9FD97331F2195333EBB4 /* App.swift */,
+				DCD9EC14C57AD7D364CCFF89 /* Info.plist */,
+				F4413EFA9205886CE5D98E76 /* Audio */,
+				E757C8D4269CBC1DBB6DA168 /* Clients */,
+				77EFE55FAE168ECE52A885E4 /* Models */,
+				54F708BD4703769A5FF500C5 /* Theme */,
+				9B87F11E4EEC8F3ECB210B1F /* ViewModels */,
+				0273570D0FA05B5DA36B3649 /* Widget */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		E757C8D4269CBC1DBB6DA168 /* Clients */ = {
+			isa = PBXGroup;
+			children = (
+				8FF916EBBDEE291AEA37BF8C /* AtomsClient.swift */,
+			);
+			path = Clients;
+			sourceTree = "<group>";
+		};
+		F4413EFA9205886CE5D98E76 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				63383C66620835D76061866E /* AudioEngine.swift */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		EA2B58EC02E659EFE50BCB65 /* AtomsVoiceWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85A5EC4EBB2770E8E4AB61D3 /* Build configuration list for PBXNativeTarget "AtomsVoiceWidget" */;
+			buildPhases = (
+				8478C2BBB8053D321B2A4687 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AtomsVoiceWidget;
+			packageProductDependencies = (
+			);
+			productName = AtomsVoiceWidget;
+			productReference = A3DDE9CC4CC346EE2FB03D26 /* AtomsVoiceWidget.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C21E25E4D3CC0AEDF48D83F6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					EA2B58EC02E659EFE50BCB65 = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = AB67FCC6DEEB8B61709105D7 /* Build configuration list for PBXProject "AtomsVoiceWidget" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 33C0595C4517AA913B6C2659;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = CD82855291423E7236992265 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EA2B58EC02E659EFE50BCB65 /* AtomsVoiceWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8478C2BBB8053D321B2A4687 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A9227FDCF14EE20D6654E0D /* App.swift in Sources */,
+				4766F6D1BDAE97EECE086803 /* AtomsClient.swift in Sources */,
+				0AD22BACCD2AE9F466E52794 /* AtomsWidget.swift in Sources */,
+				36C7D136E15D1C7B40A1B3F8 /* AudioEngine.swift in Sources */,
+				2AAF95B5E811A7DC492FED11 /* BrandColors.swift in Sources */,
+				C5A6A7D7A0276016B2F6737F /* SessionState.swift in Sources */,
+				C76504C88F5C60714DB1DA17 /* SessionViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		073989694143C7506D90F70F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Sources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.smallest.atoms.voicewidget;
+				PRODUCT_NAME = AtomsVoiceWidget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		29DE0EA7785EDAB0569035EE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MyClinic uses your microphone so you can ask the assistant questions by voice.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		31A877EDD08F7A2DAA94794B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Sources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.smallest.atoms.voicewidget;
+				PRODUCT_NAME = AtomsVoiceWidget;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		721F78C097EA910B4075D700 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MyClinic uses your microphone so you can ask the assistant questions by voice.";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		85A5EC4EBB2770E8E4AB61D3 /* Build configuration list for PBXNativeTarget "AtomsVoiceWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				073989694143C7506D90F70F /* Debug */,
+				31A877EDD08F7A2DAA94794B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AB67FCC6DEEB8B61709105D7 /* Build configuration list for PBXProject "AtomsVoiceWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				721F78C097EA910B4075D700 /* Debug */,
+				29DE0EA7785EDAB0569035EE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C21E25E4D3CC0AEDF48D83F6 /* Project object */;
+}
