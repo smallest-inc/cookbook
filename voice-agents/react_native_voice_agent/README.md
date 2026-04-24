@@ -4,7 +4,7 @@ A minimal React Native (Expo) sample that opens a real-time voice session with a
 
 <p align="center"><img src="./assets/hearthside-home.png" alt="Hearthside home screen on Android" width="260"></p>
 
-The app is deliberately small — under 600 lines of app code — so it reads as a reference for anyone wiring an Atoms agent into their own mobile app.
+The app is deliberately small so it reads as a reference for anyone wiring an Atoms agent into their own mobile app.
 
 ## What it shows
 

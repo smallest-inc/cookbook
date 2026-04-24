@@ -172,7 +172,7 @@ Build AI voice agents that can talk to anyone on voice or text, in any language,
 
 ### Mobile Apps
 
-- [React Native Voice Agent (Hearthside)](./voice-agents/react_native_voice_agent/) — iOS + Android voice agent over the plain WebSocket endpoint. Expo, ~600 lines, no WebRTC. In-app voice/speed/language picker, mute toggle, transport diagnostics, correct iOS audio session.
+- [React Native Voice Agent (Hearthside)](./voice-agents/react_native_voice_agent/) — iOS + Android voice agent over the plain WebSocket endpoint. Expo, no WebRTC. In-app voice/speed/language picker, mute toggle, transport diagnostics, correct iOS audio session.
 
 **[See all Voice Agents examples &rarr;](./voice-agents/)**
 
