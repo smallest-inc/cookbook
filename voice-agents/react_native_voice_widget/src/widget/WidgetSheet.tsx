@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Dimensions, Easing, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Animated, Easing, Modal, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/theme/colors';
 
@@ -9,19 +9,19 @@ interface Props {
   children: React.ReactNode;
 }
 
-const SCREEN_H = Dimensions.get('window').height;
-
 // Bottom-sheet shell. No external bottom-sheet lib — uses Modal + a simple
 // slide/fade animation so consumers don't have to add @gorhom/bottom-sheet
 // or react-native-reanimated to their host app.
 export function WidgetSheet({ visible, onRequestClose, children }: Props) {
-  const translateY = useRef(new Animated.Value(SCREEN_H)).current;
+  // Re-reads on rotation so the off-screen position tracks the new height.
+  const { height: screenH } = useWindowDimensions();
+  const translateY = useRef(new Animated.Value(screenH)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
       Animated.timing(translateY, {
-        toValue: visible ? 0 : SCREEN_H,
+        toValue: visible ? 0 : screenH,
         duration: visible ? 260 : 180,
         easing: visible ? Easing.out(Easing.cubic) : Easing.in(Easing.cubic),
         useNativeDriver: true,
@@ -32,7 +32,7 @@ export function WidgetSheet({ visible, onRequestClose, children }: Props) {
         useNativeDriver: true,
       }),
     ]).start();
-  }, [visible, translateY, backdropOpacity]);
+  }, [visible, translateY, backdropOpacity, screenH]);
 
   return (
     <Modal

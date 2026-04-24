@@ -112,10 +112,11 @@ export function useAtomsSession({ apiKey, agentId }: UseAtomsSessionConfig): Use
         break;
       case 'transcript':
         if ('role' in ev && 'text' in ev && typeof ev.text === 'string' && ev.text.trim().length) {
-          const role = ev.role === 'agent' ? 'assistant' : 'user';
+          const text = ev.text;
+          const role: 'user' | 'assistant' = ev.role === 'agent' ? 'assistant' : 'user';
           setTranscript((prev) => [
             ...prev,
-            { id: `${Date.now()}-${prev.length}`, role, text: ev.text as string },
+            { id: `${Date.now()}-${prev.length}`, role, text },
           ]);
         }
         break;

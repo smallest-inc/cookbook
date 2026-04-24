@@ -30,16 +30,15 @@ export interface AtomsWidgetProps {
 export function AtomsWidget({ apiKey, agentId, label = 'Ask AI' }: AtomsWidgetProps) {
   const [open, setOpen] = useState(false);
   const session = useAtomsSession({ apiKey, agentId });
+  const { status, start, stop } = session;
 
-  // Starting / stopping the session tracks the sheet's visibility. This is
-  // the single rule callers need to reason about: open sheet ⇒ session alive.
+  // Session tracks the sheet's visibility. One rule callers reason about:
+  // open sheet ⇒ session alive. Pulling `start`/`stop` out explicitly keeps
+  // React's exhaustive-deps rule satisfied; both are stable useCallback refs.
   useEffect(() => {
-    if (open && session.status === 'idle') {
-      session.start();
-    } else if (!open && session.status !== 'idle') {
-      session.stop();
-    }
-  }, [open, session.status]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (open && status === 'idle') start();
+    else if (!open && status !== 'idle') stop();
+  }, [open, status, start, stop]);
 
   const activeLevel = session.status === 'narrating' ? session.agentLevel : session.micLevel;
   const waveformActive = session.status === 'narrating' ||
