@@ -1,0 +1,17 @@
+# Xcode user data + derived projects — regenerate with `xcodegen generate`
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcworkspace/xcuserdata/
+build/
+DerivedData/
+
+# xcodegen can re-create the xcodeproj from project.yml; don't commit it.
+AtomsVoiceAgent.xcodeproj/
+
+# macOS
+.DS_Store
+
+# Swift Package Manager (only if you end up adding deps)
+.swiftpm/
+.build/
+Packages/
