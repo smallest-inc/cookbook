@@ -174,6 +174,7 @@ Build AI voice agents that can talk to anyone on voice or text, in any language,
 
 - [React Native Voice Agent (Hearthside)](./voice-agents/react_native_voice_agent/) — iOS + Android voice agent over the plain WebSocket endpoint. Expo, no WebRTC. In-app voice/speed/language picker, mute toggle, transport diagnostics, correct iOS audio session.
 - [iOS Swift Voice Agent](./voice-agents/ios_swift_voice_agent/) — Native iOS (SwiftUI) implementation of the same pattern. `URLSessionWebSocketTask` + `AVAudioEngine`, no WebRTC, no SDK.
+- [Android Kotlin Voice Agent](./voice-agents/android_kotlin_voice_agent/) — Native Android (Jetpack Compose) implementation. OkHttp `WebSocket` + `AudioRecord`/`AudioTrack`, min SDK 24.
 
 **[See all Voice Agents examples &rarr;](./voice-agents/)**
 
