@@ -31,7 +31,7 @@ Two paths depending on whether you want the app to create the agent for you or y
 ### A. Let the script create the narrator agent
 
 ```bash
-cd voice-agents/atoms_hearthside_claude
+cd voice-agents/react_native_voice_agent
 
 cp .env.example .env
 # paste your SMALLEST_API_KEY into .env
@@ -55,7 +55,7 @@ python3 scripts/setup_agent.py --force-create       # ignore existing AGENT_ID i
 ### B. Use an agent you already built in the dashboard
 
 ```bash
-cd voice-agents/atoms_hearthside_claude
+cd voice-agents/react_native_voice_agent
 
 cp .env.example .env
 # paste SMALLEST_API_KEY and AGENT_ID into .env
