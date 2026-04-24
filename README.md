@@ -170,6 +170,10 @@ Build AI voice agents that can talk to anyone on voice or text, in any language,
 - [Calendar Receptionist](./voice-agents/calendar_receptionist/) — Google Calendar, webhooks, agent duplication, React client
 - [Multi-Agent Voice AI Dashboard](./voice-agents/atoms_sdk_web_agent/) — Real-time dashboard with specialized agents for gaming and utility powered by Atoms SDK.
 
+### Mobile Apps
+
+- [React Native Voice Agent (Hearthside)](./voice-agents/react_native_voice_agent/) — iOS + Android voice agent over the plain WebSocket endpoint. Expo, ~600 lines, no WebRTC. In-app voice/speed/language picker, mute toggle, transport diagnostics, correct iOS audio session.
+
 **[See all Voice Agents examples &rarr;](./voice-agents/)**
 
 ---
