@@ -1,0 +1,23 @@
+name: atoms_voice_agent
+description: "Minimal Flutter voice agent sample over the Smallest Atoms WebSocket."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  web_socket_channel: ^3.0.2
+  mic_stream:         ^0.7.1
+  flutter_pcm_sound:  ^3.3.3
+  permission_handler: ^11.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
