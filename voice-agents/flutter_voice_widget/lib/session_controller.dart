@@ -17,22 +17,6 @@ enum SessionStatus {
   error,
 }
 
-extension SessionStatusX on SessionStatus {
-  bool get inSession => switch (this) {
-        SessionStatus.idle || SessionStatus.error => false,
-        _ => true,
-      };
-
-  String get label => switch (this) {
-        SessionStatus.idle       => 'ready',
-        SessionStatus.connecting => 'connecting',
-        SessionStatus.joined     => 'narrator joined',
-        SessionStatus.listening  => 'listening',
-        SessionStatus.narrating  => 'narrator speaking',
-        SessionStatus.error      => 'error',
-      };
-}
-
 class SessionState {
   const SessionState({
     this.status = SessionStatus.idle,

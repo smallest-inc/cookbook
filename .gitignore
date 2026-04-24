@@ -65,3 +65,20 @@ htmlcov/
 
 # Project files (cookbooks use requirements.txt only)
 pyproject.toml
+
+# Native mobile build artifacts
+**/.gradle/
+**/local.properties
+**/.cxx/
+
+# Flutter
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.metadata
+
+# iOS / Xcode
+**/*.xcuserstate
+**/xcuserdata/
+**/DerivedData/
+**/Pods/

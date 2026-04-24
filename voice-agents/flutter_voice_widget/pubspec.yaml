@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   web_socket_channel: ^3.0.2
-  mic_stream:         ^0.7.1
+  record:             ^6.1.0
   flutter_pcm_sound:  ^3.3.3
   permission_handler: ^11.3.1
 

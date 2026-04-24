@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:mic_stream/mic_stream.dart';
+import 'package:record/record.dart';
 
 /// Starts the platform microphone stream and emits base64-encoded Int16 LE
-/// PCM chunks at [sampleRate]. On Android the source is
-/// `MediaRecorder.AudioSource.VOICE_COMMUNICATION` which engages the AEC+NS
-/// pipeline. On iOS the default capture path is used; configure
-/// AVAudioSession via `audio_session` if you want echo cancellation there.
+/// PCM chunks at [sampleRate]. Uses the `record` package, which bridges to
+/// native PCM capture on iOS / Android / macOS. On Android this maps to
+/// `MediaRecorder.AudioSource.VOICE_COMMUNICATION` (AEC + NS engaged); on
+/// iOS to `AVAudioSession` record route.
 class MicCapture {
   MicCapture({
     required this.sampleRate,
@@ -22,16 +22,19 @@ class MicCapture {
   final void Function(String message) onError;
   final bool Function() mutedProvider;
 
+  final AudioRecorder _recorder = AudioRecorder();
   StreamSubscription<Uint8List>? _sub;
 
   Future<void> start() async {
     try {
-      final stream = MicStream.microphone(
-        audioSource: AudioSource.VOICE_COMMUNICATION,
+      final stream = await _recorder.startStream(RecordConfig(
+        encoder: AudioEncoder.pcm16bits,
         sampleRate: sampleRate,
-        channelConfig: ChannelConfig.CHANNEL_IN_MONO,
-        audioFormat: AudioFormat.ENCODING_PCM_16BIT,
-      );
+        numChannels: 1,
+        androidConfig: const AndroidRecordConfig(
+          audioSource: AndroidAudioSource.voiceCommunication,
+        ),
+      ));
       _sub = stream.listen(_onBytes, onError: (Object e) => onError(e.toString()));
     } catch (e) {
       onError('mic start failed: $e');
@@ -41,6 +44,10 @@ class MicCapture {
   Future<void> stop() async {
     await _sub?.cancel();
     _sub = null;
+    if (await _recorder.isRecording()) {
+      await _recorder.stop();
+    }
+    await _recorder.dispose();
   }
 
   void _onBytes(Uint8List bytes) {
@@ -48,24 +55,10 @@ class MicCapture {
       onChunk('', 0);
       return;
     }
-    final rms = _rmsPcm16(bytes);
-    onChunk(base64Encode(bytes), rms);
-  }
-
-  static double _rmsPcm16(Uint8List bytes) {
-    if (bytes.length < 2) return 0;
-    final frames = bytes.length ~/ 2;
-    double sum = 0;
-    final data = ByteData.view(bytes.buffer, bytes.offsetInBytes, bytes.lengthInBytes);
-    for (var i = 0; i < frames; i++) {
-      final s = data.getInt16(i * 2, Endian.little) / 32768.0;
-      sum += s * s;
-    }
-    return (sum / frames).abs().toDouble(); // actually sqrt below
+    onChunk(base64Encode(bytes), rmsFromPcm16(bytes));
   }
 }
 
-// Keeping helper here rather than in the class so tests can reach it.
 double rmsFromPcm16(Uint8List bytes) {
   if (bytes.length < 2) return 0;
   final frames = bytes.length ~/ 2;

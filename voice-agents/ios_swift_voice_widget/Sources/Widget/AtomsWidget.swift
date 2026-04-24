@@ -28,7 +28,7 @@ struct AtomsWidget: View {
         }
         .ignoresSafeArea(edges: .bottom)
         .sheet(isPresented: $open, onDismiss: { session.stop() }) {
-            WidgetSheet(session: session)
+            WidgetSheet(session: session, onClose: { open = false })
                 .presentationDetents([.fraction(0.55)])
                 .presentationDragIndicator(.visible)
                 .task { await session.start(apiKey: apiKey, agentId: agentId) }
@@ -57,6 +57,7 @@ struct AtomsWidget: View {
 /// own the session lifecycle and SwiftUI cleans up properly on dismiss.
 struct WidgetSheet: View {
     @ObservedObject var session: SessionViewModel
+    var onClose: () -> Void
 
     var body: some View {
         VStack(spacing: 18) {
@@ -68,7 +69,7 @@ struct WidgetSheet: View {
             ActionRow(
                 muted: session.muted,
                 onMic: { session.toggleMute() },
-                onClose: { /* sheet is dismissed via swipe / drag handle */ }
+                onClose: onClose
             )
             if let err = session.error {
                 Text(err.message)

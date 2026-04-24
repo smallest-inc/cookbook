@@ -97,6 +97,9 @@ class AtomsClient {
   }
 
   void _onMessage(dynamic data) {
+    // Any successful inbound frame means the reconnect budget should reset.
+    _reconnectAttempt = 0;
+
     final text = data is String ? data : (data is List<int> ? utf8.decode(data) : null);
     if (text == null) return;
     Map<String, dynamic> json;

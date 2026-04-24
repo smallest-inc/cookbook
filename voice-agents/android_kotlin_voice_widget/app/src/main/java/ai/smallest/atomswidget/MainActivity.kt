@@ -9,12 +9,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ShowChart
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,10 +71,10 @@ private fun HostDashboard() {
             Appointment("11:00", "Marie Curie", "Lab results", "Pending")
         }
         Section("QUICK LINKS") {
-            LinkRow("📅", "Full calendar")
-            LinkRow("👥", "Patient directory")
-            LinkRow("📊", "Today's metrics")
-            LinkRow("⚙", "Settings")
+            LinkRow(Icons.Outlined.CalendarMonth, "Full calendar")
+            LinkRow(Icons.Outlined.People, "Patient directory")
+            LinkRow(Icons.AutoMirrored.Outlined.ShowChart, "Today's metrics")
+            LinkRow(Icons.Outlined.Settings, "Settings")
         }
         Spacer(Modifier.height(140.dp))
     }
@@ -135,7 +141,7 @@ private fun Appointment(time: String, name: String, reason: String, status: Stri
 }
 
 @Composable
-private fun LinkRow(icon: String, label: String) {
+private fun LinkRow(icon: ImageVector, label: String) {
     Row(
         Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
@@ -143,10 +149,10 @@ private fun LinkRow(icon: String, label: String) {
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(icon, fontSize = 18.sp)
+        Icon(icon, contentDescription = null, tint = BrandColors.InkSoft, modifier = Modifier.size(20.dp))
         Spacer(Modifier.width(12.dp))
         Text(label, color = BrandColors.Ink, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
              modifier = Modifier.weight(1f))
-        Text("›", color = BrandColors.TextMuted, fontSize = 22.sp)
+        Icon(Icons.Outlined.ChevronRight, contentDescription = null, tint = BrandColors.TextMuted, modifier = Modifier.size(22.dp))
     }
 }
