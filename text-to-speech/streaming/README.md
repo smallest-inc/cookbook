@@ -67,8 +67,8 @@ node stream_ws.js "This text will be streamed via WebSocket."
 
 ## API Reference
 
-- [Lightning v3.1 SSE Streaming](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1)
-- [Lightning v3.1 WebSocket](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1-ws)
+- [Lightning v3.1 SSE Streaming](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/stream-lightning-v-31-speech)
+- [Lightning v3.1 WebSocket](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/text-to-speech-v-3-1)
 
 ## Next Steps
 
