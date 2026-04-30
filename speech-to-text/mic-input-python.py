@@ -53,9 +53,17 @@ async def transcribe_mic():
                     await ws.send(data)
                     await asyncio.sleep(0.01)
             except asyncio.CancelledError:
-                await ws.send(json.dumps({"type": "finalize"}))
+                # close_stream ends the session and triggers is_last=true.
+                # finalize would only flush the current buffer without ending.
+                try:
+                    await ws.send(json.dumps({"type": "close_stream"}))
+                except websockets.exceptions.ConnectionClosed:
+                    pass
+
+        full_transcript = ""
 
         async def receive_transcripts():
+            nonlocal full_transcript
             async for message in ws:
                 result = json.loads(message)
                 prefix = ">> " if result.get("is_final") else ".. "
@@ -63,6 +71,10 @@ async def transcribe_mic():
                     f"{prefix}{result.get('transcript', '')}",
                     end="\r" if not result.get("is_final") else "\n",
                 )
+                if result.get("is_final"):
+                    full_transcript += result.get("transcript", "") or ""
+                if result.get("is_last"):
+                    return
 
         send_task = asyncio.create_task(send_audio())
         try:
@@ -74,6 +86,7 @@ async def transcribe_mic():
             stream.stop_stream()
             stream.close()
             audio.terminate()
+            print(f"\nFull Transcript: {full_transcript}")
 
 
 asyncio.run(transcribe_mic())

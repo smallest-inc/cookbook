@@ -45,14 +45,19 @@ async def transcribe():
         for i in range(0, len(pcm_data), CHUNK_SIZE):
             await ws.send(pcm_data[i : i + CHUNK_SIZE])
 
-        # Signal end of audio
-        await ws.send(json.dumps({"type": "finalize"}))
+        # Signal end of audio (close_stream triggers is_last=true)
+        await ws.send(json.dumps({"type": "close_stream"}))
 
-        # Receive transcription results
+        # Receive transcription results, concatenating finals into a session transcript
+        full_transcript = ""
         async for message in ws:
             data = json.loads(message)
             if data.get("is_final"):
                 print(f"Final: {data.get('transcript')}")
+                full_transcript += data.get("transcript", "") or ""
+                if data.get("is_last"):
+                    print(f"\nFull Transcript: {full_transcript}")
+                    break
             else:
                 print(f"Partial: {data.get('transcript')}")
 
