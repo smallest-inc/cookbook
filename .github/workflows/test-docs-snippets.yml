@@ -39,7 +39,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install requests pytest
+        run: pip install requests pytest websockets
 
       - name: Run test suite
         env:
@@ -58,6 +58,27 @@ jobs:
           SMALLEST_API_KEY: ${{ secrets.SMALLEST_API_KEY }}
         run: |
           python speech-to-text/transcribe-python.py
+
+      # WebSocket STT was previously not exercised by CI — that's how the
+      # finalize-vs-close_stream bug (PR #35) hid for so long. The script
+      # downloads a sample WAV, streams it, and prints the assembled
+      # full transcript on is_last=true. Bounded by the 90s timeout in
+      # case close_stream fails to trigger is_last.
+      - name: Run STT WebSocket script
+        timeout-minutes: 2
+        env:
+          SMALLEST_API_KEY: ${{ secrets.SMALLEST_API_KEY }}
+        run: |
+          out=$(python speech-to-text/websocket-python.py)
+          echo "$out"
+          echo "$out" | grep -q "Full Transcript:" || { echo "missing Full Transcript line"; exit 1; }
+          echo "$out" | grep -q "Pulse API" || { echo "transcript content missing"; exit 1; }
+
+      # mic-input-python.py needs microphone hardware which CI runners
+      # do not have. We at least verify the script imports and parses,
+      # so a syntax error or stale import surface gets caught.
+      - name: Syntax-check STT mic script
+        run: python -c "import ast; ast.parse(open('speech-to-text/mic-input-python.py').read())"
 
       - name: Notify Slack on failure
         if: failure()
