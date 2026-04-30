@@ -12,6 +12,7 @@ on:
       - 'speech-to-text/*.sh'
       - 'speech-to-text/getting-started/samples/**'
       - 'docs/tests/**'
+      - '.github/workflows/test-docs-snippets.yml'
   pull_request:
     paths:
       - 'text-to-speech/*.py'
@@ -21,6 +22,7 @@ on:
       - 'speech-to-text/*.js'
       - 'speech-to-text/*.sh'
       - 'docs/tests/**'
+      - '.github/workflows/test-docs-snippets.yml'
   schedule:
     # Weekly Monday 9am UTC — catch API breaking changes
     - cron: '0 9 * * 1'
