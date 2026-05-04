@@ -21,6 +21,11 @@
 
 name: Notify docs of merged PR
 
+# Workflow uses no GITHUB_TOKEN-protected APIs — auth is via the
+# DOCS_DISPATCH_TOKEN secret only. Lock GITHUB_TOKEN to no permissions
+# (CodeQL js/actions/missing-workflow-permissions).
+permissions: {}
+
 on:
   pull_request:
     types: [closed]
