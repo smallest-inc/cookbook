@@ -1,0 +1,69 @@
+# COPY THIS FILE INTO EACH UPSTREAM REPO at .github/workflows/notify-docs-on-merge.yml
+#
+# Required upstream-repo setup (one-time per repo):
+#   1. Create a fine-grained PAT (or GitHub App installation token) with
+#      "Contents: read" + "Metadata: read" on the upstream repo, and
+#      "Repository dispatches: write" on the docs repo.
+#   2. Add two secrets in this upstream repo:
+#        DOCS_DISPATCH_TOKEN  — the PAT above
+#        DOCS_REPO_OWNER_NAME — the docs repo as `owner/name` (e.g. set
+#                              once in your internal runbook). Kept as a
+#                              secret so this public-template file does
+#                              not enumerate the docs/upstream relationship.
+#   3. Commit this workflow file. From the next merged PR onwards, the
+#      docs repo's pr-drift-detector.yml gets a repository_dispatch
+#      event, runs the Claude classifier, and DMs the docs owner only if
+#      verdict == DOCS_NEEDED or MAYBE.
+#
+# Where to install: any private upstream repo whose merges may require
+# docs follow-up (backend services, demos, etc.). The list lives in the
+# operators' internal runbook, not here.
+
+name: Notify docs of merged PR
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  signal-docs-repo:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch upstream_pr_merged event to docs repo
+        env:
+          # PAT or App token with `repository_dispatch:write` on the
+          # docs repo. Fine-grained scope, ONE repo.
+          DOCS_DISPATCH_TOKEN: ${{ secrets.DOCS_DISPATCH_TOKEN }}
+          DOCS_REPO_OWNER_NAME: ${{ secrets.DOCS_REPO_OWNER_NAME }}
+        run: |
+          : "${DOCS_REPO_OWNER_NAME:?DOCS_REPO_OWNER_NAME secret not set on this repo}"
+          # Build client_payload as JSON. We send a small subset; the docs
+          # workflow fetches body + diff via the GitHub API itself so the
+          # payload stays tight (GitHub caps client_payload at 64 KB).
+          jq -n \
+            --arg repo "${{ github.repository }}" \
+            --arg pr_number "${{ github.event.pull_request.number }}" \
+            --arg pr_title  "${{ github.event.pull_request.title }}" \
+            --arg pr_url    "${{ github.event.pull_request.html_url }}" \
+            --arg merged_by "${{ github.event.pull_request.merged_by.login }}" \
+            --arg base_ref  "${{ github.event.pull_request.base.ref }}" \
+            '{
+              event_type: "upstream_pr_merged",
+              client_payload: {
+                repo: $repo,
+                pr_number: ($pr_number | tonumber),
+                pr_title: $pr_title,
+                pr_url: $pr_url,
+                merged_by: $merged_by,
+                base_ref: $base_ref
+              }
+            }' > /tmp/dispatch.json
+
+          curl -sS -X POST \
+            -H "Authorization: Bearer $DOCS_DISPATCH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$DOCS_REPO_OWNER_NAME/dispatches" \
+            -d @/tmp/dispatch.json
+          echo "Dispatched upstream_pr_merged for ${{ github.repository }}#${{ github.event.pull_request.number }}"
