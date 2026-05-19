@@ -192,7 +192,7 @@ uv run app.py
 ### 4. Test
 
 ```bash
-smallestai agent-swarm chat
+smallestai agent-crew chat
 ```
 
 Walk through the insurance claim form — the agent guides you step by step.
@@ -200,7 +200,7 @@ Walk through the insurance claim form — the agent guides you step by step.
 ### 5. Deploy
 
 ```bash
-smallestai agent-swarm deploy --entry app.py
+smallestai agent-crew deploy --entry app.py
 ```
 
 ---
@@ -260,11 +260,11 @@ After completing a form over the phone, check your Jotform dashboard — the sub
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                          SwarmSession                             │
+│                          CrewSession                             │
 │                                                                  │
 │  ┌──────────────────────┐     ┌──────────────────────────────┐  │
 │  │  FormEngine            │     │  FormAgent                    │  │
-│  │  (State Machine)       │◄────│  OutputSwarmNode               │  │
+│  │  (State Machine)       │◄────│  OutputCrewNode               │  │
 │  │                        │     │                              │  │
 │  │  State:                │     │  Tools:                      │  │
 │  │  NOT_STARTED           │     │  • start_form                │  │
@@ -303,7 +303,7 @@ After completing a form over the phone, check your Jotform dashboard — the sub
 |------|-------|-------------|
 | `app.py` | ~76 | Entry point — creates form + Jotform client + agent |
 | `form_engine.py` | ~567 | State machine, field types, voice-friendly validation, HTML generation |
-| `form_agent.py` | ~299 | OutputSwarmNode with form tools + multi-round chaining |
+| `form_agent.py` | ~299 | OutputCrewNode with form tools + multi-round chaining |
 | `jotform_client.py` | ~166 | Auto-discovers Jotform question IDs, submits native entries |
 | `requirements.txt` | ~2 | Dependencies |
 
@@ -468,13 +468,13 @@ Then create a matching Jotform form with the same labels, and the `JotformClient
 
 | Component | Import | Purpose |
 |-----------|--------|---------|
-| `AtomsSwarmApp` | `smallestai.atoms.swarm.server` | WebSocket server + session lifecycle |
-| `SwarmSession` | `smallestai.atoms.swarm.session` | Session management, node graph |
-| `OutputSwarmNode` | `smallestai.atoms.swarm.nodes` | Conversational agent with TTS output |
-| `OpenAIClient` | `smallestai.atoms.swarm.clients.openai` | Streaming LLM client |
-| `ToolRegistry` | `smallestai.atoms.swarm.tools` | Tool discovery, schema generation, execution |
-| `@function_tool` | `smallestai.atoms.swarm.tools` | Decorator to register tools from methods |
-| `SDKAgentEndCallEvent` | `smallestai.atoms.swarm.events` | End call |
+| `AtomsCrewApp` | `smallestai.atoms.crew.server` | WebSocket server + session lifecycle |
+| `CrewSession` | `smallestai.atoms.crew.session` | Session management, node graph |
+| `OutputCrewNode` | `smallestai.atoms.crew.nodes` | Conversational agent with TTS output |
+| `OpenAIClient` | `smallestai.atoms.crew.clients.openai` | Streaming LLM client |
+| `ToolRegistry` | `smallestai.atoms.crew.tools` | Tool discovery, schema generation, execution |
+| `@function_tool` | `smallestai.atoms.crew.tools` | Decorator to register tools from methods |
+| `SDKAgentEndCallEvent` | `smallestai.atoms.crew.events` | End call |
 
 - Atoms SDK docs: [docs.smallest.ai](https://docs.smallest.ai)
 - Jotform API docs: [api.jotform.com/docs](https://api.jotform.com/docs/)

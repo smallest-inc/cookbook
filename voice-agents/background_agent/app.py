@@ -5,17 +5,17 @@ from loguru import logger
 from sentiment_analyzer import SentimentAnalyzer
 from support_agent import SupportAgent
 
-from smallestai.atoms.swarm.events import SDKEvent, SDKSystemUserJoinedEvent
-from smallestai.atoms.swarm.server import AtomsSwarmApp
-from smallestai.atoms.swarm.session import SwarmSession
+from smallestai.atoms.crew.events import SDKEvent, SDKSystemUserJoinedEvent
+from smallestai.atoms.crew.server import AtomsCrewApp
+from smallestai.atoms.crew.session import CrewSession
 
 
-async def setup_session(session: SwarmSession):
+async def setup_session(session: CrewSession):
     """Configure multi-node session with background processing.
     
     Architecture:
-    - SentimentAnalyzer (BackgroundSwarmNode): Processes all events, analyzes sentiment
-    - SupportAgent (OutputSwarmNode): Handles conversation, queries sentiment state
+    - SentimentAnalyzer (BackgroundCrewNode): Processes all events, analyzes sentiment
+    - SupportAgent (OutputCrewNode): Handles conversation, queries sentiment state
     
     Both nodes run in parallel, receiving the same events.
     """
@@ -52,5 +52,5 @@ async def setup_session(session: SwarmSession):
 
 
 if __name__ == "__main__":
-    app = AtomsSwarmApp(setup_handler=setup_session)
+    app = AtomsCrewApp(setup_handler=setup_session)
     app.run()

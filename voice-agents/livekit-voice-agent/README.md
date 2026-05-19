@@ -114,7 +114,7 @@ tts=tts.StreamAdapter(
 
 ### Interruption — Zero Custom Code
 
-The `SwarmSession` handles interruptions automatically. When Silero VAD detects you speaking mid-response, the TTS stream is cancelled and your speech is processed as a new turn.
+The `CrewSession` handles interruptions automatically. When Silero VAD detects you speaking mid-response, the TTS stream is cancelled and your speech is processed as a new turn.
 
 ---
 

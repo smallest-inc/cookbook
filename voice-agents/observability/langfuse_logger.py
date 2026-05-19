@@ -1,4 +1,4 @@
-"""Langfuse observability logger — BackgroundSwarmNode.
+"""Langfuse observability logger — BackgroundCrewNode.
 
 Streams all voice-agent events (transcripts, tool calls, LLM generations,
 call lifecycle) to Langfuse in real-time.  Runs silently alongside the
@@ -23,17 +23,17 @@ from dotenv import load_dotenv
 from langfuse import Langfuse
 from loguru import logger
 
-from smallestai.atoms.swarm.events import (
+from smallestai.atoms.crew.events import (
     SDKAgentTranscriptUpdateEvent,
     SDKEvent,
     SDKSystemUserJoinedEvent,
 )
-from smallestai.atoms.swarm.nodes import BackgroundSwarmNode
+from smallestai.atoms.crew.nodes import BackgroundCrewNode
 
 load_dotenv()
 
 
-class LangfuseLogger(BackgroundSwarmNode):
+class LangfuseLogger(BackgroundCrewNode):
     """Streams every meaningful event to Langfuse as spans, generations, and events.
 
     Architecture (Langfuse 3.x):

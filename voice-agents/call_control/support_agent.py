@@ -5,9 +5,9 @@ from typing import List
 
 from dotenv import load_dotenv
 
-from smallestai.atoms.swarm.clients.openai import OpenAIClient
-from smallestai.atoms.swarm.clients.types import ToolCall, ToolResult
-from smallestai.atoms.swarm.events import (
+from smallestai.atoms.crew.clients.openai import OpenAIClient
+from smallestai.atoms.crew.clients.types import ToolCall, ToolResult
+from smallestai.atoms.crew.events import (
     SDKAgentEndCallEvent,
     SDKAgentTransferConversationEvent,
     TransferOption,
@@ -15,13 +15,13 @@ from smallestai.atoms.swarm.events import (
     WarmTransferPrivateHandoffOption,
     WarmTransferHandoffOptionType,
 )
-from smallestai.atoms.swarm.nodes import OutputSwarmNode
-from smallestai.atoms.swarm.tools import ToolRegistry, function_tool
+from smallestai.atoms.crew.nodes import OutputCrewNode
+from smallestai.atoms.crew.tools import ToolRegistry, function_tool
 
 load_dotenv()
 
 
-class SupportAgent(OutputSwarmNode):
+class SupportAgent(OutputCrewNode):
     """Support agent with comprehensive call control capabilities.
     
     Demonstrates:

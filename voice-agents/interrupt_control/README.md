@@ -23,7 +23,7 @@ uv run app.py
 Connect with the CLI:
 
 ```bash
-smallestai agent-swarm chat
+smallestai agent-crew chat
 ```
 
 **Try these:**
@@ -71,7 +71,7 @@ User can speak again
 ### Key Code
 
 ```python
-from smallestai.atoms.swarm.events import (
+from smallestai.atoms.crew.events import (
     SDKAgentControlMuteUserEvent,
     SDKAgentControlUnmuteUserEvent,
 )

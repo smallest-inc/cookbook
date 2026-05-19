@@ -37,7 +37,7 @@ uv run app.py
 Connect with the CLI:
 
 ```bash
-smallestai agent-swarm chat
+smallestai agent-crew chat
 ```
 
 ## Recommended Usage
@@ -51,7 +51,7 @@ smallestai agent-swarm chat
 ### Define Tools with Decorator
 
 ```python
-from smallestai.atoms.swarm.tools import function_tool
+from smallestai.atoms.crew.tools import function_tool
 
 @function_tool()
 def get_weather(self, city: str) -> str:
@@ -66,9 +66,9 @@ def get_weather(self, city: str) -> str:
 ### Register Tools in Agent
 
 ```python
-from smallestai.atoms.swarm.tools import ToolRegistry
+from smallestai.atoms.crew.tools import ToolRegistry
 
-class AssistantAgent(OutputSwarmNode):
+class AssistantAgent(OutputCrewNode):
     def __init__(self):
         super().__init__(name="assistant-agent")
         

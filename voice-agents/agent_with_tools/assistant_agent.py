@@ -5,16 +5,16 @@ from typing import List
 
 from dotenv import load_dotenv
 
-from smallestai.atoms.swarm.clients.openai import OpenAIClient
-from smallestai.atoms.swarm.clients.types import ToolCall, ToolResult
-from smallestai.atoms.swarm.events import SDKAgentEndCallEvent
-from smallestai.atoms.swarm.nodes import OutputSwarmNode
-from smallestai.atoms.swarm.tools import ToolRegistry, function_tool
+from smallestai.atoms.crew.clients.openai import OpenAIClient
+from smallestai.atoms.crew.clients.types import ToolCall, ToolResult
+from smallestai.atoms.crew.events import SDKAgentEndCallEvent
+from smallestai.atoms.crew.nodes import OutputCrewNode
+from smallestai.atoms.crew.tools import ToolRegistry, function_tool
 
 load_dotenv()
 
 
-class AssistantAgent(OutputSwarmNode):
+class AssistantAgent(OutputCrewNode):
     """Assistant that can call tools to answer questions."""
 
     def __init__(self):

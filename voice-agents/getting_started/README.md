@@ -4,9 +4,9 @@ Your first Atoms agent — from zero to a running AI assistant.
 
 ## Features
 
-- **OutputSwarmNode** — The base class for conversational agents
+- **OutputCrewNode** — The base class for conversational agents
 - **generate_response()** — Streaming LLM responses
-- **AtomsSwarmApp** — Running the agent server
+- **AtomsCrewApp** — Running the agent server
 - **Event handling** — Greeting users on join
 
 ## Requirements
@@ -23,13 +23,13 @@ uv run server.py
 Connect with the CLI:
 
 ```bash
-smallestai agent-swarm chat
+smallestai agent-crew chat
 ```
 
 ## Recommended Usage
 
 - Your starting point — the simplest possible Atoms agent with LLM responses
-- Learning the core concepts: `OutputSwarmNode`, `generate_response()`, `AtomsSwarmApp`
+- Learning the core concepts: `OutputCrewNode`, `generate_response()`, `AtomsCrewApp`
 - For function calling, [Agent with Tools](../agent_with_tools/) is recommended
 
 ## Key Snippets
@@ -37,10 +37,10 @@ smallestai agent-swarm chat
 ### Define an Agent
 
 ```python
-from smallestai.atoms.swarm.nodes import OutputSwarmNode
-from smallestai.atoms.swarm.clients.openai import OpenAIClient
+from smallestai.atoms.crew.nodes import OutputCrewNode
+from smallestai.atoms.crew.clients.openai import OpenAIClient
 
-class Assistant(OutputSwarmNode):
+class Assistant(OutputCrewNode):
     def __init__(self):
         super().__init__(name="assistant")
         self.llm = OpenAIClient(model="gpt-4o-mini")
@@ -58,17 +58,17 @@ class Assistant(OutputSwarmNode):
 ### Run the Server
 
 ```python
-from smallestai.atoms.swarm.server import AtomsSwarmApp
-from smallestai.atoms.swarm.session import SwarmSession
+from smallestai.atoms.crew.server import AtomsCrewApp
+from smallestai.atoms.crew.session import CrewSession
 
-async def setup_session(session: SwarmSession):
+async def setup_session(session: CrewSession):
     agent = Assistant()
     session.add_node(agent)
     await session.start()
     await session.wait_until_complete()
 
 if __name__ == "__main__":
-    app = AtomsSwarmApp(setup_handler=setup_session)
+    app = AtomsCrewApp(setup_handler=setup_session)
     app.run()
 ```
 

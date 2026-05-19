@@ -4,7 +4,7 @@ Multi-node architecture with real-time sentiment analysis running alongside the 
 
 ## Features
 
-- **BackgroundSwarmNode** — Processes events without producing audio output
+- **BackgroundCrewNode** — Processes events without producing audio output
 - **Multi-node sessions** — Multiple agents running in parallel
 - **Event handling** — Reacting to `UserStartedSpeaking`, `UserStoppedSpeaking`, `TranscriptUpdate`
 - **Cross-agent communication** — Main agent queries background agent state
@@ -14,11 +14,11 @@ Multi-node architecture with real-time sentiment analysis running alongside the 
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                     SwarmSession                        │
+│                     CrewSession                        │
 │                                                         │
 │  ┌─────────────────────┐   ┌─────────────────────────┐  │
 │  │  SentimentAnalyzer  │   │     SupportAgent        │  │
-│  │  (BackgroundNode)   │   │    (OutputSwarmNode)    │  │
+│  │  (BackgroundNode)   │   │    (OutputCrewNode)    │  │
 │  │                     │   │                         │  │
 │  │  - Listens to all   │   │  - Handles conversation │  │
 │  │    events           │◄──│  - Queries sentiment    │  │
@@ -63,7 +63,7 @@ Starts a WebSocket server on `localhost:8080`.
 ### 4. Test via CLI
 
 ```bash
-smallestai agent-swarm chat
+smallestai agent-crew chat
 ```
 
 Try the conversation in [Example Output](#example-output) below — three frustrated messages will trigger the auto-escalation branch in `SupportAgent.generate_response()`.
@@ -71,19 +71,19 @@ Try the conversation in [Example Output](#example-output) below — three frustr
 ### 5. Deploy to Smallest Platform
 
 ```bash
-smallestai agent-swarm deploy --entry app.py
+smallestai agent-crew deploy --entry app.py
 ```
 
 Then activate the build so it serves real calls:
 
 ```bash
-smallestai agent-swarm builds
+smallestai agent-crew builds
 # pick your build from the table → choose "Make Live"
 ```
 
 Then make a call from the [Smallest Platform](https://platform.smallest.ai) dashboard.
 
-> **Note — environment variables on deployed builds:** the deploy pipeline does not yet propagate `.env` / `OPENAI_API_KEY` into the running pod, so this example currently works end-to-end **only locally**. Once `smallestai agent-swarm deploy` learns to ship a Kubernetes Secret with your env vars, deployed builds will be able to make OpenAI calls too. Until then, on a real call you'll see `openai.OpenAIError: Missing credentials` in the pod logs and the connection will close. Replace the OpenAI client with a stub (or use an LLM the pod can reach without credentials) if you want to test the deployed flow.
+> **Note — environment variables on deployed builds:** the deploy pipeline does not yet propagate `.env` / `OPENAI_API_KEY` into the running pod, so this example currently works end-to-end **only locally**. Once `smallestai agent-crew deploy` learns to ship a Kubernetes Secret with your env vars, deployed builds will be able to make OpenAI calls too. Until then, on a real call you'll see `openai.OpenAIError: Missing credentials` in the pod logs and the connection will close. Replace the OpenAI client with a stub (or use an LLM the pod can reach without credentials) if you want to test the deployed flow.
 
 ## Recommended Usage
 
@@ -93,18 +93,18 @@ Then make a call from the [Smallest Platform](https://platform.smallest.ai) dash
 
 ## Key Snippets
 
-### BackgroundSwarmNode
+### BackgroundCrewNode
 
-Unlike `OutputSwarmNode`, background agents:
+Unlike `OutputCrewNode`, background agents:
 - Don't produce audio output
 - Don't auto-handle interrupts
 - Process events silently in the background
 - Store state for other agents to query
 
 ```python
-from smallestai.atoms.swarm.nodes import BackgroundSwarmNode
+from smallestai.atoms.crew.nodes import BackgroundCrewNode
 
-class SentimentAnalyzer(BackgroundSwarmNode):
+class SentimentAnalyzer(BackgroundCrewNode):
     def __init__(self):
         super().__init__(name="sentiment-analyzer")
         self.current_sentiment = "neutral"
@@ -120,7 +120,7 @@ class SentimentAnalyzer(BackgroundSwarmNode):
 Add multiple nodes to run them in parallel:
 
 ```python
-async def setup_session(session: SwarmSession):
+async def setup_session(session: CrewSession):
     background_agent = SentimentAnalyzer()
     main_agent = SupportAgent(sentiment_analyzer=background_agent)
     
@@ -175,8 +175,8 @@ Assistant: I can hear this has been frustrating. Let me connect you with a super
 ```
 background_agent/
 ├── app.py                  # Session setup with multi-node architecture
-├── sentiment_analyzer.py   # BackgroundSwarmNode for sentiment analysis
-└── support_agent.py        # OutputSwarmNode with sentiment-aware responses
+├── sentiment_analyzer.py   # BackgroundCrewNode for sentiment analysis
+└── support_agent.py        # OutputCrewNode with sentiment-aware responses
 ```
 
 ## API Reference
