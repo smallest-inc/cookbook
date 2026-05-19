@@ -1,6 +1,6 @@
 """Getting Started - Your first Atoms agent."""
 
-from my_agent import MyAgent
+from assistant import Assistant
 from loguru import logger
 
 from smallestai.atoms.swarm.events import SDKEvent, SDKSystemUserJoinedEvent
@@ -10,7 +10,7 @@ from smallestai.atoms.swarm.session import SwarmSession
 
 async def setup_session(session: SwarmSession):
     """Configure the agent session."""
-    agent = MyAgent()
+    agent = Assistant()
     session.add_node(agent)
     await session.start()
 
