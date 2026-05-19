@@ -17,7 +17,7 @@ Your first Atoms agent — from zero to a running AI assistant.
 
 ```bash
 uv pip install -r requirements.txt
-uv run app.py
+uv run server.py
 ```
 
 Connect with the CLI:
@@ -40,9 +40,9 @@ smallestai agent-swarm chat
 from smallestai.atoms.swarm.nodes import OutputSwarmNode
 from smallestai.atoms.swarm.clients.openai import OpenAIClient
 
-class MyAgent(OutputSwarmNode):
+class Assistant(OutputSwarmNode):
     def __init__(self):
-        super().__init__(name="my-agent")
+        super().__init__(name="assistant")
         self.llm = OpenAIClient(model="gpt-4o-mini")
 
     async def generate_response(self):
@@ -62,7 +62,7 @@ from smallestai.atoms.swarm.server import AtomsSwarmApp
 from smallestai.atoms.swarm.session import SwarmSession
 
 async def setup_session(session: SwarmSession):
-    agent = MyAgent()
+    agent = Assistant()
     session.add_node(agent)
     await session.start()
     await session.wait_until_complete()
@@ -76,8 +76,8 @@ if __name__ == "__main__":
 
 ```
 getting_started/
-├── app.py       # Server entry point
-└── my_agent.py  # Simple conversational agent
+├── server.py    # Server entry point
+└── assistant.py  # Simple conversational agent
 ```
 
 ## Example Output

@@ -9,11 +9,11 @@ from smallestai.atoms.swarm.clients.openai import OpenAIClient
 load_dotenv()
 
 
-class MyAgent(OutputSwarmNode):
+class Assistant(OutputSwarmNode):
     """Basic agent that streams LLM responses."""
     
     def __init__(self):
-        super().__init__(name="my-agent")
+        super().__init__(name="assistant")
         self.llm = OpenAIClient(
             model="gpt-4o-mini",
             api_key=os.getenv("OPENAI_API_KEY")
