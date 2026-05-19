@@ -35,18 +35,55 @@ Multi-node architecture with real-time sentiment analysis running alongside the 
 
 > Make sure you've run `uv venv && uv pip install -r requirements.txt` at the repo root first. See the [main README](../../README.md#usage).
 
+Both `SupportAgent` and `SentimentAnalyzer` call the OpenAI Chat Completions API for response generation and sentiment classification respectively, so you'll need an `OPENAI_API_KEY`.
+
 ## Usage
+
+### 1. Configure environment
+
+```bash
+cp .env.sample .env
+# Open .env and add your OPENAI_API_KEY
+```
+
+### 2. Install dependencies
 
 ```bash
 uv pip install -r requirements.txt
+```
+
+### 3. Run the agent locally
+
+```bash
 uv run app.py
 ```
 
-Connect with the CLI:
+Starts a WebSocket server on `localhost:8080`.
+
+### 4. Test via CLI
 
 ```bash
 smallestai agent-swarm chat
 ```
+
+Try the conversation in [Example Output](#example-output) below — three frustrated messages will trigger the auto-escalation branch in `SupportAgent.generate_response()`.
+
+### 5. Deploy to Smallest Platform
+
+```bash
+smallestai agent-swarm deploy --entry app.py
+```
+
+Then activate the build so it serves real calls:
+
+```bash
+smallestai agent-swarm builds
+# pick your build from the table → choose "Make Live"
+```
+
+Then make a call from the [Smallest Platform](https://platform.smallest.ai) dashboard.
+
+> **Note — environment variables on deployed builds:** the deploy pipeline does not yet propagate `.env` / `OPENAI_API_KEY` into the running pod, so this example currently works end-to-end **only locally**. Once `smallestai agent-swarm deploy` learns to ship a Kubernetes Secret with your env vars, deployed builds will be able to make OpenAI calls too. Until then, on a real call you'll see `openai.OpenAIError: Missing credentials` in the pod logs and the connection will close. Replace the OpenAI client with a stub (or use an LLM the pod can reach without credentials) if you want to test the deployed flow.
 
 ## Recommended Usage
 
