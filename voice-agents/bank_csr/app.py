@@ -6,18 +6,18 @@ from audit_logger import AuditLogger
 from csr_agent import CSRAgent
 from database import BankingDB
 
-from smallestai.atoms.agent.events import SDKEvent, SDKSystemUserJoinedEvent
-from smallestai.atoms.agent.server import AtomsApp
-from smallestai.atoms.agent.session import AgentSession
+from smallestai.atoms.swarm.events import SDKEvent, SDKSystemUserJoinedEvent
+from smallestai.atoms.swarm.server import AtomsSwarmApp
+from smallestai.atoms.swarm.session import SwarmSession
 
 
-async def setup_session(session: AgentSession):
+async def setup_session(session: SwarmSession):
     """Configure banking CSR session.
 
     Architecture:
     - BankingDB: In-memory SQLite with synthetic banking data
-    - AuditLogger (BackgroundAgentNode): Silent compliance logging
-    - CSRAgent (OutputAgentNode): Handles conversation, verification, SQL queries,
+    - AuditLogger (BackgroundSwarmNode): Silent compliance logging
+    - CSRAgent (OutputSwarmNode): Handles conversation, verification, SQL queries,
       deterministic analysis, and banking actions via multi-round tool chaining
 
     Both nodes run in parallel, receiving the same events.
@@ -61,5 +61,5 @@ async def setup_session(session: AgentSession):
 
 
 if __name__ == "__main__":
-    app = AtomsApp(setup_handler=setup_session)
+    app = AtomsSwarmApp(setup_handler=setup_session)
     app.run()

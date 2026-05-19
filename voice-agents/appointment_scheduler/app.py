@@ -13,17 +13,17 @@ from loguru import logger
 from calcom_client import CalcomClient
 from scheduler_agent import SchedulerAgent
 
-from smallestai.atoms.agent.events import SDKEvent, SDKSystemUserJoinedEvent
-from smallestai.atoms.agent.server import AtomsApp
-from smallestai.atoms.agent.session import AgentSession
+from smallestai.atoms.swarm.events import SDKEvent, SDKSystemUserJoinedEvent
+from smallestai.atoms.swarm.server import AtomsSwarmApp
+from smallestai.atoms.swarm.session import SwarmSession
 
 
-async def setup_session(session: AgentSession):
+async def setup_session(session: SwarmSession):
     """Configure appointment scheduling session.
 
     Architecture:
     - CalcomClient: Live Cal.com calendar for slots + bookings
-    - SchedulerAgent (OutputAgentNode): Receptionist with calendar tools
+    - SchedulerAgent (OutputSwarmNode): Receptionist with calendar tools
     """
 
     calcom = CalcomClient()
@@ -56,5 +56,5 @@ async def setup_session(session: AgentSession):
 
 
 if __name__ == "__main__":
-    app = AtomsApp(setup_handler=setup_session)
+    app = AtomsSwarmApp(setup_handler=setup_session)
     app.run()

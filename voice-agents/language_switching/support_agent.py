@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING, List
 
 from dotenv import load_dotenv
 
-from smallestai.atoms.agent.clients.openai import OpenAIClient
-from smallestai.atoms.agent.clients.types import ToolCall, ToolResult
-from smallestai.atoms.agent.events import SDKAgentEndCallEvent
-from smallestai.atoms.agent.nodes import OutputAgentNode
-from smallestai.atoms.agent.tools import ToolRegistry, function_tool
+from smallestai.atoms.swarm.clients.openai import OpenAIClient
+from smallestai.atoms.swarm.clients.types import ToolCall, ToolResult
+from smallestai.atoms.swarm.events import SDKAgentEndCallEvent
+from smallestai.atoms.swarm.nodes import OutputSwarmNode
+from smallestai.atoms.swarm.tools import ToolRegistry, function_tool
 
 if TYPE_CHECKING:
     from language_detector import LanguageDetector
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 load_dotenv()
 
 
-class SupportAgent(OutputAgentNode):
+class SupportAgent(OutputSwarmNode):
     """Support agent that adapts based on pipeline node data.
     
     This agent:

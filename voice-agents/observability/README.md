@@ -1,8 +1,8 @@
 # 🔍 Observability — Langfuse Integration
 
-Real-time voice agent observability with [Langfuse](https://langfuse.com) via a `BackgroundAgentNode`. Every tool call, LLM generation, and transcript update streams to your Langfuse dashboard — with zero impact on conversation latency.
+Real-time voice agent observability with [Langfuse](https://langfuse.com) via a `BackgroundSwarmNode`. Every tool call, LLM generation, and transcript update streams to your Langfuse dashboard — with zero impact on conversation latency.
 
-> **The key pattern:** a `BackgroundAgentNode` receives the same event stream as your main agent but runs silently in parallel. Swap the sink from `print()` to Langfuse (or Datadog, LangSmith, etc.) and you have production-grade observability without touching your agent code.
+> **The key pattern:** a `BackgroundSwarmNode` receives the same event stream as your main agent but runs silently in parallel. Swap the sink from `print()` to Langfuse (or Datadog, LangSmith, etc.) and you have production-grade observability without touching your agent code.
 
 ---
 
@@ -92,7 +92,7 @@ uv run app.py
 ### 4. Test
 
 ```bash
-smallestai agent chat
+smallestai agent-swarm chat
 ```
 
 ### 5. Check Langfuse
@@ -102,7 +102,7 @@ Open your [Langfuse dashboard](https://cloud.langfuse.com) → **Traces** → yo
 ### 6. Deploy
 
 ```bash
-smallestai agent deploy --entry app.py
+smallestai agent-swarm deploy --entry app.py
 ```
 
 ---
@@ -111,11 +111,11 @@ smallestai agent deploy --entry app.py
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                          AgentSession                             │
+│                          SwarmSession                             │
 │                                                                  │
 │  ┌───────────────────────┐     ┌──────────────────────────────┐  │
 │  │  LangfuseLogger        │     │  SupportAgent                │  │
-│  │  BackgroundAgentNode    │     │  OutputAgentNode              │  │
+│  │  BackgroundSwarmNode    │     │  OutputSwarmNode              │  │
 │  │                         │     │                              │  │
 │  │  • trace per call       │◄────│  • log_tool_call()           │  │
 │  │  • transcript events    │     │  • log_generation()          │  │
@@ -141,8 +141,8 @@ Both nodes receive the same event stream. The `LangfuseLogger` silently captures
 | File | Lines | Description |
 |------|-------|-------------|
 | `app.py` | ~60 | Entry point — wires `LangfuseLogger` + `SupportAgent`, handles greeting, flushes at end |
-| `langfuse_logger.py` | ~220 | `BackgroundAgentNode` → Langfuse traces, spans, generations, events |
-| `support_agent.py` | ~193 | Simple `OutputAgentNode` with order tools, pushes data to logger |
+| `langfuse_logger.py` | ~220 | `BackgroundSwarmNode` → Langfuse traces, spans, generations, events |
+| `support_agent.py` | ~193 | Simple `OutputSwarmNode` with order tools, pushes data to logger |
 | `requirements.txt` | ~3 | Dependencies |
 
 ---
@@ -154,10 +154,10 @@ Both nodes receive the same event stream. The `LangfuseLogger` silently captures
 Two nodes run in parallel:
 
 ```python
-langfuse = LangfuseLogger()      # BackgroundAgentNode — streams to Langfuse
+langfuse = LangfuseLogger()      # BackgroundSwarmNode — streams to Langfuse
 session.add_node(langfuse)
 
-agent = SupportAgent(langfuse=langfuse)  # OutputAgentNode — conversation
+agent = SupportAgent(langfuse=langfuse)  # OutputSwarmNode — conversation
 session.add_node(agent)
 
 # Register event handlers BEFORE starting the session
@@ -179,7 +179,7 @@ langfuse.flush()
 The background node creates a Langfuse trace on user-joined and logs transcripts automatically:
 
 ```python
-class LangfuseLogger(BackgroundAgentNode):
+class LangfuseLogger(BackgroundSwarmNode):
     async def process_event(self, event: SDKEvent):
         if isinstance(event, SDKSystemUserJoinedEvent):
             # Root span — Langfuse auto-creates the trace
@@ -227,14 +227,14 @@ self.langfuse.log_generation(
 
 ## Adapting to Other Platforms
 
-The `LangfuseLogger` is a thin adapter. To switch to another platform, create a new `BackgroundAgentNode` with the same interface:
+The `LangfuseLogger` is a thin adapter. To switch to another platform, create a new `BackgroundSwarmNode` with the same interface:
 
 ### Datadog
 
 ```python
 from datadog import statsd
 
-class DatadogLogger(BackgroundAgentNode):
+class DatadogLogger(BackgroundSwarmNode):
     def log_tool_call(self, tool_name, args, result):
         statsd.increment("voice_agent.tool_call", tags=[f"tool:{tool_name}"])
 
@@ -247,7 +247,7 @@ class DatadogLogger(BackgroundAgentNode):
 ```python
 from langsmith import Client
 
-class LangSmithLogger(BackgroundAgentNode):
+class LangSmithLogger(BackgroundSwarmNode):
     def __init__(self):
         super().__init__(name="langsmith-logger")
         self.client = Client()
@@ -263,7 +263,7 @@ class LangSmithLogger(BackgroundAgentNode):
 ```python
 import httpx
 
-class WebhookLogger(BackgroundAgentNode):
+class WebhookLogger(BackgroundSwarmNode):
     def __init__(self, webhook_url: str):
         super().__init__(name="webhook-logger")
         self.url = webhook_url
@@ -319,14 +319,14 @@ Meanwhile, in your Langfuse dashboard — every tool call, LLM round, and transc
 
 | Component | Import | Purpose |
 |-----------|--------|---------|
-| `AtomsApp` | `smallestai.atoms.agent.server` | WebSocket server + session lifecycle |
-| `AgentSession` | `smallestai.atoms.agent.session` | Session management, node graph |
-| `OutputAgentNode` | `smallestai.atoms.agent.nodes` | Conversational agent with TTS output |
-| `BackgroundAgentNode` | `smallestai.atoms.agent.nodes` | Silent parallel processing node |
-| `OpenAIClient` | `smallestai.atoms.agent.clients.openai` | Streaming LLM client |
-| `ToolRegistry` | `smallestai.atoms.agent.tools` | Tool discovery, schema generation, execution |
-| `@function_tool` | `smallestai.atoms.agent.tools` | Decorator to register tools from methods |
-| `SDKAgentEndCallEvent` | `smallestai.atoms.agent.events` | End call |
+| `AtomsSwarmApp` | `smallestai.atoms.swarm.server` | WebSocket server + session lifecycle |
+| `SwarmSession` | `smallestai.atoms.swarm.session` | Session management, node graph |
+| `OutputSwarmNode` | `smallestai.atoms.swarm.nodes` | Conversational agent with TTS output |
+| `BackgroundSwarmNode` | `smallestai.atoms.swarm.nodes` | Silent parallel processing node |
+| `OpenAIClient` | `smallestai.atoms.swarm.clients.openai` | Streaming LLM client |
+| `ToolRegistry` | `smallestai.atoms.swarm.tools` | Tool discovery, schema generation, execution |
+| `@function_tool` | `smallestai.atoms.swarm.tools` | Decorator to register tools from methods |
+| `SDKAgentEndCallEvent` | `smallestai.atoms.swarm.events` | End call |
 | `Langfuse` | `langfuse` | Langfuse Python SDK client |
 
 - Atoms SDK docs: [docs.smallest.ai](https://docs.smallest.ai)
@@ -336,8 +336,8 @@ Meanwhile, in your Langfuse dashboard — every tool call, LLM round, and transc
 
 ## Next Steps
 
-- **Complex agent with audit logging** → [`bank_csr`](../bank_csr) — the same `BackgroundAgentNode` pattern with SQLite-backed compliance logging
-- **Sentiment analysis node** → [`background_agent`](../background_agent) — another `BackgroundAgentNode` use case
+- **Complex agent with audit logging** → [`bank_csr`](../bank_csr) — the same `BackgroundSwarmNode` pattern with SQLite-backed compliance logging
+- **Sentiment analysis node** → [`background_agent`](../background_agent) — another `BackgroundSwarmNode` use case
 - **Call transfers** → [`call_control`](../call_control) — cold and warm transfers
 - **Add cost tracking** → Use Langfuse's token usage fields in `log_generation` to track per-call LLM costs
 - **Build dashboards** → Use Langfuse's analytics to track tool usage patterns, average call duration, and escalation rates

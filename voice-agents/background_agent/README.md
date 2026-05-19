@@ -4,7 +4,7 @@ Multi-node architecture with real-time sentiment analysis running alongside the 
 
 ## Features
 
-- **BackgroundAgentNode** — Processes events without producing audio output
+- **BackgroundSwarmNode** — Processes events without producing audio output
 - **Multi-node sessions** — Multiple agents running in parallel
 - **Event handling** — Reacting to `UserStartedSpeaking`, `UserStoppedSpeaking`, `TranscriptUpdate`
 - **Cross-agent communication** — Main agent queries background agent state
@@ -14,11 +14,11 @@ Multi-node architecture with real-time sentiment analysis running alongside the 
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                     AgentSession                        │
+│                     SwarmSession                        │
 │                                                         │
 │  ┌─────────────────────┐   ┌─────────────────────────┐  │
 │  │  SentimentAnalyzer  │   │     SupportAgent        │  │
-│  │  (BackgroundNode)   │   │    (OutputAgentNode)    │  │
+│  │  (BackgroundNode)   │   │    (OutputSwarmNode)    │  │
 │  │                     │   │                         │  │
 │  │  - Listens to all   │   │  - Handles conversation │  │
 │  │    events           │◄──│  - Queries sentiment    │  │
@@ -45,7 +45,7 @@ uv run app.py
 Connect with the CLI:
 
 ```bash
-smallestai agent chat
+smallestai agent-swarm chat
 ```
 
 ## Recommended Usage
@@ -56,18 +56,18 @@ smallestai agent chat
 
 ## Key Snippets
 
-### BackgroundAgentNode
+### BackgroundSwarmNode
 
-Unlike `OutputAgentNode`, background agents:
+Unlike `OutputSwarmNode`, background agents:
 - Don't produce audio output
 - Don't auto-handle interrupts
 - Process events silently in the background
 - Store state for other agents to query
 
 ```python
-from smallestai.atoms.agent.nodes import BackgroundAgentNode
+from smallestai.atoms.swarm.nodes import BackgroundSwarmNode
 
-class SentimentAnalyzer(BackgroundAgentNode):
+class SentimentAnalyzer(BackgroundSwarmNode):
     def __init__(self):
         super().__init__(name="sentiment-analyzer")
         self.current_sentiment = "neutral"
@@ -83,7 +83,7 @@ class SentimentAnalyzer(BackgroundAgentNode):
 Add multiple nodes to run them in parallel:
 
 ```python
-async def setup_session(session: AgentSession):
+async def setup_session(session: SwarmSession):
     background_agent = SentimentAnalyzer()
     main_agent = SupportAgent(sentiment_analyzer=background_agent)
     
@@ -138,8 +138,8 @@ Assistant: I can hear this has been frustrating. Let me connect you with a super
 ```
 background_agent/
 ├── app.py                  # Session setup with multi-node architecture
-├── sentiment_analyzer.py   # BackgroundAgentNode for sentiment analysis
-└── support_agent.py        # OutputAgentNode with sentiment-aware responses
+├── sentiment_analyzer.py   # BackgroundSwarmNode for sentiment analysis
+└── support_agent.py        # OutputSwarmNode with sentiment-aware responses
 ```
 
 ## API Reference

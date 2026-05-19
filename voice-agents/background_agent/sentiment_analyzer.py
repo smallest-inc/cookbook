@@ -6,19 +6,19 @@ from typing import Dict, List
 from dotenv import load_dotenv
 from loguru import logger
 
-from smallestai.atoms.agent.clients.openai import OpenAIClient
-from smallestai.atoms.agent.events import (
+from smallestai.atoms.swarm.clients.openai import OpenAIClient
+from smallestai.atoms.swarm.events import (
     SDKAgentTranscriptUpdateEvent,
     SDKEvent,
     SDKSystemUserStartedSpeakingEvent,
     SDKSystemUserStoppedSpeakingEvent,
 )
-from smallestai.atoms.agent.nodes import BackgroundAgentNode
+from smallestai.atoms.swarm.nodes import BackgroundSwarmNode
 
 load_dotenv()
 
 
-class SentimentAnalyzer(BackgroundAgentNode):
+class SentimentAnalyzer(BackgroundSwarmNode):
     """Analyzes user sentiment in real-time without producing output.
     
     This background agent:
@@ -51,7 +51,7 @@ class SentimentAnalyzer(BackgroundAgentNode):
     async def process_event(self, event: SDKEvent):
         """Process events in the background.
         
-        BackgroundAgentNode receives all events but doesn't auto-handle them.
+        BackgroundSwarmNode receives all events but doesn't auto-handle them.
         We manually process the ones we care about.
         """
         

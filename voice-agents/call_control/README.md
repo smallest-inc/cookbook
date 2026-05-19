@@ -55,7 +55,7 @@ uv run app.py
 Connect with the CLI:
 
 ```bash
-smallestai agent chat
+smallestai agent-swarm chat
 ```
 
 ## Recommended Usage
@@ -69,7 +69,7 @@ smallestai agent chat
 ### End Call
 
 ```python
-from smallestai.atoms.agent.events import SDKAgentEndCallEvent
+from smallestai.atoms.swarm.events import SDKAgentEndCallEvent
 
 @function_tool()
 async def end_call(self) -> None:
@@ -80,7 +80,7 @@ async def end_call(self) -> None:
 ### Cold Transfer (Immediate)
 
 ```python
-from smallestai.atoms.agent.events import (
+from smallestai.atoms.swarm.events import (
     SDKAgentTransferConversationEvent,
     TransferOption,
     TransferOptionType,

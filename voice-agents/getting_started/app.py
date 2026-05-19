@@ -3,12 +3,12 @@
 from my_agent import MyAgent
 from loguru import logger
 
-from smallestai.atoms.agent.events import SDKEvent, SDKSystemUserJoinedEvent
-from smallestai.atoms.agent.server import AtomsApp
-from smallestai.atoms.agent.session import AgentSession
+from smallestai.atoms.swarm.events import SDKEvent, SDKSystemUserJoinedEvent
+from smallestai.atoms.swarm.server import AtomsSwarmApp
+from smallestai.atoms.swarm.session import SwarmSession
 
 
-async def setup_session(session: AgentSession):
+async def setup_session(session: SwarmSession):
     """Configure the agent session."""
     agent = MyAgent()
     session.add_node(agent)
@@ -29,5 +29,5 @@ async def setup_session(session: AgentSession):
 
 
 if __name__ == "__main__":
-    app = AtomsApp(setup_handler=setup_session)
+    app = AtomsSwarmApp(setup_handler=setup_session)
     app.run()

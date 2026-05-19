@@ -4,10 +4,10 @@ Multi-language support agent with automatic language detection and response.
 
 ## Features
 
-- **Node Chaining** — Using `add_edge()` to create processing pipelines
-- **Custom Node Types** — Extending the base `Node` class
+- **SwarmNode Chaining** — Using `add_edge()` to create processing pipelines
+- **Custom SwarmNode Types** — Extending the base `SwarmNode` class
 - **Event Transformation** — Modifying events as they flow through the pipeline
-- **Cross-Node Communication** — Nodes querying each other's state
+- **Cross-SwarmNode Communication** — Nodes querying each other's state
 - **Language Detection** — Automatic language identification with confidence scoring
 - **Profanity Filtering** — Post-processing pipeline for response sanitization
 
@@ -45,25 +45,25 @@ uv run app.py
 Connect with the CLI:
 
 ```bash
-smallestai agent chat
+smallestai agent-swarm chat
 ```
 
 ## Recommended Usage
 
 - Sequential event processing pipelines — language detection, content filtering, event transformation
-- Pre/post-processing of events with custom `Node` classes and `add_edge()`
+- Pre/post-processing of events with custom `SwarmNode` classes and `add_edge()`
 - For parallel background processing, [Background Agent](../background_agent/) is recommended
 
 ## Key Snippets
 
 ### Creating Custom Nodes
 
-Extend the base `Node` class for custom processing:
+Extend the base `SwarmNode` class for custom processing:
 
 ```python
-from smallestai.atoms.agent.nodes.base import Node
+from smallestai.atoms.swarm.nodes.base import SwarmNode
 
-class MyProcessor(Node):
+class MyProcessor(SwarmNode):
     def __init__(self):
         super().__init__(name="my-processor")
 
@@ -80,7 +80,7 @@ class MyProcessor(Node):
 Use `add_edge()` to chain nodes:
 
 ```python
-async def setup_session(session: AgentSession):
+async def setup_session(session: SwarmSession):
     node_a = NodeA()
     node_b = NodeB()
     node_c = NodeC()
@@ -110,12 +110,12 @@ session.add_edge(a, b)
 session.add_edge(b, c)
 ```
 
-### Cross-Node Communication
+### Cross-SwarmNode Communication
 
 Nodes can reference each other for state queries:
 
 ```python
-class SupportAgent(OutputAgentNode):
+class SupportAgent(OutputSwarmNode):
     def __init__(self, language_detector: LanguageDetector):
         self.language_detector = language_detector
     
@@ -169,9 +169,9 @@ session.add_node(node_b)  # Both receive same events
 ```
 language_switching/
 ├── app.py                # Pipeline setup with edges
-├── language_detector.py  # Custom Node for language detection
-├── support_agent.py      # OutputAgentNode with language awareness
-└── profanity_filter.py   # Custom Node for response filtering
+├── language_detector.py  # Custom SwarmNode for language detection
+├── support_agent.py      # OutputSwarmNode with language awareness
+└── profanity_filter.py   # Custom SwarmNode for response filtering
 ```
 
 ## API Reference

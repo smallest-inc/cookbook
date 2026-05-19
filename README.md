@@ -143,14 +143,14 @@ Build AI voice agents that can talk to anyone on voice or text, in any language,
 
 ### Basics
 
-- [Getting Started](./voice-agents/getting_started/) — Create your first agent with `OutputAgentNode`, `generate_response()`, and `AtomsApp`
+- [Getting Started](./voice-agents/getting_started/) — Create your first agent with `OutputSwarmNode`, `generate_response()`, and `AtomsSwarmApp`
 - [Agent with Tools](./voice-agents/agent_with_tools/) — Add tool calling with `@function_tool` and `ToolRegistry`
 - [Call Control](./voice-agents/call_control/) — Cold/warm transfers and ending a call with `SDKAgentTransferConversationEvent`
 
 ### Multi-Node Patterns
 
-- [Background Agent](./voice-agents/background_agent/) — `BackgroundAgentNode` for parallel processing, cross-node state sharing
-- [Observability](./voice-agents/observability/) — Langfuse integration via `BackgroundAgentNode` — live traces, tool spans, transcript events
+- [Background Agent](./voice-agents/background_agent/) — `BackgroundSwarmNode` for parallel processing, cross-node state sharing
+- [Observability](./voice-agents/observability/) — Langfuse integration via `BackgroundSwarmNode` — live traces, tool spans, transcript events
 - [Language Switching](./voice-agents/language_switching/) — Multi-node agents with dynamic language detection and switching
 
 ### Call Handling

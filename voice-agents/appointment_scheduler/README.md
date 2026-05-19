@@ -143,7 +143,7 @@ uv run app.py
 ### 4. Test
 
 ```bash
-smallestai agent chat
+smallestai agent-swarm chat
 ```
 
 Try: "Can I get an appointment at 5pm tomorrow?" — see slot negotiation in action.
@@ -151,7 +151,7 @@ Try: "Can I get an appointment at 5pm tomorrow?" — see slot negotiation in act
 ### 5. Deploy
 
 ```bash
-smallestai agent deploy --entry app.py
+smallestai agent-swarm deploy --entry app.py
 ```
 
 ---
@@ -203,11 +203,11 @@ export CAL_TIMEZONE=America/New_York
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                          AgentSession                             │
+│                          SwarmSession                             │
 │                                                                  │
 │  ┌───────────────────────┐     ┌──────────────────────────────┐  │
 │  │  CalcomClient          │     │  SchedulerAgent              │  │
-│  │  (Cal.com v2 API)      │◄────│  OutputAgentNode              │  │
+│  │  (Cal.com v2 API)      │◄────│  OutputSwarmNode              │  │
 │  │                        │     │                              │  │
 │  │  Methods:              │     │  Tools:                      │  │
 │  │  • get_available_slots │     │  • resolve_date              │  │
@@ -231,7 +231,7 @@ export CAL_TIMEZONE=America/New_York
 | File | Lines | Description |
 |------|-------|-------------|
 | `app.py` | ~61 | Entry point — creates CalcomClient + SchedulerAgent |
-| `scheduler_agent.py` | ~353 | OutputAgentNode with calendar tools, date resolver, multi-round chaining |
+| `scheduler_agent.py` | ~353 | OutputSwarmNode with calendar tools, date resolver, multi-round chaining |
 | `calcom_client.py` | ~465 | Cal.com v2 API client — slots, bookings, timezone conversion |
 | `requirements.txt` | ~3 | Dependencies |
 
@@ -366,13 +366,13 @@ async def generate_response(self):
 
 | Component | Import | Purpose |
 |-----------|--------|---------|
-| `AtomsApp` | `smallestai.atoms.agent.server` | WebSocket server + session lifecycle |
-| `AgentSession` | `smallestai.atoms.agent.session` | Session management, node graph |
-| `OutputAgentNode` | `smallestai.atoms.agent.nodes` | Conversational agent with TTS output |
-| `OpenAIClient` | `smallestai.atoms.agent.clients.openai` | Streaming LLM client |
-| `ToolRegistry` | `smallestai.atoms.agent.tools` | Tool discovery, schema generation, execution |
-| `@function_tool` | `smallestai.atoms.agent.tools` | Decorator to register tools from methods |
-| `SDKAgentEndCallEvent` | `smallestai.atoms.agent.events` | End call |
+| `AtomsSwarmApp` | `smallestai.atoms.swarm.server` | WebSocket server + session lifecycle |
+| `SwarmSession` | `smallestai.atoms.swarm.session` | Session management, node graph |
+| `OutputSwarmNode` | `smallestai.atoms.swarm.nodes` | Conversational agent with TTS output |
+| `OpenAIClient` | `smallestai.atoms.swarm.clients.openai` | Streaming LLM client |
+| `ToolRegistry` | `smallestai.atoms.swarm.tools` | Tool discovery, schema generation, execution |
+| `@function_tool` | `smallestai.atoms.swarm.tools` | Decorator to register tools from methods |
+| `SDKAgentEndCallEvent` | `smallestai.atoms.swarm.events` | End call |
 
 - Atoms SDK docs: [docs.smallest.ai](https://docs.smallest.ai)
 - Cal.com API docs: [cal.com/docs/api-reference](https://cal.com/docs/api-reference/v2)

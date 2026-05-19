@@ -11,11 +11,11 @@ from typing import Any, List, Optional
 from dotenv import load_dotenv
 from loguru import logger
 
-from smallestai.atoms.agent.clients.openai import OpenAIClient
-from smallestai.atoms.agent.clients.types import ToolCall, ToolResult
-from smallestai.atoms.agent.events import SDKAgentEndCallEvent
-from smallestai.atoms.agent.nodes import OutputAgentNode
-from smallestai.atoms.agent.tools import ToolRegistry, function_tool
+from smallestai.atoms.swarm.clients.openai import OpenAIClient
+from smallestai.atoms.swarm.clients.types import ToolCall, ToolResult
+from smallestai.atoms.swarm.events import SDKAgentEndCallEvent
+from smallestai.atoms.swarm.nodes import OutputSwarmNode
+from smallestai.atoms.swarm.tools import ToolRegistry, function_tool
 
 from langfuse_logger import LangfuseLogger
 
@@ -34,7 +34,7 @@ Keep responses short and helpful (1-3 sentences).\
 """
 
 
-class SupportAgent(OutputAgentNode):
+class SupportAgent(OutputSwarmNode):
     """Support agent that pushes tool calls and LLM rounds to LangfuseLogger."""
 
     def __init__(self, langfuse: Optional[LangfuseLogger] = None):
