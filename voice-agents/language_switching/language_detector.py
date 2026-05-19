@@ -4,17 +4,17 @@ import os
 from dotenv import load_dotenv
 from loguru import logger
 
-from smallestai.atoms.swarm.clients.openai import OpenAIClient
-from smallestai.atoms.swarm.events import (
+from smallestai.atoms.crew.clients.openai import OpenAIClient
+from smallestai.atoms.crew.events import (
     SDKAgentTranscriptUpdateEvent,
     SDKEvent,
 )
-from smallestai.atoms.swarm.nodes.base import SwarmNode
+from smallestai.atoms.crew.nodes.base import CrewNode
 
 load_dotenv()
 
 
-class LanguageDetector(SwarmNode):
+class LanguageDetector(CrewNode):
     """Detects language and enriches events for downstream nodes.
     
     This node:

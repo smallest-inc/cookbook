@@ -1,12 +1,12 @@
 """Rekha — Banking Customer Support Representative agent.
 
-An OutputSwarmNode that demonstrates:
+An OutputCrewNode that demonstrates:
 - Multi-round tool chaining (query → analyse → respond)
 - Real SQL queries against a live SQLite database
 - Deterministic Python computation (no LLM for number-crunching)
 - Session-based identity verification
 - Banking actions (FD create/break, TDS certificate)
-- Audit logging via a companion BackgroundSwarmNode
+- Audit logging via a companion BackgroundCrewNode
 """
 
 import json
@@ -18,9 +18,9 @@ from typing import Any, Dict, List
 from dotenv import load_dotenv
 from loguru import logger
 
-from smallestai.atoms.swarm.clients.openai import OpenAIClient
-from smallestai.atoms.swarm.clients.types import ToolCall, ToolResult
-from smallestai.atoms.swarm.events import (
+from smallestai.atoms.crew.clients.openai import OpenAIClient
+from smallestai.atoms.crew.clients.types import ToolCall, ToolResult
+from smallestai.atoms.crew.events import (
     SDKAgentEndCallEvent,
     SDKAgentTransferConversationEvent,
     TransferOption,
@@ -28,8 +28,8 @@ from smallestai.atoms.swarm.events import (
     WarmTransferHandoffOptionType,
     WarmTransferPrivateHandoffOption,
 )
-from smallestai.atoms.swarm.nodes import OutputSwarmNode
-from smallestai.atoms.swarm.tools import ToolRegistry, function_tool
+from smallestai.atoms.crew.nodes import OutputCrewNode
+from smallestai.atoms.crew.tools import ToolRegistry, function_tool
 
 from database import BankingDB, DB_SCHEMA_DESCRIPTION
 
@@ -110,7 +110,7 @@ Anything else → politely refuse and offer to transfer to a human agent.
 # ---------------------------------------------------------------------------
 
 
-class CSRAgent(OutputSwarmNode):
+class CSRAgent(OutputCrewNode):
     """Rekha — Banking CSR with real database access and multi-round tool chaining."""
 
     def __init__(self, db: BankingDB, audit: Any = None):

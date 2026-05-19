@@ -6,20 +6,20 @@ from typing import List
 from dotenv import load_dotenv
 from loguru import logger
 
-from smallestai.atoms.swarm.clients.openai import OpenAIClient
-from smallestai.atoms.swarm.clients.types import ToolCall, ToolResult
-from smallestai.atoms.swarm.events import (
+from smallestai.atoms.crew.clients.openai import OpenAIClient
+from smallestai.atoms.crew.clients.types import ToolCall, ToolResult
+from smallestai.atoms.crew.events import (
     SDKAgentEndCallEvent,
     SDKAgentControlMuteUserEvent,
     SDKAgentControlUnmuteUserEvent,
 )
-from smallestai.atoms.swarm.nodes import OutputSwarmNode
-from smallestai.atoms.swarm.tools import ToolRegistry, function_tool
+from smallestai.atoms.crew.nodes import OutputCrewNode
+from smallestai.atoms.crew.tools import ToolRegistry, function_tool
 
 load_dotenv()
 
 
-class ConfigurableAgent(OutputSwarmNode):
+class ConfigurableAgent(OutputCrewNode):
     """Agent that can dynamically mute/unmute user to control interrupts.
     
     Key mechanism:

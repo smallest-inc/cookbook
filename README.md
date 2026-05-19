@@ -143,14 +143,14 @@ Build AI voice agents that can talk to anyone on voice or text, in any language,
 
 ### Basics
 
-- [Getting Started](./voice-agents/getting_started/) — Create your first agent with `OutputSwarmNode`, `generate_response()`, and `AtomsSwarmApp`
+- [Getting Started](./voice-agents/getting_started/) — Create your first agent with `OutputCrewNode`, `generate_response()`, and `AtomsCrewApp`
 - [Agent with Tools](./voice-agents/agent_with_tools/) — Add tool calling with `@function_tool` and `ToolRegistry`
 - [Call Control](./voice-agents/call_control/) — Cold/warm transfers and ending a call with `SDKAgentTransferConversationEvent`
 
 ### Multi-Node Patterns
 
-- [Background Agent](./voice-agents/background_agent/) — `BackgroundSwarmNode` for parallel processing, cross-node state sharing
-- [Observability](./voice-agents/observability/) — Langfuse integration via `BackgroundSwarmNode` — live traces, tool spans, transcript events
+- [Background Agent](./voice-agents/background_agent/) — `BackgroundCrewNode` for parallel processing, cross-node state sharing
+- [Observability](./voice-agents/observability/) — Langfuse integration via `BackgroundCrewNode` — live traces, tool spans, transcript events
 - [Language Switching](./voice-agents/language_switching/) — Multi-node agents with dynamic language detection and switching
 
 ### Call Handling
@@ -177,17 +177,17 @@ Build AI voice agents that can talk to anyone on voice or text, in any language,
 - [Android Kotlin Voice Agent](./voice-agents/android_kotlin_voice_agent/) — Native Android (Jetpack Compose) implementation. OkHttp `WebSocket` + `AudioRecord`/`AudioTrack`, min SDK 24.
 - [Flutter Voice Agent](./voice-agents/flutter_voice_agent/) — Cross-platform Dart implementation. `web_socket_channel` + `mic_stream` + `flutter_pcm_sound`, iOS + Android.
 
-### Deploying agent swarms
+### Deploying agent crews
 
 Once an example runs locally, deploy it to the Smallest AI platform with the CLI:
 
 ```bash
-smallestai agent-swarm init                          # link this directory to a platform agent
-smallestai agent-swarm deploy --entry app.py         # package + ship to the cloud (server.py for getting_started)
-smallestai agent-swarm builds                        # pick the new build → choose "Make Live"
+smallestai agent-crew init                          # link this directory to a platform agent
+smallestai agent-crew deploy --entry app.py         # package + ship to the cloud (server.py for getting_started)
+smallestai agent-crew builds                        # pick the new build → choose "Make Live"
 ```
 
-Then place a call from the [Smallest Platform](https://platform.smallest.ai) dashboard. Full walkthrough in the [Agent Swarm Reference](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-swarm).
+Then place a call from the [Smallest Platform](https://platform.smallest.ai) dashboard. Full walkthrough in the [Agent Crew Reference](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew).
 
 > **Heads-up:** the deploy pipeline does not yet propagate `.env` values (like `OPENAI_API_KEY`) into the running pod. Examples that depend on third-party API keys work locally but currently fail on a real call with `openai.OpenAIError: Missing credentials`. See the [background_agent](./voice-agents/background_agent/#5-deploy-to-smallest-platform) example for context.
 

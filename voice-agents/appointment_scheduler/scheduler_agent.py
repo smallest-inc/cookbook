@@ -16,11 +16,11 @@ import dateparser
 from dotenv import load_dotenv
 from loguru import logger
 
-from smallestai.atoms.swarm.clients.openai import OpenAIClient
-from smallestai.atoms.swarm.clients.types import ToolCall, ToolResult
-from smallestai.atoms.swarm.events import SDKAgentEndCallEvent
-from smallestai.atoms.swarm.nodes import OutputSwarmNode
-from smallestai.atoms.swarm.tools import ToolRegistry, function_tool
+from smallestai.atoms.crew.clients.openai import OpenAIClient
+from smallestai.atoms.crew.clients.types import ToolCall, ToolResult
+from smallestai.atoms.crew.events import SDKAgentEndCallEvent
+from smallestai.atoms.crew.nodes import OutputCrewNode
+from smallestai.atoms.crew.tools import ToolRegistry, function_tool
 
 from calcom_client import CalcomClient
 
@@ -139,7 +139,7 @@ When a patient says they want to **check**, **confirm**, or **look up** an exist
 """
 
 
-class SchedulerAgent(OutputSwarmNode):
+class SchedulerAgent(OutputCrewNode):
     """Appointment scheduling agent with Cal.com calendar."""
 
     def __init__(self, calcom: CalcomClient):

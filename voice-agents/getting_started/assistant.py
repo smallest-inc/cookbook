@@ -3,13 +3,13 @@
 import os
 from dotenv import load_dotenv
 
-from smallestai.atoms.swarm.nodes import OutputSwarmNode
-from smallestai.atoms.swarm.clients.openai import OpenAIClient
+from smallestai.atoms.crew.nodes import OutputCrewNode
+from smallestai.atoms.crew.clients.openai import OpenAIClient
 
 load_dotenv()
 
 
-class Assistant(OutputSwarmNode):
+class Assistant(OutputCrewNode):
     """Basic agent that streams LLM responses."""
     
     def __init__(self):

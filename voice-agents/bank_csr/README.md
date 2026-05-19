@@ -17,7 +17,7 @@ A production-grade voice-based Customer Support Representative (**"Rekha"**) for
 | **Deterministic computation** | Totals, trends, comparisons, rankings done in pure Python — no LLM math hallucinations |
 | **Session-based identity verification** | KBA with 2 factors (Level 1) or 3 factors (Level 2). Verify once, never re-ask |
 | **Banking actions** | Create/break Fixed Deposits, send TDS certificates — with balance validation and penalty calculation |
-| **Compliance audit logging** | Silent `BackgroundSwarmNode` writes every event, tool call, and action to an audit table |
+| **Compliance audit logging** | Silent `BackgroundCrewNode` writes every event, tool call, and action to an audit table |
 | **Cold & warm call transfers** | Immediate handoff or brief-the-supervisor-first escalation, with hold music |
 | **India-specific voice behaviour** | Amounts in lakh/crore, digits read one-at-a-time, secure handling of PINs/OTPs/CVVs |
 
@@ -148,13 +148,13 @@ Starts a WebSocket server on `localhost:8080`.
 ### 4. Test via CLI
 
 ```bash
-smallestai agent-swarm chat
+smallestai agent-crew chat
 ```
 
 ### 5. Deploy to Smallest Platform
 
 ```bash
-smallestai agent-swarm deploy --entry app.py
+smallestai agent-crew deploy --entry app.py
 ```
 
 Then make a call from the [Smallest Platform](https://platform.smallest.ai) dashboard.
@@ -184,11 +184,11 @@ Then make a call from the [Smallest Platform](https://platform.smallest.ai) dash
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│                         SwarmSession                                 │
+│                         CrewSession                                 │
 │                                                                      │
 │  ┌─────────────────────┐     ┌────────────────────────────────────┐  │
 │  │  AuditLogger         │     │  CSRAgent (Rekha)                  │  │
-│  │  BackgroundSwarmNode  │     │  OutputSwarmNode                   │  │
+│  │  BackgroundCrewNode  │     │  OutputCrewNode                   │  │
 │  │                       │     │                                    │  │
 │  │  • Logs call start    │     │  • 10 function tools               │  │
 │  │  • Logs transcripts   │     │  • Multi-round generate_response   │  │
@@ -223,8 +223,8 @@ Both nodes receive the same event stream. The `AuditLogger` silently observes an
 | File | Lines | Description |
 |------|-------|-------------|
 | `app.py` | ~66 | Entry point — creates `BankingDB`, wires `AuditLogger` + `CSRAgent`, handles greeting |
-| `csr_agent.py` | ~751 | Rekha (`OutputSwarmNode`) — system prompt, `generate_response`, all 10 tools |
-| `audit_logger.py` | ~108 | `AuditLogger` (`BackgroundSwarmNode`) — compliance event logging |
+| `csr_agent.py` | ~751 | Rekha (`OutputCrewNode`) — system prompt, `generate_response`, all 10 tools |
+| `audit_logger.py` | ~108 | `AuditLogger` (`BackgroundCrewNode`) — compliance event logging |
 | `database.py` | ~463 | SQLite schema, seed data (1 customer, 75+ transactions), query helpers |
 | `requirements.txt` | ~2 | Dependencies |
 
@@ -251,15 +251,15 @@ Both nodes receive the same event stream. The `AuditLogger` silently observes an
 
 ### 1. Session Setup (`app.py`)
 
-Two nodes run in parallel inside a single `SwarmSession`:
+Two nodes run in parallel inside a single `CrewSession`:
 
 ```python
 db = BankingDB()
 
-audit = AuditLogger(db=db)        # BackgroundSwarmNode — silent logging
+audit = AuditLogger(db=db)        # BackgroundCrewNode — silent logging
 session.add_node(audit)
 
-csr = CSRAgent(db=db, audit=audit) # OutputSwarmNode — conversation
+csr = CSRAgent(db=db, audit=audit) # OutputCrewNode — conversation
 session.add_node(csr)
 
 await session.start()
@@ -356,10 +356,10 @@ Once verified, `self.is_verified = True` persists for the entire session — no 
 
 ### 5. Audit Logging (`audit_logger.py`)
 
-The `AuditLogger` is a `BackgroundSwarmNode` that runs silently alongside the main agent:
+The `AuditLogger` is a `BackgroundCrewNode` that runs silently alongside the main agent:
 
 ```python
-class AuditLogger(BackgroundSwarmNode):
+class AuditLogger(BackgroundCrewNode):
     async def process_event(self, event: SDKEvent):
         if isinstance(event, SDKSystemUserJoinedEvent):
             self.db.log_audit("CALL_START", ...)
@@ -424,7 +424,7 @@ async def warm_transfer_to_supervisor(self, reason: str) -> None:
 
 ### 7. Extending to External Observability
 
-The `AuditLogger` writes to SQLite by default, but the `BackgroundSwarmNode` pattern makes it trivial to stream events to any external observability platform — **without changing the main agent at all**.
+The `AuditLogger` writes to SQLite by default, but the `BackgroundCrewNode` pattern makes it trivial to stream events to any external observability platform — **without changing the main agent at all**.
 
 Because the background node runs in parallel and never blocks the conversation, you get real-time visibility into live transcription, tool calls, and banking actions with zero impact on latency.
 
@@ -441,7 +441,7 @@ self._trace.span(name=f"tool:{tool_name}", input=args, output=result)
 self.dd_client.send_event(name="tool_call", tags={"tool": tool_name})
 ```
 
-The key insight: the `BackgroundSwarmNode` receives the **exact same event stream** as the main agent — transcript updates, tool calls, user join/leave, everything. Swapping the sink from SQLite to Langfuse (or any platform) is a one-file change.
+The key insight: the `BackgroundCrewNode` receives the **exact same event stream** as the main agent — transcript updates, tool calls, user join/leave, everything. Swapping the sink from SQLite to Langfuse (or any platform) is a one-file change.
 
 > **See the [`observability`](../observability) cookbook for a full working integration with [Langfuse](https://langfuse.com)** — live traces, tool call spans, transcript events, and session summaries streaming in real-time.
 
@@ -556,16 +556,16 @@ This example uses the following Atoms SDK components:
 
 | Component | Import | Purpose |
 |-----------|--------|---------|
-| `AtomsSwarmApp` | `smallestai.atoms.swarm.server` | WebSocket server + session lifecycle |
-| `SwarmSession` | `smallestai.atoms.swarm.session` | Session management, node graph |
-| `OutputSwarmNode` | `smallestai.atoms.swarm.nodes` | Conversational agent with TTS output |
-| `BackgroundSwarmNode` | `smallestai.atoms.swarm.nodes` | Silent parallel processing node |
-| `OpenAIClient` | `smallestai.atoms.swarm.clients.openai` | Streaming LLM client |
-| `ToolRegistry` | `smallestai.atoms.swarm.tools` | Tool discovery, schema generation, execution |
-| `@function_tool` | `smallestai.atoms.swarm.tools` | Decorator to register tools from methods |
-| `SDKAgentTransferConversationEvent` | `smallestai.atoms.swarm.events` | Cold/warm call transfers |
-| `SDKAgentEndCallEvent` | `smallestai.atoms.swarm.events` | End call |
-| `SDKSystemUserJoinedEvent` | `smallestai.atoms.swarm.events` | User joined trigger |
+| `AtomsCrewApp` | `smallestai.atoms.crew.server` | WebSocket server + session lifecycle |
+| `CrewSession` | `smallestai.atoms.crew.session` | Session management, node graph |
+| `OutputCrewNode` | `smallestai.atoms.crew.nodes` | Conversational agent with TTS output |
+| `BackgroundCrewNode` | `smallestai.atoms.crew.nodes` | Silent parallel processing node |
+| `OpenAIClient` | `smallestai.atoms.crew.clients.openai` | Streaming LLM client |
+| `ToolRegistry` | `smallestai.atoms.crew.tools` | Tool discovery, schema generation, execution |
+| `@function_tool` | `smallestai.atoms.crew.tools` | Decorator to register tools from methods |
+| `SDKAgentTransferConversationEvent` | `smallestai.atoms.crew.events` | Cold/warm call transfers |
+| `SDKAgentEndCallEvent` | `smallestai.atoms.crew.events` | End call |
+| `SDKSystemUserJoinedEvent` | `smallestai.atoms.crew.events` | User joined trigger |
 
 Full SDK docs: [docs.smallest.ai](https://docs.smallest.ai)
 
