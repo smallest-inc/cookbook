@@ -177,6 +177,20 @@ Build AI voice agents that can talk to anyone on voice or text, in any language,
 - [Android Kotlin Voice Agent](./voice-agents/android_kotlin_voice_agent/) — Native Android (Jetpack Compose) implementation. OkHttp `WebSocket` + `AudioRecord`/`AudioTrack`, min SDK 24.
 - [Flutter Voice Agent](./voice-agents/flutter_voice_agent/) — Cross-platform Dart implementation. `web_socket_channel` + `mic_stream` + `flutter_pcm_sound`, iOS + Android.
 
+### Deploying agent swarms
+
+Once an example runs locally, deploy it to the Smallest AI platform with the CLI:
+
+```bash
+smallestai agent-swarm init                          # link this directory to a platform agent
+smallestai agent-swarm deploy --entry app.py         # package + ship to the cloud (server.py for getting_started)
+smallestai agent-swarm builds                        # pick the new build → choose "Make Live"
+```
+
+Then place a call from the [Smallest Platform](https://platform.smallest.ai) dashboard. Full walkthrough in the [Agent Swarm Reference](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-swarm).
+
+> **Heads-up:** the deploy pipeline does not yet propagate `.env` values (like `OPENAI_API_KEY`) into the running pod. Examples that depend on third-party API keys work locally but currently fail on a real call with `openai.OpenAIError: Missing credentials`. See the [background_agent](./voice-agents/background_agent/#5-deploy-to-smallest-platform) example for context.
+
 **[See all Voice Agents examples &rarr;](./voice-agents/)**
 
 ---
