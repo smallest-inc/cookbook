@@ -7,7 +7,7 @@ The simplest way to generate speech from text using Smallest AI's Lightning TTS 
 - Generate speech from text with a single API call
 - Save output as WAV file
 - Choose voice, speed, and language
-- Uses Lightning v3.1 for highest quality output
+- Uses the unified `/waves/v1/tts` route — defaults to Lightning v3.1 Pro pool, pass `MODEL="lightning_v3.1"` to use the standard pool instead
 
 ## Requirements
 
@@ -40,8 +40,8 @@ Output is saved to `output.wav` in the current directory.
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `MODEL` | TTS model | `lightning-v3.1` |
-| `VOICE_ID` | Voice to use (see [Voices](../voices/)) | `sophia` |
+| `MODEL` | TTS pool (`lightning_v3.1_pro` or `lightning_v3.1`) | `lightning_v3.1_pro` |
+| `VOICE_ID` | Voice to use (see [Voices](../voices/)) | `meher` |
 | `SPEED` | Playback speed (0.5 to 2.0) | `1.0` |
 | `SAMPLE_RATE` | Audio sample rate in Hz | `24000` |
 | `LANGUAGE` | Language code (`en`, `hi`, `es`, `ta`) | `en` |
@@ -49,7 +49,9 @@ Output is saved to `output.wav` in the current directory.
 
 ## API Reference
 
-- [Lightning v3.1 API](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1)
+- [Synthesize speech (unified `/waves/v1/tts`)](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/synthesize-speech)
+- [Lightning v3.1 model card](https://docs.smallest.ai/waves/model-cards/text-to-speech/lightning-v-3-1)
+- [Lightning v3.1 Pro model card](https://docs.smallest.ai/waves/model-cards/text-to-speech/lightning-v-3-1-pro)
 
 ## Next Steps
 

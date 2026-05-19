@@ -10,14 +10,15 @@ if not api_key:
     sys.exit(1)
 
 response = requests.post(
-    "https://api.smallest.ai/waves/v1/lightning-v3.1/get_speech",
+    "https://api.smallest.ai/waves/v1/tts",
     headers={
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     },
     json={
         "text": "Hello! Welcome to Smallest AI. This is your first text-to-speech generation.",
-        "voice_id": "sophia",
+        "voice_id": "meher",
+        "model": "lightning_v3.1_pro",
         "sample_rate": 24000,
         "output_format": "wav",
     },

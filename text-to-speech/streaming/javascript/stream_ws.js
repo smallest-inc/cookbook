@@ -17,12 +17,14 @@
 const fs = require("fs");
 const WebSocket = require("ws");
 
-const MODEL = "lightning-v3.1";
-const VOICE_ID = "sophia";
+// Set MODEL to "lightning_v3.1_pro" for the Pro pool (curated voices)
+// or "lightning_v3.1" for the standard pool (more voices + voice cloning).
+const MODEL = "lightning_v3.1_pro";
+const VOICE_ID = "meher";
 const SAMPLE_RATE = 24000;
 const SPEED = 1.0;
 
-const WS_URL = `wss://api.smallest.ai/waves/v1/${MODEL}/get_speech/stream`;
+const WS_URL = "wss://api.smallest.ai/waves/v1/tts/live";
 
 function addWavHeader(pcmData, sampleRate, channels = 1, bitsPerSample = 16) {
   const dataSize = pcmData.length;
@@ -63,6 +65,7 @@ function streamSpeech(text, apiKey) {
         JSON.stringify({
           text,
           voice_id: VOICE_ID,
+          model: MODEL,
           sample_rate: SAMPLE_RATE,
           speed: SPEED,
         })

@@ -60,15 +60,17 @@ node stream_ws.js "This text will be streamed via WebSocket."
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `MODEL` | TTS model | `lightning-v3.1` |
-| `VOICE_ID` | Voice to use | `sophia` |
+| `MODEL` | TTS pool (`lightning_v3.1_pro` or `lightning_v3.1`) | `lightning_v3.1_pro` |
+| `VOICE_ID` | Voice to use | `meher` |
 | `SAMPLE_RATE` | Audio sample rate in Hz | `24000` |
 | `SPEED` | Playback speed (0.5–2.0) | `1.0` |
 
 ## API Reference
 
-- [Lightning v3.1 SSE Streaming](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/stream-lightning-v-31-speech)
-- [Lightning v3.1 WebSocket](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/text-to-speech-v-3-1)
+- [Synthesize speech (REST sync)](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/synthesize-speech)
+- [Stream speech (SSE)](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/synthesize-speech-sse)
+- [Live TTS WebSocket](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/live-tts-web-socket)
+- [Lightning v3.1 Pro model card](https://docs.smallest.ai/waves/model-cards/text-to-speech/lightning-v-3-1-pro)
 
 ## Next Steps
 
