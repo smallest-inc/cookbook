@@ -60,7 +60,7 @@ uv run app.py
 Connect with the CLI:
 
 ```bash
-smallestai agent chat
+smallestai agent-swarm chat
 ```
 
 ## Recommended Usage
@@ -127,7 +127,7 @@ transfer_options = TransferOption(
 Control the caller's microphone:
 
 ```python
-from smallestai.atoms.agent.events import (
+from smallestai.atoms.swarm.events import (
     SDKAgentControlMuteUserEvent,
     SDKAgentControlUnmuteUserEvent,
 )

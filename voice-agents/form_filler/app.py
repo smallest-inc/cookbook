@@ -15,18 +15,18 @@ from form_agent import FormAgent
 from form_engine import create_insurance_claim_form
 from jotform_client import JotformClient
 
-from smallestai.atoms.agent.events import SDKEvent, SDKSystemUserJoinedEvent
-from smallestai.atoms.agent.server import AtomsApp
-from smallestai.atoms.agent.session import AgentSession
+from smallestai.atoms.swarm.events import SDKEvent, SDKSystemUserJoinedEvent
+from smallestai.atoms.swarm.server import AtomsSwarmApp
+from smallestai.atoms.swarm.session import SwarmSession
 
 
-async def setup_session(session: AgentSession):
+async def setup_session(session: SwarmSession):
     """Configure form filler session.
 
     Architecture:
     - FormEngine: State machine with typed fields, validation, step progression
     - JotformClient: Submits completed data as native Jotform entries
-    - FormAgent (OutputAgentNode): Voice agent that follows the state machine
+    - FormAgent (OutputSwarmNode): Voice agent that follows the state machine
     """
 
     # Create a fresh insurance claim form for this session
@@ -71,5 +71,5 @@ async def setup_session(session: AgentSession):
 
 
 if __name__ == "__main__":
-    app = AtomsApp(setup_handler=setup_session)
+    app = AtomsSwarmApp(setup_handler=setup_session)
     app.run()

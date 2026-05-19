@@ -16,11 +16,11 @@ from typing import Any, Dict, List, Optional
 from dotenv import load_dotenv
 from loguru import logger
 
-from smallestai.atoms.agent.clients.openai import OpenAIClient
-from smallestai.atoms.agent.clients.types import ToolCall, ToolResult
-from smallestai.atoms.agent.events import SDKAgentEndCallEvent
-from smallestai.atoms.agent.nodes import OutputAgentNode
-from smallestai.atoms.agent.tools import ToolRegistry, function_tool
+from smallestai.atoms.swarm.clients.openai import OpenAIClient
+from smallestai.atoms.swarm.clients.types import ToolCall, ToolResult
+from smallestai.atoms.swarm.events import SDKAgentEndCallEvent
+from smallestai.atoms.swarm.nodes import OutputSwarmNode
+from smallestai.atoms.swarm.tools import ToolRegistry, function_tool
 
 from form_engine import FormEngine
 from jotform_client import JotformClient
@@ -81,7 +81,7 @@ You have a form engine that tracks which fields are needed.
 """
 
 
-class FormAgent(OutputAgentNode):
+class FormAgent(OutputSwarmNode):
     """Voice agent that fills forms via a state machine."""
 
     def __init__(self, form: FormEngine, jotform: Optional[JotformClient] = None):

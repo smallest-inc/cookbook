@@ -14,7 +14,7 @@ Build AI voice agents with the [Atoms SDK](https://atoms-docs.smallest.ai/dev) o
 
 | Example | What You'll Learn |
 |---------|-------------------|
-| [getting_started](./getting_started/) | `OutputAgentNode`, `generate_response()`, `AtomsApp` |
+| [getting_started](./getting_started/) | `OutputSwarmNode`, `generate_response()`, `AtomsSwarmApp` |
 | [agent_with_tools](./agent_with_tools/) | `@function_tool`, `ToolRegistry`, tool execution |
 | [call_control](./call_control/) | `SDKAgentEndCallEvent`, cold/warm transfers |
 
@@ -22,8 +22,8 @@ Build AI voice agents with the [Atoms SDK](https://atoms-docs.smallest.ai/dev) o
 
 | Example | What You'll Learn |
 |---------|-------------------|
-| [background_agent](./background_agent/) | `BackgroundAgentNode`, parallel nodes, cross-node state |
-| [observability](./observability/) | Langfuse integration via `BackgroundAgentNode` — live traces, tool spans, transcript events |
+| [background_agent](./background_agent/) | `BackgroundSwarmNode`, parallel nodes, cross-node state |
+| [observability](./observability/) | Langfuse integration via `BackgroundSwarmNode` — live traces, tool spans, transcript events |
 | [language_switching](./language_switching/) | `add_edge()`, custom nodes, event pipelines |
 
 ## Call Handling
@@ -77,7 +77,7 @@ uv run voice-agents/bank_csr/app.py
 ### Step 3: Connect via CLI
 
 ```bash
-smallestai agent chat
+smallestai agent-swarm chat
 ```
 
 ### API Keys

@@ -6,9 +6,9 @@ from typing import List
 from dotenv import load_dotenv
 from loguru import logger
 
-from smallestai.atoms.agent.clients.openai import OpenAIClient
-from smallestai.atoms.agent.clients.types import ToolCall, ToolResult
-from smallestai.atoms.agent.events import (
+from smallestai.atoms.swarm.clients.openai import OpenAIClient
+from smallestai.atoms.swarm.clients.types import ToolCall, ToolResult
+from smallestai.atoms.swarm.events import (
     SDKAgentControlMuteUserEvent,
     SDKAgentControlUnmuteUserEvent,
     SDKAgentEndCallEvent,
@@ -18,8 +18,8 @@ from smallestai.atoms.agent.events import (
     WarmTransferHandoffOptionType,
     WarmTransferPrivateHandoffOption,
 )
-from smallestai.atoms.agent.nodes import OutputAgentNode
-from smallestai.atoms.agent.tools import ToolRegistry, function_tool
+from smallestai.atoms.swarm.nodes import OutputSwarmNode
+from smallestai.atoms.swarm.tools import ToolRegistry, function_tool
 
 load_dotenv()
 
@@ -49,7 +49,7 @@ DEPARTMENTS = {
 }
 
 
-class IVRAgent(OutputAgentNode):
+class IVRAgent(OutputSwarmNode):
     """IVR-style agent that routes callers to the right department.
     
     Demonstrates:

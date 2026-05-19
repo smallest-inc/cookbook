@@ -3,11 +3,11 @@
 import re
 from loguru import logger
 
-from smallestai.atoms.agent.events import (
+from smallestai.atoms.swarm.events import (
     SDKAgentLLMResponseChunkEvent,
     SDKEvent,
 )
-from smallestai.atoms.agent.nodes.base import Node
+from smallestai.atoms.swarm.nodes.base import SwarmNode
 
 
 # Simple profanity list (in production, use a proper library)
@@ -16,7 +16,7 @@ PROFANITY_WORDS = {
 }
 
 
-class ProfanityFilter(Node):
+class ProfanityFilter(SwarmNode):
     """Filters profanity from agent responses before they reach TTS.
     
     This node:
@@ -24,7 +24,7 @@ class ProfanityFilter(Node):
     - Sanitizes any inappropriate language
     - Passes clean text downstream
     
-    Position in pipeline: After OutputAgentNode, before Sink
+    Position in pipeline: After OutputSwarmNode, before Sink
     """
 
     def __init__(self):

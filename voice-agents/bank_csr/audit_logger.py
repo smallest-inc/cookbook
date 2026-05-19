@@ -11,17 +11,17 @@ from typing import Dict, List, Optional
 
 from loguru import logger
 
-from smallestai.atoms.agent.events import (
+from smallestai.atoms.swarm.events import (
     SDKAgentTranscriptUpdateEvent,
     SDKEvent,
     SDKSystemUserJoinedEvent,
 )
-from smallestai.atoms.agent.nodes import BackgroundAgentNode
+from smallestai.atoms.swarm.nodes import BackgroundSwarmNode
 
 from database import BankingDB
 
 
-class AuditLogger(BackgroundAgentNode):
+class AuditLogger(BackgroundSwarmNode):
     """Logs every meaningful event to the audit_log table.
 
     Architecture:

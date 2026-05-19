@@ -1,4 +1,4 @@
-"""Observability Example — Langfuse integration via BackgroundAgentNode.
+"""Observability Example — Langfuse integration via BackgroundSwarmNode.
 
 Streams live traces, tool calls, LLM generations, and transcripts
 to Langfuse — all running silently alongside the main agent.
@@ -9,17 +9,17 @@ from loguru import logger
 from langfuse_logger import LangfuseLogger
 from support_agent import SupportAgent
 
-from smallestai.atoms.agent.events import SDKEvent, SDKSystemUserJoinedEvent
-from smallestai.atoms.agent.server import AtomsApp
-from smallestai.atoms.agent.session import AgentSession
+from smallestai.atoms.swarm.events import SDKEvent, SDKSystemUserJoinedEvent
+from smallestai.atoms.swarm.server import AtomsSwarmApp
+from smallestai.atoms.swarm.session import SwarmSession
 
 
-async def setup_session(session: AgentSession):
+async def setup_session(session: SwarmSession):
     """Configure session with Langfuse observability.
 
     Architecture:
-    - LangfuseLogger (BackgroundAgentNode): Streams events to Langfuse
-    - SupportAgent (OutputAgentNode): Handles conversation + tools
+    - LangfuseLogger (BackgroundSwarmNode): Streams events to Langfuse
+    - SupportAgent (OutputSwarmNode): Handles conversation + tools
 
     Both nodes run in parallel, receiving the same events.
     """
@@ -55,5 +55,5 @@ async def setup_session(session: AgentSession):
 
 
 if __name__ == "__main__":
-    app = AtomsApp(setup_handler=setup_session)
+    app = AtomsSwarmApp(setup_handler=setup_session)
     app.run()
