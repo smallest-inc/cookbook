@@ -24,6 +24,7 @@ from langfuse import Langfuse
 from loguru import logger
 
 from smallestai.atoms.crew.events import (
+    SDKAgentLogEvent,
     SDKAgentTranscriptUpdateEvent,
     SDKEvent,
     SDKSystemUserJoinedEvent,
@@ -89,6 +90,25 @@ class LangfuseLogger(BackgroundCrewNode):
             logger.info(
                 f"[LangfuseLogger] Trace created (trace_id={self._root_span.trace_id})"
             )
+
+            # Surface the Langfuse trace URL to the orchestrator so it lands
+            # in call logs / post-call analytics — operators can jump straight
+            # from the call record to the Langfuse trace without opening
+            # the Langfuse dashboard.
+            try:
+                trace_url = self._langfuse.get_trace_url(
+                    trace_id=self._root_span.trace_id
+                )
+            except Exception:
+                trace_url = None
+            await self.send_event(SDKAgentLogEvent(
+                name="observability.trace_created",
+                payload={
+                    "trace_id": self._root_span.trace_id,
+                    "trace_url": trace_url,
+                    "vendor": "langfuse",
+                }
+            ))
 
         elif isinstance(event, SDKAgentTranscriptUpdateEvent):
             entry = {"role": event.role, "content": event.content}

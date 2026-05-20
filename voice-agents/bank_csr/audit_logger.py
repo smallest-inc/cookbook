@@ -12,6 +12,7 @@ from typing import Dict, List, Optional
 from loguru import logger
 
 from smallestai.atoms.crew.events import (
+    SDKAgentLogEvent,
     SDKAgentTranscriptUpdateEvent,
     SDKEvent,
     SDKSystemUserJoinedEvent,
@@ -49,6 +50,14 @@ class AuditLogger(BackgroundCrewNode):
                 json.dumps({"timestamp": self._call_start}),
             )
             logger.info("[AuditLogger] Call started")
+
+            # Surface to the orchestrator so the call's compliance start
+            # marker shows up in call logs / post-call analytics, not just
+            # in the SQLite audit_log table inside the pod.
+            await self.send_event(SDKAgentLogEvent(
+                name="audit.call_started",
+                payload={"timestamp": self._call_start}
+            ))
 
         elif isinstance(event, SDKAgentTranscriptUpdateEvent):
             entry = {"role": event.role, "content": event.content}

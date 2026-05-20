@@ -115,6 +115,21 @@ class SentimentAnalyzer(BackgroundCrewNode):
                 self.current_sentiment = await self._analyze(event.content)
 ```
 
+### Surfacing custom events to the call timeline
+
+`BackgroundCrewNode` doesn't speak to the user, but it can publish custom events that show up in the call's **Events** tab — alongside transcripts, tool calls, and lifecycle markers. Use `SDKAgentLogEvent` for sentiment classifications, intent labels, lead scores, escalation flags, or any other state you want operators / dashboards / webhooks to see:
+
+```python
+from smallestai.atoms.crew.events import SDKAgentLogEvent
+
+await self.send_event(SDKAgentLogEvent(
+    name="sentiment",
+    payload={"sentiment": "frustrated", "frustration_count": 3},
+))
+```
+
+The orchestrator logs each event at INFO (`[log] name=sentiment payload=…`) and forwards it through the relay (RabbitMQ → ClickHouse) so it lands in the Events tab and post-call analytics. Without this, your background node's state stays inside the pod — only visible via `kubectl logs`.
+
 ### Multi-Node Session
 
 Add multiple nodes to run them in parallel:

@@ -8,6 +8,7 @@ from loguru import logger
 
 from smallestai.atoms.crew.clients.openai import OpenAIClient
 from smallestai.atoms.crew.events import (
+    SDKAgentLogEvent,
     SDKAgentTranscriptUpdateEvent,
     SDKEvent,
     SDKSystemUserStartedSpeakingEvent,
@@ -111,7 +112,19 @@ Only respond with that single word."""
                     self.frustration_count = max(0, self.frustration_count - 1)
                     
             logger.info(f"[SentimentAnalyzer] Sentiment: {sentiment}")
-            
+
+            # Surface the classification to the orchestrator so it shows up in
+            # call logs, metrics, and post-call analytics — not just pod stdout.
+            await self.send_event(SDKAgentLogEvent(
+                name="sentiment",
+                payload={
+                    "sentiment": sentiment,
+                    "frustration_count": self.frustration_count,
+                    "should_escalate": self.should_escalate(),
+                    "text": text,
+                }
+            ))
+
         except Exception as e:
             logger.error(f"[SentimentAnalyzer] Analysis failed: {e}")
 

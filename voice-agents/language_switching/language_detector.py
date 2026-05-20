@@ -6,6 +6,7 @@ from loguru import logger
 
 from smallestai.atoms.crew.clients.openai import OpenAIClient
 from smallestai.atoms.crew.events import (
+    SDKAgentLogEvent,
     SDKAgentTranscriptUpdateEvent,
     SDKEvent,
 )
@@ -66,19 +67,34 @@ Only respond with the JSON, nothing else."""
                 ],
                 stream=False
             )
-            
+
             import json
             result = json.loads(response.content)
-            
+
+            previous_language = self.detected_language
             self.detected_language = result.get("language", "english").lower()
             self.language_confidence = result.get("confidence", 0.5)
             self.language_history.append(self.detected_language)
-            
+
             logger.info(
                 f"[LanguageDetector] Detected: {self.detected_language} "
                 f"(confidence: {self.language_confidence:.0%})"
             )
-            
+
+            # Surface a signal only when the language actually changes —
+            # emitting on every turn would be noisy. Operators / analytics
+            # care about transitions, not every confirmation of the same
+            # language.
+            if self.detected_language != previous_language:
+                await self.send_event(SDKAgentLogEvent(
+                    name="language.switched",
+                    payload={
+                        "from": previous_language,
+                        "to": self.detected_language,
+                        "confidence": self.language_confidence,
+                    }
+                ))
+
         except Exception as e:
             logger.error(f"[LanguageDetector] Detection failed: {e}")
             self.detected_language = "english"
