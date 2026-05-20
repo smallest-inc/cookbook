@@ -1,5 +1,5 @@
 # Extra dependency for Langfuse observability
-smallestai>=4.4.4
+smallestai>=4.4.6
 langfuse>=2.0.0
 
 # Logging

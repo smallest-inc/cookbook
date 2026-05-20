@@ -1,2 +1,2 @@
 # No extra dependencies — base SDK from root requirements.txt is sufficient
-smallestai>=4.4.4
+smallestai>=4.4.6
