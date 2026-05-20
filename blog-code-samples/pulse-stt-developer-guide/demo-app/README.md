@@ -135,6 +135,6 @@ demo-app/
 
 ## Resources
 
-- [Smallest AI Console](https://console.smallest.ai) - Get API key
+- [Smallest AI Console](https://app.smallest.ai) - Get API key
 - [Waves Documentation](https://waves-docs.smallest.ai) - Full API reference
 - [GitHub](https://github.com/smallest-inc) - Official repositories

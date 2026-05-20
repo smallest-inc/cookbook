@@ -81,7 +81,7 @@ smallestai agent-crew builds
 # pick your build from the table → choose "Make Live"
 ```
 
-Then make a call from the [Smallest Platform](https://platform.smallest.ai) dashboard.
+Then make a call from the [Smallest Platform](https://app.smallest.ai) dashboard.
 
 > **Note — environment variables on deployed builds:** the deploy pipeline does not yet propagate `.env` / `OPENAI_API_KEY` into the running pod, so this example currently works end-to-end **only locally**. Once `smallestai agent-crew deploy` learns to ship a Kubernetes Secret with your env vars, deployed builds will be able to make OpenAI calls too. Until then, on a real call you'll see `openai.OpenAIError: Missing credentials` in the pod logs and the connection will close. Replace the OpenAI client with a stub (or use an LLM the pod can reach without credentials) if you want to test the deployed flow.
 
@@ -181,8 +181,8 @@ background_agent/
 
 ## API Reference
 
-- [Agents — Overview](https://atoms-docs.smallest.ai/dev/build/agents/overview)
-- [Core Concepts — Nodes](https://atoms-docs.smallest.ai/dev/introduction/core-concepts/nodes)
+- [Agents — Overview](https://docs.smallest.ai/atoms/developer-guide/build/agent-crews/overview)
+- [Core Concepts — Nodes](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew-core-concepts/nodes)
 
 ## Next Steps
 

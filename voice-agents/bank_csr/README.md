@@ -99,7 +99,7 @@ Rekha:  I'll brief my supervisor and connect you right away.
 
 - Python ≥ 3.12
 - An [OpenAI API key](https://platform.openai.com/api-keys) (GPT-4o)
-- A [Smallest AI API key](https://platform.smallest.ai) (for deployment)
+- A [Smallest AI API key](https://app.smallest.ai) (for deployment)
 
 ### Dependencies
 
@@ -125,7 +125,7 @@ uv pip install -r voice-agents/bank_csr/requirements.txt
 
 ```bash
 export OPENAI_API_KEY=sk-...
-export SMALLEST_API_KEY=...        # from platform.smallest.ai
+export SMALLEST_API_KEY=...        # from app.smallest.ai
 export TRANSFER_NUMBER=+91...      # optional: phone number for call transfers
 ```
 
@@ -157,7 +157,7 @@ smallestai agent-crew chat
 smallestai agent-crew deploy --entry app.py
 ```
 
-Then make a call from the [Smallest Platform](https://platform.smallest.ai) dashboard.
+Then make a call from the [Smallest Platform](https://app.smallest.ai) dashboard.
 
 ---
 

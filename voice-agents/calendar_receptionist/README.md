@@ -109,7 +109,7 @@ calendar_receptionist/
 
 ## Documentation
 
-- [Atoms docs](https://atoms-docs.smallest.ai/dev)
+- [Atoms docs](https://docs.smallest.ai/atoms/developer-guide)
 
 ## Next Steps
 
