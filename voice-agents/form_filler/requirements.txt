@@ -1,2 +1,2 @@
-smallestai>=4.3.0
+smallestai>=4.4.4
 httpx

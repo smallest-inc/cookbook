@@ -1,3 +1,3 @@
 # Extra dependency for PDF generation in the demo script
-smallestai>=4.3.0
+smallestai>=4.4.4
 reportlab

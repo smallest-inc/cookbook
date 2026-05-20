@@ -1,3 +1,3 @@
 # Extra dependency for Langfuse observability
-smallestai>=4.3.0
+smallestai>=4.4.4
 langfuse>=2.0.0

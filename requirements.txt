@@ -16,7 +16,7 @@ websockets>=11.0
 python-dotenv>=1.0.0
 
 # Smallest AI SDK
-smallestai>=4.3.0
+smallestai>=4.4.4
 
 # Logging
 loguru
