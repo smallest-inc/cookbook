@@ -25,6 +25,6 @@ npm install n8n-nodes-smallestai
 
 ## Links
 
-- [Smallest AI Console](https://console.smallest.ai)
+- [Smallest AI Console](https://app.smallest.ai/dashboard)
 - [Smallest AI Docs](https://docs.smallest.ai)
 - [n8n Community Nodes — Installation Guide](https://docs.n8n.io/integrations/community-nodes/installation/)

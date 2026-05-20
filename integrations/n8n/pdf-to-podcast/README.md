@@ -43,7 +43,7 @@ The workflow runs end-to-end without manual intervention:
 ## Prerequisites
 
 - [n8n](https://n8n.io) instance (cloud or self-hosted)
-- [Smallest AI](https://console.smallest.ai) account and API key
+- [Smallest AI](https://app.smallest.ai/dashboard) account and API key
 - [OpenAI](https://platform.openai.com) account and API key
 - Gmail account connected to n8n via OAuth2
 
@@ -70,7 +70,7 @@ npm install n8n-nodes-smallestai
 You need three sets of credentials in n8n (**Credentials → New**):
 
 **Smallest AI**
-1. Go to [console.smallest.ai](https://console.smallest.ai) → **Settings → API Keys**
+1. Go to [app.smallest.ai/dashboard](https://app.smallest.ai/dashboard) → **Settings → API Keys**
 2. Click **Create API Key**, copy it
 3. In n8n: **Credentials → New → Smallest.ai API**, paste the key and save
 
