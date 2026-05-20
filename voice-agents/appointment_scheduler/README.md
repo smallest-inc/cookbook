@@ -92,7 +92,7 @@ The agent **always** calls `resolve_date` first — it never constructs dates on
 
 - Python ≥ 3.10
 - An [OpenAI API key](https://platform.openai.com/api-keys)
-- A [Smallest AI API key](https://platform.smallest.ai)
+- A [Smallest AI API key](https://app.smallest.ai)
 - A [Cal.com API key](https://cal.com) + Event Type ID
 
 ### Dependencies

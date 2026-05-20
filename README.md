@@ -187,7 +187,7 @@ smallestai agent-crew deploy --entry app.py         # package + ship to the clou
 smallestai agent-crew builds                        # pick the new build → choose "Make Live"
 ```
 
-Then place a call from the [Smallest Platform](https://platform.smallest.ai) dashboard. Full walkthrough in the [Agent Crew Reference](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew).
+Then place a call from the [Smallest Platform](https://app.smallest.ai) dashboard. Full walkthrough in the [Agent Crew Reference](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew).
 
 > **Heads-up:** the deploy pipeline does not yet propagate `.env` values (like `OPENAI_API_KEY`) into the running pod. Examples that depend on third-party API keys work locally but currently fail on a real call with `openai.OpenAIError: Missing credentials`. See the [background_agent](./voice-agents/background_agent/#5-deploy-to-smallest-platform) example for context.
 
