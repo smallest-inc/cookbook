@@ -44,7 +44,7 @@ Output is saved to `output.wav` in the current directory.
 | `VOICE_ID` | Voice to use (see [Voices](../voices/)) | `meher` |
 | `SPEED` | Playback speed (0.5 to 2.0) | `1.0` |
 | `SAMPLE_RATE` | Audio sample rate in Hz | `24000` |
-| `LANGUAGE` | Language code (`en`, `hi`, `es`, `ta`) | `en` |
+| `LANGUAGE` | Language code — Pro pool: `en` (all voices) or `hi` (Indian voices); switch `MODEL` to `lightning_v3.1` to use `es`, `ta`, and 9 more | `en` |
 | `OUTPUT_FORMAT` | Output format (`wav`, `pcm`, `mp3`, `mulaw`) | `wav` |
 
 ## API Reference
