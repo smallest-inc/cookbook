@@ -115,6 +115,52 @@ class SentimentAnalyzer(BackgroundCrewNode):
                 self.current_sentiment = await self._analyze(event.content)
 ```
 
+### Surfacing custom events to the call timeline
+
+`BackgroundCrewNode` doesn't speak to the user, but it can publish custom events that show up in the call's **Events** tab — alongside transcripts, tool calls, and lifecycle markers. Use `SDKAgentLogEvent` for sentiment classifications, intent labels, lead scores, escalation flags, or any other state you want operators / dashboards / webhooks to see:
+
+```python
+from smallestai.atoms.crew.events import SDKAgentLogEvent
+
+await self.send_event(SDKAgentLogEvent(
+    name="sentiment",
+    payload={"sentiment": "frustrated", "frustration_count": 3},
+))
+```
+
+The orchestrator logs each event at INFO (`[log] name=sentiment payload=…`) and forwards it through the relay (RabbitMQ → ClickHouse) so it lands in the Events tab and post-call analytics. Without this, your background node's state stays inside the pod — only visible via `kubectl logs`.
+
+### How errors surface on the call
+
+The SDK auto-emits `SDKAgentErrorEvent` whenever your `process_event` (or `generate_response` for output nodes) raises an uncaught exception — the orchestrator writes it to `calllog.errors[]` and surfaces it in the Events tab. So if you let exceptions bubble up, you get error visibility for free.
+
+If you want a **graceful fallback** instead (catch the error, set a sensible default, continue the conversation), emit the error explicitly so it's still durably recorded:
+
+```python
+from smallestai.atoms.crew.events import SDKAgentErrorEvent
+
+try:
+    sentiment = await self._classify(text)
+except Exception as e:
+    logger.error(f"[SentimentAnalyzer] Analysis failed: {e}")
+    self.current_sentiment = "neutral"  # fallback
+    await self.send_event(SDKAgentErrorEvent(
+        message=str(e),
+        severity="warning",          # background → call continues
+        payload={
+            "node_name": self.name,
+            "error_class": type(e).__name__,
+        },
+    ))
+```
+
+Severity semantics:
+
+- `severity="warning"` (default for `BackgroundCrewNode`) — recorded on the call, **call continues**. Use for background observations where a fallback exists.
+- `severity="fatal"` (default for `OutputCrewNode`) — recorded on the call, **call ends**, `calllog.failureReason` is set. Use when the agent itself can't function (e.g., missing credentials in the user-facing LLM client).
+
+This example wires the pattern into `SentimentAnalyzer._analyze_sentiment` — if the OpenAI call fails (missing/expired key, rate limit, network), the analyzer logs it, falls back to `"neutral"`, and surfaces a warning on the call so operators can diagnose without `kubectl logs`.
+
 ### Multi-Node Session
 
 Add multiple nodes to run them in parallel:

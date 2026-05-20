@@ -6,6 +6,8 @@ from loguru import logger
 
 from smallestai.atoms.crew.clients.openai import OpenAIClient
 from smallestai.atoms.crew.events import (
+    SDKAgentErrorEvent,
+    SDKAgentLogEvent,
     SDKAgentTranscriptUpdateEvent,
     SDKEvent,
 )
@@ -66,23 +68,53 @@ Only respond with the JSON, nothing else."""
                 ],
                 stream=False
             )
-            
+
             import json
             result = json.loads(response.content)
-            
+
+            previous_language = self.detected_language
             self.detected_language = result.get("language", "english").lower()
             self.language_confidence = result.get("confidence", 0.5)
             self.language_history.append(self.detected_language)
-            
+
             logger.info(
                 f"[LanguageDetector] Detected: {self.detected_language} "
                 f"(confidence: {self.language_confidence:.0%})"
             )
-            
+
+            # Surface a signal only when the language actually changes —
+            # emitting on every turn would be noisy. Operators / analytics
+            # care about transitions, not every confirmation of the same
+            # language.
+            if self.detected_language != previous_language:
+                await self.send_event(SDKAgentLogEvent(
+                    name="language.switched",
+                    payload={
+                        "from": previous_language,
+                        "to": self.detected_language,
+                        "confidence": self.language_confidence,
+                    }
+                ))
+
         except Exception as e:
             logger.error(f"[LanguageDetector] Detection failed: {e}")
             self.detected_language = "english"
             self.language_confidence = 0.5
+            # Surface to orchestrator (calllog.errors[] + Events tab).
+            # severity="warning" — call continues with fallback ("english").
+            try:
+                await self.send_event(SDKAgentErrorEvent(
+                    message=str(e),
+                    severity="warning",
+                    payload={
+                        "node_name": self.name,
+                        "error_class": type(e).__name__,
+                    },
+                ))
+            except Exception:
+                logger.exception(
+                    "[LanguageDetector] Failed to send error event upstream"
+                )
 
     def get_primary_language(self) -> str:
         """Get the most commonly detected language in this session."""
