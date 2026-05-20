@@ -1,2 +1,5 @@
-# No extra dependencies — base SDK from root requirements.txt is sufficient
+# Dependencies for this example
 smallestai>=4.4.4
+
+# Logging
+loguru>=0.7.0

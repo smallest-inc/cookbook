@@ -1,3 +1,6 @@
 # Extra dependency for Langfuse observability
 smallestai>=4.4.4
 langfuse>=2.0.0
+
+# Logging
+loguru>=0.7.0
