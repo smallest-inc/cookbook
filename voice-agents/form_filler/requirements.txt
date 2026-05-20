@@ -1,4 +1,4 @@
-smallestai>=4.4.4
+smallestai>=4.4.6
 httpx
 
 # Logging
