@@ -42,7 +42,7 @@ pulse-stt-developer-guide/
 
 ### Prerequisites
 
-1. Get your API key from [console.smallest.ai](https://console.smallest.ai/apikeys)
+1. Get your API key from [app.smallest.ai](https://app.smallest.ai/dashboard/api-keys)
 2. Set environment variable:
    ```bash
    export SMALLEST_API_KEY="your_api_key_here"
@@ -217,7 +217,7 @@ See [demo-app/README.md](./demo-app/README.md) for detailed instructions.
 ## 🔗 Resources
 
 - [Waves Documentation](https://waves-docs.smallest.ai)
-- [Smallest AI Console](https://console.smallest.ai)
+- [Smallest AI Console](https://app.smallest.ai)
 - [Python SDK](https://github.com/smallest-inc/smallest-python-sdk)
 - [Discord Community](https://discord.gg/5evETqguJs)
 

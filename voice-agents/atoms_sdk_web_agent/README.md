@@ -8,7 +8,7 @@ A real-time, multi-agent voice AI dashboard powered by **Smallest.ai Atoms SDK**
 
 ### 1. Create your Agents
 First, you need to set up your voice agents on the Smallest.ai platform:
-1. Visit [Smallest.ai Atoms](https://atoms.smallest.ai/).
+1. Visit [Smallest.ai Atoms](https://app.smallest.ai/).
 2. Create three agents: one for Weather, one for Tic-Tac-Toe, and one for Hacker News.
 3. Configure their voices, system prompts, and tools as detailed in the [`agents-config`](./agents-config) folder. Each agent requires specific tool definitions (API calls, parameters, and query mappings) to function correctly.
 

@@ -126,8 +126,8 @@ interrupt_control/
 
 ## API Reference
 
-- [Core Concepts — Events](https://atoms-docs.smallest.ai/dev/introduction/core-concepts/events)
-- [Core Concepts — Nodes](https://atoms-docs.smallest.ai/dev/introduction/core-concepts/nodes)
+- [Core Concepts — Events](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew-core-concepts/events)
+- [Core Concepts — Nodes](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew-core-concepts/nodes)
 
 ## Next Steps
 

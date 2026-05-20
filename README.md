@@ -21,7 +21,7 @@ Smallest AI offers an end-to-end Voice AI suite for developers building real-tim
 
 This cookbook contains practical examples and tutorials for building with Smallest AI's APIs. Each example is self-contained and demonstrates a real-world use case — from basic transcription to fully autonomous voice agents.
 
-**Documentation:** [Waves (STT & TTS)](https://waves-docs.smallest.ai) · [Atoms (Voice Agents)](https://atoms-docs.smallest.ai/dev) · [Python SDK](https://github.com/smallest-inc/smallest-python-sdk)
+**Documentation:** [Waves (STT & TTS)](https://waves-docs.smallest.ai) · [Atoms (Voice Agents)](https://docs.smallest.ai/atoms/developer-guide) · [Python SDK](https://github.com/smallest-inc/smallest-python-sdk)
 
 ---
 
@@ -139,7 +139,7 @@ Generate natural-sounding speech from text with real-time latency. 80+ voices ac
 
 ## Voice Agents Examples
 
-Build AI voice agents that can talk to anyone on voice or text, in any language, in any voice. The Atoms SDK provides abstractions like KnowledgeBase, Campaigns, and graph-based Workflows to let you build the smartest voice agent for your use case. Powered by the [Atoms SDK](https://atoms-docs.smallest.ai/dev).
+Build AI voice agents that can talk to anyone on voice or text, in any language, in any voice. The Atoms SDK provides abstractions like KnowledgeBase, Campaigns, and graph-based Workflows to let you build the smartest voice agent for your use case. Powered by the [Atoms SDK](https://docs.smallest.ai/atoms/developer-guide).
 
 ### Basics
 
@@ -187,7 +187,7 @@ smallestai agent-crew deploy --entry app.py         # package + ship to the clou
 smallestai agent-crew builds                        # pick the new build → choose "Make Live"
 ```
 
-Then place a call from the [Smallest Platform](https://platform.smallest.ai) dashboard. Full walkthrough in the [Agent Crew Reference](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew).
+Then place a call from the [Smallest Platform](https://app.smallest.ai) dashboard. Full walkthrough in the [Agent Crew Reference](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew-cli).
 
 > **Heads-up:** the deploy pipeline does not yet propagate `.env` values (like `OPENAI_API_KEY`) into the running pod. Examples that depend on third-party API keys work locally but currently fail on a real call with `openai.OpenAIError: Missing credentials`. See the [background_agent](./voice-agents/background_agent/#5-deploy-to-smallest-platform) example for context.
 

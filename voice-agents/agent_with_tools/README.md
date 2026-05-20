@@ -135,8 +135,8 @@ agent_with_tools/
 
 ## API Reference
 
-- [Atoms SDK — Quick Start](https://atoms-docs.smallest.ai/dev/introduction/quickstart)
-- [Core Concepts — Nodes](https://atoms-docs.smallest.ai/dev/introduction/core-concepts/nodes)
+- [Atoms SDK — Quick Start](https://docs.smallest.ai/atoms/developer-guide/get-started/quickstart)
+- [Core Concepts — Nodes](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew-core-concepts/nodes)
 
 ## Next Steps
 

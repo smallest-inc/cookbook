@@ -94,7 +94,7 @@ kb.delete(kb_id)
 
 ## API Reference
 
-- [Atoms SDK — Quick Start](https://atoms-docs.smallest.ai/dev/introduction/quickstart)
+- [Atoms SDK — Quick Start](https://docs.smallest.ai/atoms/developer-guide/get-started/quickstart)
 
 ## Next Steps
 

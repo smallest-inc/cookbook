@@ -42,7 +42,7 @@ Each call creates a **trace** with nested spans for every tool call, LLM generat
 - Python ≥ 3.12
 - An [OpenAI API key](https://platform.openai.com/api-keys)
 - A [Langfuse account](https://langfuse.com) (free tier works)
-- A [Smallest AI API key](https://platform.smallest.ai) (for deployment)
+- A [Smallest AI API key](https://app.smallest.ai) (for deployment)
 
 ### Dependencies
 

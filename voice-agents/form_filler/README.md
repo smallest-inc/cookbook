@@ -142,7 +142,7 @@ The agent **never** reads out format codes to the caller — no "YYYY-MM-DD", no
 
 - Python ≥ 3.12
 - An [OpenAI API key](https://platform.openai.com/api-keys)
-- A [Smallest AI API key](https://platform.smallest.ai)
+- A [Smallest AI API key](https://app.smallest.ai)
 - A [Jotform account](https://www.jotform.com) (free tier — optional but recommended)
 
 ### Dependencies
