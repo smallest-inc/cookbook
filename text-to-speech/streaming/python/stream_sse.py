@@ -23,8 +23,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MODEL = "lightning-v3.1"
-VOICE_ID = "sophia"
+# Set MODEL to "lightning_v3.1_pro" for the Pro pool (curated voices)
+# or "lightning_v3.1" for the standard pool (more voices + voice cloning).
+MODEL = "lightning_v3.1_pro"
+VOICE_ID = "meher"
 SAMPLE_RATE = 24000
 SPEED = 1.0
 
@@ -62,7 +64,7 @@ def stream_speech(text: str, api_key: str) -> bytes:
     chunk_count = 0
 
     response = requests.post(
-        f"{API_BASE}/{MODEL}/stream",
+        f"{API_BASE}/tts/live",
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -70,6 +72,7 @@ def stream_speech(text: str, api_key: str) -> bytes:
         json={
             "text": text,
             "voice_id": VOICE_ID,
+            "model": MODEL,
             "sample_rate": SAMPLE_RATE,
             "speed": SPEED,
         },

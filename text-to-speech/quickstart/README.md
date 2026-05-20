@@ -7,14 +7,16 @@ Get your API key at [app.smallest.ai](https://app.smallest.ai/dashboard/settings
 ## curl (Fastest — zero install)
 
 ```bash
-curl -X POST https://api.smallest.ai/waves/v1/lightning-v3.1/get_speech \
+curl -X POST https://api.smallest.ai/waves/v1/tts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"text": "Hello from Smallest AI!", "voice_id": "sophia", "sample_rate": 24000, "output_format": "wav"}' \
+  -d '{"text": "Hello from Smallest AI!", "voice_id": "meher", "model": "lightning_v3.1_pro", "sample_rate": 24000, "output_format": "wav"}' \
   --output hello.wav && echo "Done! Play hello.wav"
 ```
 
 Replace `YOUR_API_KEY` with your key. That's it — you'll have a WAV file in 2 seconds.
+
+> The example above uses the Lightning v3.1 Pro pool. Omit `"model"` (or set it to `"lightning_v3.1"`) to use the standard pool — that one has more voices, the full 12-language catalog, plus voice cloning.
 
 ## Python
 

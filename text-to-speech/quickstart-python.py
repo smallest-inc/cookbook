@@ -1,6 +1,9 @@
 """
 Text-to-Speech Quickstart — Python
-Generate speech from text using Lightning v3.1.
+Generate speech using the unified Lightning TTS route.
+
+Targets the Lightning v3.1 Pro pool — drop the `model` field (or set it to
+`"lightning_v3.1"`) to use the standard Lightning v3.1 pool instead.
 
 Usage:
     export SMALLEST_API_KEY="your-api-key"
@@ -15,14 +18,15 @@ import requests
 API_KEY = os.environ["SMALLEST_API_KEY"]
 
 response = requests.post(
-    "https://api.smallest.ai/waves/v1/lightning-v3.1/get_speech",
+    "https://api.smallest.ai/waves/v1/tts",
     headers={
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json",
     },
     json={
         "text": "Modern problems require modern solutions.",
-        "voice_id": "magnus",
+        "voice_id": "meher",
+        "model": "lightning_v3.1_pro",
         "sample_rate": 24000,
         "speed": 1.0,
         "language": "en",

@@ -13,17 +13,20 @@
 const fs = require("fs");
 
 // Configuration
-const MODEL = "lightning-v3.1";
-const VOICE_ID = "sophia";
+// Set MODEL to "lightning_v3.1_pro" for the Pro pool (curated voices, en + hi
+// on Indian voices, en on British/American voices). Set to "lightning_v3.1"
+// for the standard pool (more voices, full 12-language catalog, voice cloning).
+const MODEL = "lightning_v3.1_pro";
+const VOICE_ID = "meher";
 const SPEED = 1.0;
 const SAMPLE_RATE = 24000;
-const LANGUAGE = "en"; // en, hi, es, ta
+const LANGUAGE = "en"; // en, hi, es, ta (per voice; see voice tags via /get_voices)
 const OUTPUT_FORMAT = "wav";
 
 const API_BASE = "https://api.smallest.ai/waves/v1";
 
 async function synthesize(text, apiKey) {
-  const response = await fetch(`${API_BASE}/${MODEL}/get_speech`, {
+  const response = await fetch(`${API_BASE}/tts`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -32,6 +35,7 @@ async function synthesize(text, apiKey) {
     body: JSON.stringify({
       text,
       voice_id: VOICE_ID,
+      model: MODEL,
       speed: SPEED,
       sample_rate: SAMPLE_RATE,
       language: LANGUAGE,

@@ -18,11 +18,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuration
-MODEL = "lightning-v3.1"
-VOICE_ID = "sophia"
+# Set MODEL to "lightning_v3.1_pro" for the Pro pool (curated voices, en + hi
+# on Indian voices, en on British/American voices). Set to "lightning_v3.1"
+# for the standard pool (more voices, full 12-language catalog, voice cloning).
+MODEL = "lightning_v3.1_pro"
+VOICE_ID = "meher"
 SPEED = 1.0
 SAMPLE_RATE = 24000
-LANGUAGE = "en"  # en, hi, es, ta
+LANGUAGE = "en"  # en, hi, es, ta (per voice; see voice tags via /get_voices)
 OUTPUT_FORMAT = "wav"
 
 API_BASE = "https://api.smallest.ai/waves/v1"
@@ -30,7 +33,7 @@ API_BASE = "https://api.smallest.ai/waves/v1"
 
 def synthesize(text: str, api_key: str) -> bytes:
     response = requests.post(
-        f"{API_BASE}/{MODEL}/get_speech",
+        f"{API_BASE}/tts",
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -38,6 +41,7 @@ def synthesize(text: str, api_key: str) -> bytes:
         json={
             "text": text,
             "voice_id": VOICE_ID,
+            "model": MODEL,
             "speed": SPEED,
             "sample_rate": SAMPLE_RATE,
             "language": LANGUAGE,

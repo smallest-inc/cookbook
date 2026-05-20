@@ -1,18 +1,20 @@
 # Text-to-Speech
 
-> **Powered by [Lightning TTS v3.1](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1)**
+> **Powered by [Lightning TTS v3.1](https://docs.smallest.ai/waves/model-cards/text-to-speech/lightning-v-3-1) and the new [Lightning v3.1 Pro](https://docs.smallest.ai/waves/model-cards/text-to-speech/lightning-v-3-1-pro) pool.**
 
-Generate natural-sounding speech from text using Smallest AI's Lightning TTS API. 80+ voices, 44.1 kHz native sample rate, ~200ms latency.
+Generate natural-sounding speech from text using Smallest AI's Lightning TTS API. 80+ voices on standard Lightning v3.1, plus a curated Pro voice catalog across American, British, and Indian accents. 44.1 kHz native sample rate, ~200ms latency.
 
 ## Try It Now (Zero Install)
 
 ```bash
-curl -X POST https://api.smallest.ai/waves/v1/lightning-v3.1/get_speech \
+curl -X POST https://api.smallest.ai/waves/v1/tts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"text": "Hello from Smallest AI!", "voice_id": "sophia", "sample_rate": 24000, "output_format": "wav"}' \
+  -d '{"text": "Hello from Smallest AI!", "voice_id": "meher", "model": "lightning_v3.1_pro", "sample_rate": 24000, "output_format": "wav"}' \
   --output hello.wav
 ```
+
+Drop the `model` field (or set it to `"lightning_v3.1"`) to use the standard pool — that pool has more voices, the full 12-language catalog, plus voice cloning. The unified `/waves/v1/tts` route serves both.
 
 Get your API key at [app.smallest.ai](https://app.smallest.ai/dashboard/settings/apikeys).
 
@@ -75,7 +77,9 @@ uv run text-to-speech/getting-started/python/synthesize.py "Hello from Smallest 
 
 ## Supported Languages
 
-`en` English · `hi` Hindi · `es` Spanish · `ta` Tamil
+Standard Lightning v3.1: `en` English · `hi` Hindi · `mr` Marathi · `kn` Kannada · `ta` Tamil · `bn` Bengali · `gu` Gujarati · `te` Telugu · `ml` Malayalam · `pa` Punjabi · `or` Odia · `es` Spanish · `auto`
+
+Lightning v3.1 Pro: depends on the voice — Indian Pro voices speak `en` + `hi`; British and American Pro voices speak `en`. Query `GET /waves/v1/lightning-v3.1/get_voices` and read `tags.language` for the source of truth.
 
 ## Output Formats
 
@@ -83,8 +87,8 @@ uv run text-to-speech/getting-started/python/synthesize.py "Hello from Smallest 
 
 ## Documentation
 
-- [Lightning v3.1 REST](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1)
-- [Lightning v3.1 WebSocket](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1-ws)
+- [Lightning v3.1 REST](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/synthesize-speech)
+- [Lightning v3.1 WebSocket](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/synthesize-speech-ws)
 - [Voices API](https://waves-docs.smallest.ai/v4.0.0/content/api-references/get-voices-api)
 - [Voice Cloning](https://waves-docs.smallest.ai/v4.0.0/content/api-references/voice-cloning-api)
 - [Pronunciation Dicts](https://waves-docs.smallest.ai/v4.0.0/content/api-references/pronunciation-dicts-api)

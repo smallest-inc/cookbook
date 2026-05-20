@@ -24,12 +24,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MODEL = "lightning-v3.1"
-VOICE_ID = "sophia"
+# Set MODEL to "lightning_v3.1_pro" for the Pro pool (curated voices)
+# or "lightning_v3.1" for the standard pool (more voices + voice cloning).
+MODEL = "lightning_v3.1_pro"
+VOICE_ID = "meher"
 SAMPLE_RATE = 24000
 SPEED = 1.0
 
-WS_URL = f"wss://api.smallest.ai/waves/v1/{MODEL}/get_speech/stream"
+WS_URL = "wss://api.smallest.ai/waves/v1/tts/live"
 
 
 def add_wav_header(pcm_data: bytes, sample_rate: int, channels: int = 1, bits_per_sample: int = 16) -> bytes:
@@ -68,6 +70,7 @@ async def stream_speech(text: str, api_key: str) -> bytes:
         await ws.send(json.dumps({
             "text": text,
             "voice_id": VOICE_ID,
+            "model": MODEL,
             "sample_rate": SAMPLE_RATE,
             "speed": SPEED,
         }))
