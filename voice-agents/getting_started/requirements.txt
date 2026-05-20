@@ -1,5 +1,10 @@
 # Dependencies for this example
-smallestai>=4.4.6
+# Pinned below 4.4.7 — that release introduced AtomsCrewApp._validate_startup
+# in smallestai/atoms/crew/server.py which calls the user's setup_handler
+# against a null WebSocket, then trips on `await session.start()` because
+# no init event arrives. Pod refuses sessions; agent boots silent.
+# Remove the upper bound once a 4.4.8+ ships with the validator fixed/reverted.
+smallestai>=4.4.6,<4.4.7
 
 # Logging
 loguru>=0.7.0
