@@ -8,6 +8,7 @@ from loguru import logger
 
 from smallestai.atoms.crew.clients.openai import OpenAIClient
 from smallestai.atoms.crew.events import (
+    SDKAgentErrorEvent,
     SDKAgentLogEvent,
     SDKAgentTranscriptUpdateEvent,
     SDKEvent,
@@ -127,6 +128,22 @@ Only respond with that single word."""
 
         except Exception as e:
             logger.error(f"[SentimentAnalyzer] Analysis failed: {e}")
+            # Surface to orchestrator (calllog.errors[] + Events tab).
+            # severity="warning" — background observation, call continues
+            # with the fallback sentiment. See SDKAgentErrorEvent docstring.
+            try:
+                await self.send_event(SDKAgentErrorEvent(
+                    message=str(e),
+                    severity="warning",
+                    payload={
+                        "node_name": self.name,
+                        "error_class": type(e).__name__,
+                    },
+                ))
+            except Exception:
+                logger.exception(
+                    "[SentimentAnalyzer] Failed to send error event upstream"
+                )
 
     def should_escalate(self) -> bool:
         """Check if the call should be escalated based on sentiment."""

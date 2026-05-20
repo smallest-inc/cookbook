@@ -6,6 +6,7 @@ from loguru import logger
 
 from smallestai.atoms.crew.clients.openai import OpenAIClient
 from smallestai.atoms.crew.events import (
+    SDKAgentErrorEvent,
     SDKAgentLogEvent,
     SDKAgentTranscriptUpdateEvent,
     SDKEvent,
@@ -99,6 +100,21 @@ Only respond with the JSON, nothing else."""
             logger.error(f"[LanguageDetector] Detection failed: {e}")
             self.detected_language = "english"
             self.language_confidence = 0.5
+            # Surface to orchestrator (calllog.errors[] + Events tab).
+            # severity="warning" — call continues with fallback ("english").
+            try:
+                await self.send_event(SDKAgentErrorEvent(
+                    message=str(e),
+                    severity="warning",
+                    payload={
+                        "node_name": self.name,
+                        "error_class": type(e).__name__,
+                    },
+                ))
+            except Exception:
+                logger.exception(
+                    "[LanguageDetector] Failed to send error event upstream"
+                )
 
     def get_primary_language(self) -> str:
         """Get the most commonly detected language in this session."""
