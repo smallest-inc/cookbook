@@ -20,7 +20,7 @@ from livekit.plugins import openai, silero, smallestai
 logger = logging.getLogger("livekit-voice-agent")
 load_dotenv()
 
-VOICE_ID = os.getenv("VOICE_ID", "sophia")
+VOICE_ID = os.getenv("VOICE_ID", "meher")
 LANGUAGE = os.getenv("LANGUAGE", "en")
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 
@@ -52,7 +52,7 @@ async def entrypoint(ctx: JobContext):
         llm=openai.LLM(model=LLM_MODEL),
         tts=tts.StreamAdapter(
             tts=smallestai.TTS(
-                model="lightning-v3.1",
+                model="lightning_v3.1_pro",
                 voice_id=VOICE_ID,
                 language=LANGUAGE,
             ),

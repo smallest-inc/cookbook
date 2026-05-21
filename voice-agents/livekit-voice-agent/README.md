@@ -81,7 +81,7 @@ Open the [LiveKit Agents Playground](https://agents-playground.livekit.io) and e
 
 | Variable | Default | Description |
 |---|---|---|
-| `VOICE_ID` | `sophia` | TTS voice ID — browse all voices at [waves.smallest.ai](https://waves.smallest.ai) |
+| `VOICE_ID` | `meher` | TTS voice ID — browse all voices at [waves.smallest.ai](https://waves.smallest.ai) |
 | `LANGUAGE` | `en` | BCP-47 language code for STT and TTS. Use `multi` for automatic detection across 39 languages |
 | `LLM_MODEL` | `gpt-4o-mini` | OpenAI model name |
 
@@ -97,15 +97,15 @@ Real-time transcription over WebSocket with ~64ms TTFT. Set `language="multi"` t
 stt=smallestai.STT(language="en")
 ```
 
-### Smallest AI TTS — Lightning
+### Smallest AI TTS — Lightning v3.1 Pro
 
 The Lightning TTS plugin synthesizes audio per sentence rather than streaming tokens, so it is wrapped in `tts.StreamAdapter` with a `SentenceTokenizer`. The adapter buffers LLM output to the next sentence boundary before firing synthesis — keeping first-audio latency low while the LLM is still generating:
 
 ```python
 tts=tts.StreamAdapter(
     tts=smallestai.TTS(
-        model="lightning-v3.1",
-        voice_id="sophia",
+        model="lightning_v3.1_pro",
+        voice_id="meher",
         language="en",
     ),
     sentence_tokenizer=tokenize.basic.SentenceTokenizer(),
