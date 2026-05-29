@@ -1,0 +1,5 @@
+node_modules/
+.next/
+.env.local
+*.log
+next-env.d.ts
