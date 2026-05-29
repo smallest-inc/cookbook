@@ -136,6 +136,7 @@ These are the things that look like "ITN is broken" but are configuration issues
 5. **`max_words` too low** forces frequent finalizes that starve ITN of context. Leave at default unless you have a specific need.
 6. **`is_last` ≠ `is_final`.** Every utterance boundary fires `is_final: true`. `is_last: true` fires only after `close_stream`. Listen for both.
 7. **Word timestamps collapse on ITN entities.** When "twenty five dollars" merges into "$25", the output word's timestamp spans all three source words. Don't assume 1:1 word↔timestamp mapping in downstream code.
+8. **Spoken "and" inside numbers breaks the cardinal entity.** *"five hundred and twenty five dollars"* normalizes to **"500 and 25 dollars"** (two cardinals split by the literal connector), not **"$525"**. Pulse's WFST treats "and" as a word boundary, so the currency aggregator never sees the full number adjacent to "dollars". To get **$525**, say *"five hundred twenty five dollars"* (no "and") or *"five twenty five dollars"*. Phone numbers in the same utterance still normalize cleanly because spoken phone numbers don't use connectors. For dollar-dictation UX, add a system-prompt instruction ("read amounts without saying 'and'") or post-process the transcript with a regex like `/(\d+) and (\d+) dollars/` before it hits downstream business logic.
 
 ### Pattern: client-driven finalization (what we use here)
 
