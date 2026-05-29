@@ -1,0 +1,26 @@
+{
+  "name": "smallest-chat-widget-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n next,proxy -c cyan,magenta \"next dev -p 3030\" \"node proxy.mjs\"",
+    "dev:next": "next dev -p 3030",
+    "dev:proxy": "node proxy.mjs",
+    "build": "next build",
+    "start": "next start -p 3030"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "ws": "8.18.0",
+    "dotenv": "16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.0",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "concurrently": "8.2.2",
+    "typescript": "5.5.3"
+  }
+}
