@@ -35,6 +35,7 @@ stt = SmallestSTTService(
 # Use lightning_v3.1 for the lighter model (voice: sophia)
 tts = SmallestTTSService(
     api_key=os.getenv("SMALLEST_API_KEY"),
+    output_format="pcm",
     settings=SmallestTTSService.Settings(
         model=SmallestTTSModel.LIGHTNING_V3_1_PRO,
         voice="meher",
@@ -47,15 +48,22 @@ from pipecat.pipeline.pipeline import Pipeline
 pipeline = Pipeline([transport.input(), stt, llm, tts, transport.output()])
 ```
 
-### TTS Settings Reference
+### TTS Parameters Reference
 
-| Setting         | Default              | Description                                                              |
-| --------------- | -------------------- | ------------------------------------------------------------------------ |
-| `model`         | `lightning_v3.1_pro` | Model to use: `lightning_v3.1` or `lightning_v3.1_pro`                   |
-| `voice`         | model-dependent      | Voice ID. Default: `meher` (pro), `sophia` (v3.1)                        |
-| `language`      | `en`                 | Language code for synthesis                                              |
-| `speed`         | `None`               | Speech speed multiplier (0.5–2.0)                                        |
-| `output_format` | `pcm`                | Audio format: `pcm`, `mp3`, `wav`, `ulaw`, `alaw`                        |
+**Constructor parameters:**
+
+| Parameter       | Default | Description                                               |
+| --------------- | ------- | --------------------------------------------------------- |
+| `output_format` | `pcm`   | Audio format: `pcm`, `mp3`, `wav`, `ulaw`, `alaw`         |
+
+**Settings (`SmallestTTSService.Settings`):**
+
+| Setting    | Default              | Description                                        |
+| ---------- | -------------------- | -------------------------------------------------- |
+| `model`    | `lightning_v3.1_pro` | Model to use: `lightning_v3.1` or `lightning_v3.1_pro` |
+| `voice`    | model-dependent      | Voice ID. Default: `meher` (pro), `sophia` (v3.1)  |
+| `language` | `en`                 | Language code for synthesis                        |
+| `speed`    | `None`               | Speech speed multiplier (0.5–2.0)                  |
 
 Model changes take effect on the next utterance — no reconnection needed.
 
