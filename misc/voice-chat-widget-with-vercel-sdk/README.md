@@ -53,7 +53,7 @@ If you're porting from raw-WS code, the rename is mechanical:
 | (send `{"type":"close_stream"}`) | `stream.closeStream()` |
 | (send `{"type":"finalize"}`) | `stream.finalize()` |
 
-The same ITN gotchas apply (ITN only runs on `is_final` frames, `finalize_on_words=false` is critical for clean entity context, etc.) — see the raw-WS sibling's README for the full deep-dive. The SDK version just makes the *config* less typo-prone.
+The same ITN gotchas apply (ITN only runs on `is_final` frames, `finalize_on_words=false` is critical for clean entity context, **spoken "and" inside dollar amounts breaks the currency entity**, etc.) — see the raw-WS sibling's README for the full deep-dive. The SDK version just makes the *config* less typo-prone.
 
 ## Quick start
 
