@@ -99,16 +99,13 @@ stt=smallestai.STT(language="en")
 
 ### Smallest AI TTS — Lightning v3.1 Pro
 
-The Lightning TTS plugin synthesizes audio per sentence rather than streaming tokens, so it is wrapped in `tts.StreamAdapter` with a `SentenceTokenizer`. The adapter buffers LLM output to the next sentence boundary before firing synthesis — keeping first-audio latency low while the LLM is still generating:
+The plugin uses persistent WebSocket streaming backed by a connection pool for low-latency audio delivery — no `StreamAdapter` wrapper needed:
 
 ```python
-tts=tts.StreamAdapter(
-    tts=smallestai.TTS(
-        model="lightning_v3.1_pro",
-        voice_id="meher",
-        language="en",
-    ),
-    sentence_tokenizer=tokenize.basic.SentenceTokenizer(),
+tts=smallestai.TTS(
+    model="lightning_v3.1_pro",
+    voice_id="meher",
+    language="en",
 )
 ```
 
