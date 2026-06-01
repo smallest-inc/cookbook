@@ -64,6 +64,7 @@ pipeline = Pipeline([transport.input(), stt, llm, tts, transport.output()])
 | `voice`    | model-dependent      | Voice ID. Default: `meher` (pro), `sophia` (v3.1)  |
 | `language` | `en`                 | Language code for synthesis                        |
 | `speed`    | `None`               | Speech speed multiplier (0.5–2.0)                  |
+| `word_timestamps` | `None` | Opt in to per-word timing events on WebSocket streaming (Lightning v3.1 / v3.1 Pro). Supported on base-queue English + Hindi voices. |
 
 Model changes take effect on the next utterance — no reconnection needed.
 
