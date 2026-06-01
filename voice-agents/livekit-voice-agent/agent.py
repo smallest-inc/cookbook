@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from livekit.agents import (
     Agent,
-    CrewSession,
+    AgentSession,
     JobContext,
     JobProcess,
     RoomInputOptions,
@@ -44,7 +44,7 @@ def prewarm(proc: JobProcess):
 async def entrypoint(ctx: JobContext):
     ctx.log_context_fields = {"room": ctx.room.name}
 
-    session = CrewSession(
+    session = AgentSession(
         vad=ctx.proc.userdata["vad"],
         stt=smallestai.STT(language=LANGUAGE),
         llm=openai.LLM(model=LLM_MODEL),
