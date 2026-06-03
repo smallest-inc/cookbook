@@ -266,34 +266,36 @@ export function ProjectDetail({ project }: { project: Project }) {
             </section>
           )}
 
-          {/* Quick Start */}
-          <section>
-            <h2 className="flex items-center gap-2 text-xl font-semibold mb-4">
-                <Terminal className="h-5 w-5 text-teal" />
-              Quick Start
-            </h2>
-            <div className="rounded-xl border border-border bg-secondary/50 p-4 font-mono text-sm">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-muted-foreground">terminal</span>
-                <CopyButton text={cloneCommand} projectSlug={project.slug} />
+          {/* Quick Start — only for projects that actually live in the cookbook repo */}
+          {project.githubUrl.includes("/cookbook/") && (
+            <section>
+              <h2 className="flex items-center gap-2 text-xl font-semibold mb-4">
+                  <Terminal className="h-5 w-5 text-teal" />
+                Quick Start
+              </h2>
+              <div className="rounded-xl border border-border bg-secondary/50 p-4 font-mono text-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">terminal</span>
+                  <CopyButton text={cloneCommand} projectSlug={project.slug} />
+                </div>
+                <code className="text-secondary-foreground whitespace-pre-wrap break-all">
+                  {cloneCommand}
+                </code>
               </div>
-              <code className="text-secondary-foreground whitespace-pre-wrap break-all">
-                {cloneCommand}
-              </code>
-            </div>
-            {project.setupSteps && (
-              <ol className="mt-4 space-y-2">
-                {project.setupSteps.map((step, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-foreground/10 text-xs font-semibold text-foreground">
-                      {i + 1}
-                    </span>
-                    {step}
-                  </li>
-                ))}
-              </ol>
-            )}
-          </section>
+              {project.setupSteps && (
+                <ol className="mt-4 space-y-2">
+                  {project.setupSteps.map((step, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-foreground/10 text-xs font-semibold text-foreground">
+                        {i + 1}
+                      </span>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
+          )}
         </div>
 
         {/* Right Sidebar */}

@@ -6,6 +6,36 @@ const GITHUB_BASE =
 export const projects: Project[] = [
   // ─── FEATURED ─────────────────────────────────────────
   {
+    slug: "podcast-generator",
+    title: "Podcast Generator",
+    description:
+      "Turn any URL, text, or PDF into a podcast with two AI hosts, voice cloning, and live 3D lip-sync avatars.",
+    longDescription:
+      "A full BYOK podcast generation app: paste a URL, text, or upload a PDF — Claude writes a two-host script, and Lightning v3.1 Pro voices synthesize it. Pick from 38 voices across American, British, Indian English, and Hindi, or clone your own voice in 30 seconds. Toggle on Live 3D mode to watch Avaturn avatars lip-sync the conversation in real time via wawa-lipsync. Export to MP3, WAV, or one-click YouTube upload. Pronunciation editing for tricky names. Four formats (Deep-dive, News brief, Interview, Tutorial) and three lengths up to 5 minutes.",
+    category: "text-to-speech",
+    tags: ["podcast", "lip-sync", "voice-cloning", "3d-avatars", "byok", "next.js"],
+    difficulty: "advanced",
+    status: "live",
+    featured: true,
+    cookbookPath: "podcast-generator",
+    githubUrl: "https://github.com/smallest-inc/podcast-generator",
+    demoUrl: "https://podcast.smallest.ai",
+    thumbnailUrl: "/thumbnails/ai-podcast-generator.png",
+    techStack: ["Next.js", "Lightning v3.1 Pro", "Anthropic Claude", "Three.js", "wawa-lipsync", "Vercel Blob"],
+    apiProducts: ["lightning-tts", "voice-cloning"],
+    features: [
+      "Paste URL, text, or PDF — Claude writes the script",
+      "38 voices across American, British, Indian English, and Hindi",
+      "Voice cloning in 30 seconds — use your own voice as a host",
+      "Live 3D avatars with real-time lip-sync in the browser",
+      "Four podcast formats — Deep-dive, News brief, Interview, Tutorial",
+      "Three lengths — Short, Standard, Extended (up to 5 min)",
+      "Pronunciation editing for tricky names and terms",
+      "Export to MP3 / WAV, or one-click upload to YouTube",
+      "BYOK — bring your own Smallest AI key, free to use",
+    ],
+  },
+  {
     slug: "debate-arena",
     title: "The Agora — AI Debate Arena",
     description:
