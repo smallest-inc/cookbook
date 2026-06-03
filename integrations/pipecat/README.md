@@ -52,19 +52,19 @@ pipeline = Pipeline([transport.input(), stt, llm, tts, transport.output()])
 
 **Constructor parameters:**
 
-| Parameter       | Default | Description                                               |
-| --------------- | ------- | --------------------------------------------------------- |
-| `output_format` | `pcm`   | Audio format: `pcm`, `mp3`, `wav`, `ulaw`, `alaw`         |
+| Parameter         | Default | Description                                                                                                                                                                                              |
+| ----------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `output_format`   | `pcm`   | Audio format: `pcm`, `mp3`, `wav`, `ulaw`, `alaw`                                                                                                                                                       |
+| `word_timestamps` | `True`  | Emit per-word `TTSTextFrame`s aligned to audio playback. Enabled by default. Supported on base-queue English + Hindi voices (`meher`, `devansh`, `kartik`, `maithili`, `liam`, `avery`); other voices silently emit no word events, so leaving this on is safe. Pass `word_timestamps=False` to fall back to whole-text frames. |
 
 **Settings (`SmallestTTSService.Settings`):**
 
-| Setting    | Default              | Description                                        |
-| ---------- | -------------------- | -------------------------------------------------- |
+| Setting    | Default              | Description                                            |
+| ---------- | -------------------- | ------------------------------------------------------ |
 | `model`    | `lightning_v3.1_pro` | Model to use: `lightning_v3.1` or `lightning_v3.1_pro` |
-| `voice`    | model-dependent      | Voice ID. Default: `meher` (pro), `sophia` (v3.1)  |
-| `language` | `en`                 | Language code for synthesis                        |
-| `speed`    | `None`               | Speech speed multiplier (0.5–2.0)                  |
-| `word_timestamps` | `None` | Opt in to per-word timing events on WebSocket streaming (Lightning v3.1 / v3.1 Pro). Supported on base-queue English + Hindi voices. |
+| `voice`    | model-dependent      | Voice ID. Default: `meher` (pro), `sophia` (v3.1)      |
+| `language` | `en`                 | Language code for synthesis                            |
+| `speed`    | `None`               | Speech speed multiplier (0.5–2.0)                      |
 
 Model changes take effect on the next utterance — no reconnection needed.
 
