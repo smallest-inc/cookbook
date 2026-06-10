@@ -1,9 +1,10 @@
 # Dependencies for this example
-# smallestai>=4.4.7 logs a misleading ERROR at boot:
+# On smallestai>=4.4.7, startup includes a validation routine that
+# exercises the setup_handler before any client connects. The dry-run
+# reaches `await session.start()` and logs at ERROR level:
 #   "Startup validation failed — pod will not accept sessions. ValueError: Session not initialized"
-# Despite the message, the pod DOES accept sessions and the agent works.
-# This is a dry-run validator in smallestai/atoms/crew/server.py that always
-# trips on `await session.start()`; safe to ignore. Tracked for an SDK fix.
+# The server proceeds past this point; `Application startup complete.`
+# follows and real connections handshake normally.
 smallestai>=4.4.6
 
 # Logging
