@@ -1,0 +1,7 @@
+smallestai
+openai
+sounddevice
+numpy
+Pillow
+python-dotenv
+requests
