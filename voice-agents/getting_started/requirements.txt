@@ -1,10 +1,11 @@
 # Dependencies for this example
-# Pinned below 4.4.7 — that release introduced AtomsCrewApp._validate_startup
-# in smallestai/atoms/crew/server.py which calls the user's setup_handler
-# against a null WebSocket, then trips on `await session.start()` because
-# no init event arrives. Pod refuses sessions; agent boots silent.
-# Remove the upper bound once a 4.4.8+ ships with the validator fixed/reverted.
-smallestai>=4.4.6,<4.4.7
+# On smallestai>=4.4.7, startup includes a validation routine that
+# exercises the setup_handler before any client connects. The dry-run
+# reaches `await session.start()` and logs at ERROR level:
+#   "Startup validation failed — pod will not accept sessions. ValueError: Session not initialized"
+# The server proceeds past this point; `Application startup complete.`
+# follows and real connections handshake normally.
+smallestai>=4.4.6
 
 # Logging
 loguru>=0.7.0
