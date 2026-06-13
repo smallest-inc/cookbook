@@ -1,4 +1,4 @@
-# Tamagotchi Listens & Speaks
+# Tamagotchi Speaks
 
 > **Powered by [Pulse STT](https://smallest.ai) + [Lightning v3.1 Pro TTS](https://smallest.ai) + GPT-4o — your pocket pet finally understands you, and talks back**
 
@@ -74,7 +74,7 @@ Ask gochi anything. It transcribes your question with Pulse STT, generates a sho
 
 | | |
 |---|---|
-| **Pulse STT transcription** | Same record-then-transcribe pattern as `tamagotchi_listens.py`. |
+| **Pulse STT transcription** | Same record-then-transcribe pattern as `tamagotchi_listens.py` — mic → WAV bytes → Pulse → clean text. |
 | **Conversational LLM response** | GPT-4o-mini replies in character as gochi — 10 words or fewer, returning `{"answer": "...", "face": "..."}`. |
 | **Lightning v3.1 Pro TTS** | REST POST to `https://api.smallest.ai/waves/v1/tts` with `model: "lightning_v3.1_pro"` → WAV audio → played with `afplay`. |
 | **Simultaneous display + speech** | Answer scrolls on the OLED while audio synthesises and plays, then the emotion face appears. |
@@ -131,7 +131,7 @@ python3 gochi_chat.py
 ## Quick start
 
 ```bash
-cd misc/tamagotchi-listens
+cd misc/tamagotchi-speaks
 cp .env.example .env
 # fill in SMALLEST_API_KEY and OPENAI_API_KEY
 pip install -r requirements.txt
@@ -192,6 +192,7 @@ If you don't have hardware, both scripts still run — they print a warning and 
 ```
 misc/tamagotchi-speaks/
 ├── README.md               ← you are here
+├── tamagotchi_listens.py   ← STT → intent routing → draw / face / text
 ├── gochi_chat.py           ← STT → GPT answer → TTS speech + OLED display + face
 ├── requirements.txt
 └── .env.example
