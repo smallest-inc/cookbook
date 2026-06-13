@@ -1,12 +1,23 @@
-# Tamagotchi Listens
+# Tamagotchi Listens & Speaks
 
-> **Powered by [Pulse STT](https://smallest.ai) + GPT-4o — your pocket pet finally understands you**
+> **Powered by [Pulse STT](https://smallest.ai) + [Lightning v3.1 Pro TTS](https://smallest.ai) + GPT-4o — your pocket pet finally understands you, and talks back**
 
-A voice-driven demo for [gochi](https://github.com/devfolioco/gochi) — a physical tamagotchi built on an ESP32-C3 SuperMini with a 128×64 OLED screen. Speak naturally; Pulse STT transcribes your voice in real time, GPT-4o classifies your intent, and gochi reacts on its tiny screen: changing expressions, drawing pixel art, or scrolling text — all from a single spoken command.
+Two voice demos for [gochi](https://github.com/devfolioco/gochi) — a physical tamagotchi built on an ESP32-C3 SuperMini with a 128×64 OLED screen.
+
+| Script | What it does |
+|---|---|
+| `tamagotchi_listens.py` | Speak a command → gochi draws pixel art, changes expression, or scrolls text |
+| `gochi_chat.py` | Ask gochi a question → it thinks, scrolls its answer on screen, **speaks it aloud**, and shows a matching face |
 
 ---
 
-## What this example demonstrates
+## Scripts
+
+### `tamagotchi_listens.py` — gochi draws and reacts
+
+Speak naturally; Pulse STT transcribes your voice, GPT-4o-mini classifies your intent, and gochi reacts on its tiny screen: changing expressions, drawing pixel art, or scrolling text — all from a single spoken command.
+
+#### What this example demonstrates
 
 | | |
 |---|---|
@@ -16,9 +27,7 @@ A voice-driven demo for [gochi](https://github.com/devfolioco/gochi) — a physi
 | **Real-time face reactions** | Ten named expressions (`happy`, `sad`, `sleepy`, `angry`, `love`, `shy`, `dead`, …) mapped from natural language. |
 | **Text scrolling** | Arbitrary messages scroll across the screen, then the pet returns to neutral. |
 
----
-
-## How it works
+#### How it works
 
 ```
 You speak
@@ -42,7 +51,7 @@ GPT-4o-mini router          ROUTER_PROMPT + transcript
     └── text               ──► message string  ──► /text
 ```
 
-### The four action types
+#### The four action types
 
 | You say | Action | What gochi does |
 |---|---|---|
@@ -51,9 +60,96 @@ GPT-4o-mini router          ROUTER_PROMPT + transcript
 | `"draw a cat and I feel happy"` | `draw_and_face` | Draws the cat, then switches to `happy` |
 | `"show text hello world"` | `text` | Scrolls "hello world" across the screen |
 
-### Why Pulse for this
+```bash
+python3 tamagotchi_listens.py
+```
 
-Pulse `transcribe_pulse` works on a short pre-recorded clip — there's no streaming WS to manage. The demo records until you press Enter, converts to WAV, and sends the whole clip in one call. This keeps the code simple and latency acceptable for a local pet demo. For a truly hands-free version (VAD + streaming), the WebSocket path (`/waves/v1/pulse/get_text`) is the right upgrade.
+---
+
+### `gochi_chat.py` — gochi answers out loud
+
+Ask gochi anything. It transcribes your question with Pulse STT, generates a short witty answer with GPT-4o-mini, scrolls that answer on the OLED, **speaks it aloud via Lightning TTS**, and then shows the matching emotion face.
+
+#### What this example demonstrates
+
+| | |
+|---|---|
+| **Pulse STT transcription** | Same record-then-transcribe pattern as `tamagotchi_listens.py`. |
+| **Conversational LLM response** | GPT-4o-mini replies in character as gochi — 10 words or fewer, returning `{"answer": "...", "face": "..."}`. |
+| **Lightning v3.1 Pro TTS** | REST POST to `https://api.smallest.ai/waves/v1/tts` with `model: "lightning_v3.1_pro"` → WAV audio → played with `afplay`. |
+| **Simultaneous display + speech** | Answer scrolls on the OLED while audio synthesises and plays, then the emotion face appears. |
+
+#### How it works
+
+```
+You speak
+    │
+    ▼
+record_until_enter()        mic → int16 PCM at 16 kHz
+    │
+    ▼
+Pulse STT                   transcribe_pulse() → your question as text
+    │
+    ▼
+GPT-4o-mini                 SYSTEM_PROMPT + question
+(ask_gochi)                 → {"answer": "Rockets! Obviously. 🚀", "face": "excited"}
+    │
+    ├── /text  ──► answer scrolls on OLED
+    ├── speak() ──► Lightning v3.1 Pro TTS synthesises audio ──► afplay plays it
+    └── /face  ──► emotion face shows ──► resets to neutral after 2 s
+```
+
+#### Lightning v3.1 Pro TTS — key call
+
+```python
+import requests
+
+response = requests.post(
+    "https://api.smallest.ai/waves/v1/tts",
+    headers={
+        "Authorization": f"Bearer {SMALLEST_KEY}",
+        "Content-Type": "application/json",
+        "Accept": "audio/wav",
+    },
+    json={
+        "text": answer,
+        "voice_id": "austin",       # male voice; change to any supported voice
+        "model": "lightning_v3.1_pro",
+        "sample_rate": 24000,
+        "output_format": "wav",
+    },
+)
+# write response.content to a temp WAV file, then play with afplay (macOS)
+```
+
+```bash
+python3 gochi_chat.py
+```
+
+---
+
+## Quick start
+
+```bash
+cd misc/tamagotchi-listens
+cp .env.example .env
+# fill in SMALLEST_API_KEY and OPENAI_API_KEY
+pip install -r requirements.txt
+
+# gochi draws and reacts to commands
+python3 tamagotchi_listens.py
+
+# gochi answers questions out loud
+python3 gochi_chat.py
+```
+
+Then for either script:
+
+1. Press **Enter** — recording starts.
+2. Speak your command or question.
+3. Press **Enter** again — recording stops and Pulse transcribes.
+4. Watch (and listen to) gochi react.
+5. **Ctrl+C** to quit (resets gochi to neutral face).
 
 ---
 
@@ -66,27 +162,9 @@ curl http://localhost:7474/health
 # → {"connected": true, ...}
 ```
 
-If you don't have hardware yet the script still runs — it prints a warning and skips the HTTP calls to the daemon, so you can test the STT + routing pipeline on its own.
+If you don't have hardware, both scripts still run — they print a warning and skip the HTTP calls to the daemon, so you can test the STT + TTS + routing pipeline on its own.
 
----
-
-## Quick start
-
-```bash
-cd misc/tamagotchi-listens
-cp .env.example .env
-# fill in SMALLEST_API_KEY and OPENAI_API_KEY
-pip install -r requirements.txt
-python3 tamagotchi_listens.py
-```
-
-Then:
-
-1. Press **Enter** — recording starts.
-2. Speak your command.
-3. Press **Enter** again — recording stops and Pulse transcribes.
-4. Watch gochi react.
-5. **Ctrl+C** to quit (resets gochi to neutral face).
+> **Note (`gochi_chat.py`):** audio playback uses `afplay`, which is macOS-only. On Linux, swap it for `aplay` or `ffplay`.
 
 ---
 
@@ -94,13 +172,14 @@ Then:
 
 | Variable | Required | Description |
 |---|---|---|
-| `SMALLEST_API_KEY` | Yes | Powers Pulse STT — get one at [smallest.ai](https://smallest.ai) |
+| `SMALLEST_API_KEY` | Yes | Powers Pulse STT and Lightning v3.1 Pro TTS — get one at [smallest.ai](https://smallest.ai) |
 | `OPENAI_API_KEY` | Yes | Powers the intent router (GPT-4o-mini) and the drawing code generator (GPT-4o) |
 
 | Constant | Default | Description |
 |---|---|---|
 | `GOCHI_URL` | `http://localhost:7474` | Address of the gochi HTTP daemon |
 | `SAMPLE_RATE` | `16000` | Mic capture rate in Hz — Pulse's recommended input rate |
+| `VOICE_ID` | `austin` | Lightning v3.1 Pro voice used by `gochi_chat.py` |
 
 ### Available expressions
 
@@ -112,8 +191,9 @@ Then:
 
 ```
 misc/tamagotchi-listens/
-├── README.md            ← you are here
-├── tamagotchi_listens.py ← the full demo: STT → routing → draw / face / text
+├── README.md               ← you are here
+├── tamagotchi_listens.py   ← STT → intent routing → draw / face / text
+├── gochi_chat.py           ← STT → GPT answer → TTS speech + OLED display + face
 ├── requirements.txt
 └── .env.example
 ```
@@ -123,19 +203,22 @@ misc/tamagotchi-listens/
 ## Pulse STT — key call
 
 ```python
-from smallestai import SmallestAI
+import requests
 
-client = SmallestAI(api_key=SMALLEST_KEY)
-result = client.waves.transcribe_pulse(
-    request=wav_bytes,      # raw WAV bytes — mono, 16 kHz, int16
-    language="en",
-    punctuate="true",       # adds full stops, commas, etc.
-    capitalize="true",      # capitalises proper nouns and sentence starts
+resp = requests.post(
+    "https://api.smallest.ai/waves/v1/stt/",
+    headers={
+        "Authorization": f"Bearer {SMALLEST_KEY}",
+        "Content-Type": "application/octet-stream",
+    },
+    params={"model": "pulse-pro", "language": "en"},
+    data=wav_bytes,         # raw WAV bytes — mono, 16 kHz, int16
+    timeout=15,
 )
-transcript = result.transcription   # → "Draw a rocket and I feel excited."
+transcript = resp.json().get("transcription", "")   # → "Draw a rocket and I feel excited."
 ```
 
-Pulse also supports `emotion_detection="true"` — returning per-emotion float scores (happiness, sadness, anger, fear, disgust). The companion script `listen_gochi.py` in the [gochi repo](https://github.com/devfolioco/gochi) shows how to use emotion scores to drive face selection automatically, without needing the GPT router.
+Pulse also supports `emotion_detection=true` via query param — returning per-emotion float scores (happiness, sadness, anger, fear, disgust). The companion script `listen_gochi.py` in the [gochi repo](https://github.com/devfolioco/gochi) shows how to use emotion scores to drive face selection automatically, without needing the GPT router.
 
 ---
 
@@ -170,4 +253,6 @@ GPT-4o is given a tightly scoped system prompt: only PIL drawing primitives, exa
 
 - [Pulse STT — Pre-recorded Quickstart](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/pre-recorded/quickstart)
 - [Pulse STT API Reference](https://waves-docs.smallest.ai/v4.0.0/content/api-references/pulse-asr)
+- [Lightning TTS — Quickstart](https://waves-docs.smallest.ai/v4.0.0/content/text-to-speech/lightning/quickstart)
+- [Lightning TTS API Reference](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-tts)
 - [gochi hardware + daemon setup](https://github.com/devfolioco/gochi/blob/main/HOW-TO-SETUP.md)
