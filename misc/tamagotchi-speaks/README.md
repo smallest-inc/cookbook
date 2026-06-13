@@ -190,9 +190,8 @@ If you don't have hardware, both scripts still run — they print a warning and 
 ## File map
 
 ```
-misc/tamagotchi-listens/
+misc/tamagotchi-speaks/
 ├── README.md               ← you are here
-├── tamagotchi_listens.py   ← STT → intent routing → draw / face / text
 ├── gochi_chat.py           ← STT → GPT answer → TTS speech + OLED display + face
 ├── requirements.txt
 └── .env.example
