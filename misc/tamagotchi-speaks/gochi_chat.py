@@ -8,12 +8,14 @@ Flow:
   4. Gochi shows the face immediately, then speaks the answer via Lightning TTS
 """
 
+import base64
 import io
 import json
 import os
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import wave
 
@@ -22,6 +24,7 @@ import requests
 import sounddevice as sd
 from dotenv import load_dotenv
 from openai import OpenAI
+from PIL import Image, ImageDraw, ImageFont
 
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
@@ -69,6 +72,69 @@ def gochi(path: str, data: dict):
     except Exception:
         pass
 
+_FONT = ImageFont.load_default(size=12)
+
+def _to_b64(img: Image.Image) -> str:
+    pix = list(img.getdata())
+    buf = bytearray(1024)
+    for row in range(64):
+        for cb in range(16):
+            b = 0
+            for bit in range(8):
+                if pix[row * 128 + cb * 8 + bit]:
+                    b |= (1 << (7 - bit))
+            buf[row * 16 + cb] = b
+    return base64.b64encode(bytes(buf)).decode()
+
+# Varied mouth sequence — avoids mechanical feel, reaches wide-open infrequently
+_MOUTH_SEQ = [0, 1, 2, 1, 0, 0, 1, 2, 3, 2, 1, 0, 1, 2, 1, 0, 0, 1, 3, 2, 1, 0]
+
+def _make_frame(mouth: int, blink: bool, text: str, text_x: int) -> str:
+    """One animation frame: speaking face (top) + scrolling text (bottom)."""
+    img  = Image.new("1", (128, 64), 0)
+    draw = ImageDraw.Draw(img)
+
+    # Eyes — blink closes them to a line
+    for ex in (42, 78):
+        if blink:
+            draw.line([(ex, 14), (ex + 14, 14)], fill=1, width=2)
+        else:
+            draw.ellipse([ex, 7, ex + 14, 21], outline=1)
+            draw.ellipse([ex + 4, 11, ex + 10, 17], fill=1)
+
+    # Mouth — 4 states: closed / barely open / medium / wide with teeth hint
+    mx0, mx1, my = 50, 78, 33
+    if mouth == 0:
+        draw.line([(mx0, my), (mx1, my)], fill=1, width=2)
+    elif mouth == 1:
+        draw.ellipse([mx0, my - 2, mx1, my + 2], outline=1)
+    elif mouth == 2:
+        draw.ellipse([mx0, my - 5, mx1, my + 5], outline=1)
+    else:  # wide open — dark interior + tooth lines
+        draw.ellipse([mx0, my - 8, mx1, my + 8], outline=1)
+        draw.ellipse([mx0 + 2, my - 6, mx1 - 2, my + 6], fill=0)
+        for tx in (mx0 + 6, 64, mx1 - 6):
+            draw.line([(tx, my - 6), (tx, my - 3)], fill=1, width=1)
+
+    # Scrolling text in bottom strip
+    draw.text((text_x, 50), text, fill=1, font=_FONT)
+
+    return _to_b64(img)
+
+def _animate_speaking(stop: threading.Event, text: str):
+    tmp_img = Image.new("1", (128, 64), 0)
+    text_w  = int(ImageDraw.Draw(tmp_img).textlength(text, font=_FONT))
+
+    i, text_x = 0, 128
+    while not stop.is_set():
+        blink = (i % 20 == 19)  # blink once every ~3.6 s
+        gochi("/image", {"data": _make_frame(_MOUTH_SEQ[i % len(_MOUTH_SEQ)], blink, text, text_x)})
+        i      += 1
+        text_x -= 13
+        if text_x < -text_w:
+            text_x = 128
+        stop.wait(0.18)
+
 def speak(text: str):
     resp = requests.post(
         "https://api.smallest.ai/waves/v1/tts",
@@ -84,7 +150,11 @@ def speak(text: str):
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
         f.write(resp.content)
         tmp = f.name
+
+    stop = threading.Event()
+    threading.Thread(target=_animate_speaking, args=(stop, text), daemon=True).start()
     subprocess.run(["afplay", tmp], check=False)
+    stop.set()
     os.unlink(tmp)
 
 def transcribe(audio: np.ndarray) -> str:
@@ -148,8 +218,6 @@ def run_once():
     answer, face = ask_gochi(question)
     print(f'  Gochi says: "{answer}"  [{face}]')
 
-    # Text scrolls on OLED while audio synthesizes + plays, then face shows
-    gochi("/text", {"text": answer})
     print("  Speaking...")
     speak(answer)
     gochi("/face", {"name": face})
@@ -169,7 +237,7 @@ def main():
     except Exception:
         print("Warning: gochi unreachable — is the daemon running? (gochi health)")
 
-    print("Gochi Chat — ask anything, gochi answers on screen.  Ctrl+C to quit.")
+    print("Gochi Chat — ask anything, gochi answers out loud.  Ctrl+C to quit.")
 
     while True:
         try:
