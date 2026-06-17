@@ -44,15 +44,18 @@ DATA_DIR/
 └── metadata.csv            # ground-truth transcripts
 ```
 
-`metadata.csv` is comma-separated with one row per clip:
+`metadata.csv` is comma-separated with exactly two columns, header row required:
 
 ```csv
-filename,reference
+audio_filename,transcript
 clip_001.wav,Hello world this is a test.
 clip_002.mp3,The quick brown fox jumps over the lazy dog.
 ```
 
-The `filename` column matches a file in `audio/`. The `reference` column is the ground-truth transcript used for WER scoring.
+- `audio_filename` matches a file in `audio/` (just the basename, not a full path).
+- `transcript` is the ground-truth text used for WER scoring.
+
+The headers must be spelled exactly `audio_filename,transcript` — the scripts validate this and exit early on a mismatch.
 
 ## Language support
 
@@ -62,7 +65,12 @@ Both scripts currently restrict `--language` to `en` (English) and `hi` (Hindi) 
 
 ## Output
 
-Both scripts print a JSON aggregate at the end:
+Both scripts print per-clip results live + an aggregate summary table at the end. They also write a JSON results file to `DATA_DIR/`:
+
+- `ping_pulse_offline.py`  → `DATA_DIR/results_batch_<model>_<lang>.json`
+- `ping_pulse_streaming.py` → `DATA_DIR/results_streaming_<lang>.json`
+
+The JSON has an `aggregate` block and a `clips` array with per-clip detail:
 
 ```json
 {
@@ -70,21 +78,27 @@ Both scripts print a JSON aggregate at the end:
     "mode": "batch",
     "language": "en",
     "model": "pulse-pro",
-    "num_clips": 250,
-    "corpus_wer_pct": 4.55,
-    "latency_p50_s": 0.42,
-    "latency_p95_s": 0.87,
-    "rtf_p50": 0.012,
-    "rtf_p95": 0.024
+    "endpoint": "https://api.smallest.ai/waves/v1/stt/",
+    "num_clips": 5,
+    "corpus_wer_pct": 10.26,
+    "latency_p50_s": 0.693,
+    "latency_p90_s": 0.781,
+    "latency_p95_s": 0.781,
+    "rtf_p50": 0.2051,
+    "rtf_p90": 0.3753,
+    "rtf_p95": 0.3753
   },
-  "clips": [ ... ]
+  "clips": [
+    {"audio_filename": "clip_001.wav", "reference": "...", "hypothesis": "...",
+     "wer_pct": 0.0, "latency_s": 0.69, "rtf": 0.27, "server_rtfx": 32.5}
+  ]
 }
 ```
 
 Pipe to `jq` to extract just the headline numbers:
 
 ```bash
-python ping_pulse_offline.py /path/to/data --language en | jq '.aggregate'
+jq '.aggregate' /path/to/data/results_batch_pulse-pro_en.json
 ```
 
 ## What this measures vs. what it doesn't
