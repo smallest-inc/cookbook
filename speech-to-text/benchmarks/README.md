@@ -13,7 +13,14 @@ Both scripts are single-file, no imports from this repo. Copy either one anywher
 
 For the methodology behind each metric — what tail latency means, how RTF is computed, which transcripts to sample from — see the [Measuring Latency docs page](https://docs.smallest.ai/waves/documentation/speech-to-text-pulse/benchmarks/measuring-latency).
 
-## Quick start
+## Quick start — using the bundled samples
+
+The repo ships with two small ready-to-run sample datasets under `samples/`:
+
+| Dataset | Clips | Source |
+|---|---|---|
+| `samples/english_samples/` | 20 clips | English read speech, FLEURS-style |
+| `samples/hindi_samples/` | 10 clips | Hindi read speech, Devanagari transcripts |
 
 ```bash
 # 1. Install dependencies (one time)
@@ -24,11 +31,18 @@ pip install whisper-normalizer
 # 2. Set your API key
 export SMALLEST_API_KEY=sk_your_key_here
 
-# 3. Prepare your eval folder (see "Dataset format" below)
+# 3. Run against the bundled samples
+python ping_pulse_offline.py   samples/english_samples --language en --model pulse-pro
+python ping_pulse_streaming.py samples/hindi_samples   --language hi
+```
 
-# 4. Run
-python ping_pulse_offline.py   /path/to/data_dir --language en --model pulse-pro
-python ping_pulse_streaming.py /path/to/data_dir --language en
+For a quick sanity check, the offline run on the bundled English samples typically reports corpus WER ~4-5% with Pulse Pro; streaming on the Hindi samples reports tail latency p50 around 240-300 ms.
+
+## Run against your own dataset
+
+```bash
+python ping_pulse_offline.py   /path/to/your/data_dir --language en --model pulse-pro
+python ping_pulse_streaming.py /path/to/your/data_dir --language en
 ```
 
 ## Dataset format
