@@ -195,6 +195,16 @@ Then place a call from the [Smallest Platform](https://app.smallest.ai) dashboar
 
 ---
 
+## Voice Games Examples
+
+Games controlled entirely by voice, built on Pulse STT and Lightning TTS.
+
+- [Voice Wordle](./voice-games/voice-wordle/) — Wordle played by voice; bring-your-own-key auth-frame pattern for multi-tenant STT/TTS proxying
+
+**[See all Voice Games examples &rarr;](./voice-games/)**
+
+---
+
 ## Integrations
 
 Use Smallest AI with popular frameworks and libraries.
