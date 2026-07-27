@@ -28,43 +28,92 @@ export SMALLEST_API_KEY="your-api-key-here"
 python text-to-speech/quickstart/quickstart.py
 ```
 
+
+
+## Single-file examples
+
+Three self-contained scripts at the top of this directory — copy any of them anywhere and run:
+
+
+| Script                                           | Endpoint                        | Notes                                             |
+| ------------------------------------------------ | ------------------------------- | ------------------------------------------------- |
+| [quickstart-python.py](./quickstart-python.py)   | `POST /waves/v1/tts`            | Blocking request → `output.wav`                   |
+| [streaming-python.py](./streaming-python.py)     | `POST /waves/v1/tts/live` (SSE) | Streams SSE chunks → `streamed.wav`               |
+| [websocket-python.py](./websocket-python.py)     | `WSS /waves/v1/tts/live`        | CLI-flag driven WebSocket with TTFB → `output.wav` |
+
+
+Setup once:
+
+```bash
+pip install requests websocket-client              # deps used across the three
+export SMALLEST_API_KEY="your-api-key-here"
+```
+
+`websocket-python.py` takes CLI flags — no code edits needed:
+
+```bash
+python text-to-speech/websocket-python.py --text "Hello from Zoravar" --voice zoravar
+python text-to-speech/websocket-python.py --text "Modern problems..." --voice meher --out demo.wav
+python text-to-speech/websocket-python.py --text "..." --voice meher --model lightning_v3.1 --rate 44100
+```
+
+Flags: `--text` (required) · `--voice` (default `meher`) · `--model` (default `lightning_v3.1_pro`) · `--rate` (default `24000`) · `--out` (default `output.wav`).
+
+For `quickstart-python.py` and `streaming-python.py`, edit the constants at the top of the file — those two are minimal snippets, not CLIs.
+
 ## Examples
 
 ### Basics
 
-| Example | Description |
-|---------|-------------|
-| [Quickstart](./quickstart/) | 5-line hello world — generate speech in under 2 minutes |
-| [Getting Started](./getting-started/) | Configurable synthesis with voice, speed, language, output format |
-| [Voices](./voices/) | List 80+ voices, filter by language/gender/accent, preview any voice |
-| [Streaming](./streaming/) | Real-time audio streaming via SSE and WebSocket |
-| [Pronunciation Dicts](./pronunciation-dicts/) | Custom pronunciation for names, acronyms, and domain terms |
-| [SDK Usage](./sdk-usage/) | Python SDK patterns *(coming soon — SDK does not yet support v3.1)* |
-| [Voice Cloning](./voice-cloning/) | Instant voice cloning from a short audio sample *(coming soon)* |
+
+| Example                                       | Description                                                          |
+| --------------------------------------------- | -------------------------------------------------------------------- |
+| [Quickstart](./quickstart/)                   | 5-line hello world — generate speech in under 2 minutes              |
+| [Getting Started](./getting-started/)         | Configurable synthesis with voice, speed, language, output format    |
+| [Voices](./voices/)                           | List 80+ voices, filter by language/gender/accent, preview any voice |
+| [Streaming](./streaming/)                     | Real-time audio streaming via SSE and WebSocket                      |
+| [Pronunciation Dicts](./pronunciation-dicts/) | Custom pronunciation for names, acronyms, and domain terms           |
+| [SDK Usage](./sdk-usage/)                     | Python SDK patterns *(coming soon — SDK does not yet support v3.1)*  |
+| [Voice Cloning](./voice-cloning/)             | Instant voice cloning from a short audio sample *(coming soon)*      |
+
+
+
 
 ### Expressive TTS (v3.2)
 
-| Example | Description |
-|---------|-------------|
-| [Expressive TTS](./expressive-tts/) | Control emotion, pitch, volume, accent — make the same voice happy, angry, whispering, sarcastic |
-| [Chinese Whispers Game](./voice-chinese-whispers/) | Same sentence through 5 characters with different emotions/accents — viral shareable demo |
+
+| Example                                            | Description                                                                                      |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [Expressive TTS](./expressive-tts/)                | Control emotion, pitch, volume, accent — make the same voice happy, angry, whispering, sarcastic |
+| [Chinese Whispers Game](./voice-chinese-whispers/) | Same sentence through 5 characters with different emotions/accents — viral shareable demo        |
+
+
+
 
 ### Web Apps (Deploy to Vercel)
 
-| Example | Description |
-|---------|-------------|
+
+| Example                                   | Description                                                                 |
+| ----------------------------------------- | --------------------------------------------------------------------------- |
 | [Voice Gallery App](./voice-gallery-app/) | Browse, filter, preview 80+ voices in a web UI. One-click deploy to Vercel. |
+
+
+
 
 ### Applications
 
-| Example | Description |
-|---------|-------------|
-| [Multilingual Translator](./multilingual-translator/) | Hear any text spoken in English, Hindi, Spanish, and Tamil side by side |
-| [Podcast Generator](./podcast-generator/) | Give it a topic, get a two-host AI podcast (LLM + TTS) |
-| [Audiobook Generator](./audiobook-generator/) | Convert any text file into a narrated, chaptered audiobook |
-| [Voice Explorer](./voice-explorer/) | Interactive browser to preview all voices, search by use case or emotion, and play audio inline |
-| [News Voice App](./news-voice-app/) | Web dashboard that groups headlines into story clusters and plays each as a 2-3 min audio summary |
+
+| Example                                                 | Description                                                                                            |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [Multilingual Translator](./multilingual-translator/)   | Hear any text spoken in English, Hindi, Spanish, and Tamil side by side                                |
+| [Podcast Generator](./podcast-generator/)               | Give it a topic, get a two-host AI podcast (LLM + TTS)                                                 |
+| [Audiobook Generator](./audiobook-generator/)           | Convert any text file into a narrated, chaptered audiobook                                             |
+| [Voice Explorer](./voice-explorer/)                     | Interactive browser to preview all voices, search by use case or emotion, and play audio inline        |
+| [News Voice App](./news-voice-app/)                     | Web dashboard that groups headlines into story clusters and plays each as a 2-3 min audio summary      |
 | [Language Translation App](./language-translation-app/) | Translate text between 40+ languages with TTS and STT — type or speak input, hear results spoken aloud |
+
+
+
 
 ## Full Setup
 
@@ -74,6 +123,8 @@ python text-to-speech/quickstart/quickstart.py
 export SMALLEST_API_KEY="your-api-key-here"
 uv run text-to-speech/getting-started/python/synthesize.py "Hello from Smallest AI!"
 ```
+
+
 
 ## Supported Languages
 
@@ -93,3 +144,4 @@ Lightning v3.1 Pro: depends on the voice — Indian Pro voices speak `en` + `hi`
 - [Voice Cloning](https://waves-docs.smallest.ai/v4.0.0/content/api-references/voice-cloning-api)
 - [Pronunciation Dicts](https://waves-docs.smallest.ai/v4.0.0/content/api-references/pronunciation-dicts-api)
 - [Python SDK](https://github.com/smallest-inc/smallest-python-sdk)
+
