@@ -21,7 +21,7 @@ Speak naturally; Pulse STT transcribes your voice, GPT-4o-mini classifies your i
 
 | | |
 |---|---|
-| **Pulse STT transcription** | Record mic audio → WAV bytes → Pulse `transcribe_pulse` → clean text with punctuation and capitalisation. |
+| **Pulse STT transcription** | Record mic audio → WAV bytes → `client.waves.speech_to_text.transcribe()` → clean text with punctuation and capitalisation. |
 | **Intent routing via LLM** | GPT-4o-mini classifies the transcript into one of four action types with zero-shot JSON output. |
 | **Generative pixel art** | GPT-4o writes PIL drawing code on the fly; the code is executed locally and the resulting bitmap is sent to gochi's OLED. |
 | **Real-time face reactions** | Ten named expressions (`happy`, `sad`, `sleepy`, `angry`, `love`, `shy`, `dead`, …) mapped from natural language. |
@@ -39,7 +39,7 @@ record_until_enter()        mic → int16 PCM at 16 kHz
 to_wav_bytes()              pack into an in-memory WAV
     │
     ▼
-Pulse STT                   smallestai.waves.transcribe_pulse()
+Pulse STT                   client.waves.speech_to_text.transcribe()
 (transcribe)                → "draw a rocket and I'm excited"
     │
     ▼
@@ -88,7 +88,7 @@ You speak
 record_until_enter()        mic → int16 PCM at 16 kHz
     │
     ▼
-Pulse STT                   transcribe_pulse() → your question as text
+Pulse STT                   speech_to_text.transcribe() → your question as text
     │
     ▼
 GPT-4o-mini                 SYSTEM_PROMPT + question

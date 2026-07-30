@@ -1,4 +1,4 @@
-smallestai
+smallestai>=5.3.1
 openai
 sounddevice
 numpy

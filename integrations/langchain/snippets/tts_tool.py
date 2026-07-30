@@ -20,12 +20,12 @@ import requests
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 
-LIGHTNING_API_URL = "https://waves-api.smallest.ai/api/v1/lightning-v2/get_speech"
+LIGHTNING_API_URL = "https://api.smallest.ai/waves/v1/tts"
 
 
 class TTSInput(BaseModel):
     text: str = Field(description="Text to convert to speech")
-    voice_id: str = Field(default="leon", description="Voice ID to use for synthesis")
+    voice_id: str = Field(default="magnus", description="Voice ID to use for synthesis")
 
 
 class LightningTTSTool(BaseTool):
@@ -47,7 +47,7 @@ class LightningTTSTool(BaseTool):
         self.api_key = api_key or os.environ.get("SMALLEST_API_KEY", "")
         self.output_dir = output_dir
 
-    def _run(self, text: str, voice_id: str = "leon") -> str:
+    def _run(self, text: str, voice_id: str = "magnus") -> str:
         """Generate speech audio from text. Returns path to output file."""
         if not text.strip():
             return "Error: empty text"
@@ -87,7 +87,7 @@ class LightningTTSTool(BaseTool):
             wav_file.writeframes(pcm_data)
         return buffer.getvalue()
 
-    async def _arun(self, text: str, voice_id: str = "leon") -> str:
+    async def _arun(self, text: str, voice_id: str = "magnus") -> str:
         """Async version — uses httpx."""
         import httpx
 

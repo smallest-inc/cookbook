@@ -7,7 +7,7 @@ Interactive browser for all Smallest AI voices. Type preview text, pick a model,
 - **Semantic search** — find voices by use case, emotion, or attribute (e.g. "calm meditation", "news anchor", "warm storytelling", "British female")
 - **Inline audio playback** — generated audio plays directly in the card; results are cached so replaying is instant
 - **Cloned voice section** — your custom cloned voices appear in a separate section automatically
-- Model selector switches between **Lightning v2** and **Lightning v3.1** without losing your search or text
+- Model selector switches between **Lightning v3.1** and **Lightning v3.1 Pro** without losing your search or text
 
 ## Requirements
 

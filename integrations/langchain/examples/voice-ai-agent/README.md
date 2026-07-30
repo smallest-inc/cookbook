@@ -71,7 +71,7 @@ Agent: Let me look that up. Order forty five six seven eight shipped
 | `--interactive` | Run in text mode (type as the caller) |
 | `--speak` | Generate audio response using TTS |
 | `model` in `voice_chain.py` | LLM model (default: gpt-4o-mini) |
-| `voice_id` in `agent.py` | TTS voice (default: leon) |
+| `voice_id` in `agent.py` | TTS voice (default: magnus) |
 
 ## API Reference
 

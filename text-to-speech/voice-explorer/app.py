@@ -15,13 +15,13 @@ from fastembed import TextEmbedding
 
 load_dotenv()
 
-VOICES_URL = "https://waves-api.smallest.ai/api/v1/{model}/get_voices"
-CLONED_VOICES_URL = "https://waves-api.smallest.ai/api/v1/lightning-large/get_cloned_voices"
-SYNTHESIS_URL = "https://waves-api.smallest.ai/api/v1/{model}/get_speech"
+VOICES_URL = "https://api.smallest.ai/waves/v1/lightning-v3.1/get_voices"
+CLONED_VOICES_URL = "https://api.smallest.ai/waves/v1/voice-cloning"
+SYNTHESIS_URL = "https://api.smallest.ai/waves/v1/tts"
 
 MODELS = {
-    "Lightning v3.1": "lightning-v3.1",
-    "Lightning v2": "lightning-v2",
+    "Lightning v3.1": "lightning_v3.1",
+    "Lightning v3.1 Pro": "lightning_v3.1_pro",
 }
 
 SAMPLE_RATE = 24000
@@ -43,8 +43,9 @@ _C_BLUE   = "#3E91D6"
 
 @st.cache_data(ttl=300)
 def fetch_voices(model: str, api_key: str) -> list[dict]:
+    # One catalog serves both v3.1 and v3.1 Pro; the model is picked at synthesis time.
     resp = requests.get(
-        VOICES_URL.format(model=model),
+        VOICES_URL,
         headers={"Authorization": f"Bearer {api_key}"},
         timeout=15,
     )
@@ -60,14 +61,15 @@ def fetch_cloned_voices(api_key: str) -> list[dict]:
         timeout=15,
     )
     resp.raise_for_status()
-    return resp.json().get("voices", [])
+    clones = resp.json().get("data", [])
+    return [v for v in clones if v.get("status") == "completed"]
 
 
 def synthesize(text: str, voice_id: str, model: str, api_key: str) -> bytes:
     resp = requests.post(
-        SYNTHESIS_URL.format(model=model),
+        SYNTHESIS_URL,
         headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        json={"text": text, "voice_id": voice_id, "sample_rate": SAMPLE_RATE, "speed": 1.0, "output_format": "pcm"},
+        json={"text": text, "voice_id": voice_id, "model": model, "sample_rate": SAMPLE_RATE, "speed": 1.0, "output_format": "pcm"},
         timeout=30,
     )
     resp.raise_for_status()
@@ -221,7 +223,16 @@ def render_voice_card(voice: dict, is_cloned: bool, preview_text: str, model: st
                             audio = synthesize(preview_text, voice_id, model, api_key)
                             st.session_state.setdefault("audio_cache", {})[key] = audio
                         except requests.HTTPError as e:
-                            st.error(f"Synthesis failed: {e.response.status_code}")
+                            detail = ""
+                            try:
+                                err = e.response.json().get("error")
+                                if isinstance(err, list) and err:
+                                    detail = err[0].get("message", "")
+                                elif isinstance(err, str):
+                                    detail = err
+                            except Exception:
+                                pass
+                            st.error(f"Synthesis failed: {e.response.status_code}" + (f" ({detail})" if detail else ""))
                             st.stop()
                 st.session_state[f"nonce_{key}"] = nonce + 1
                 st.session_state["audio_autoplay"] = key
@@ -277,7 +288,11 @@ def main() -> None:
             placeholder="Type something to hear each voice say it...",
         )
     with col_model:
-        model_label = st.selectbox("Model", list(MODELS.keys()))
+        model_label = st.selectbox(
+            "Model",
+            list(MODELS.keys()),
+            help="v3.1 and v3.1 Pro serve different voice pools; a voice that fails on one model may be available on the other.",
+        )
     model = MODELS[model_label]
 
     search_query = st.text_input(
