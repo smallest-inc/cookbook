@@ -1,0 +1,7 @@
+# Latest smallestai. The telephony helpers (search_rentable, rent,
+# start_outbound_call) and the OpenAI-compatible OpenAIClient used in
+# assistant.py are stable on 5.3.x.
+smallestai
+
+# Logging
+loguru>=0.7.0

@@ -1,0 +1,6 @@
+# Latest smallestai. OpenAIClient(base_url=...) has been stable for a
+# while; the crew node surface used here is standard as of 5.3.x.
+smallestai
+
+# Logging
+loguru>=0.7.0
