@@ -20,18 +20,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TTS_URL = "https://waves-api.smallest.ai/api/v1/lightning-v3.2/get_speech"
+TTS_URL = "https://api.smallest.ai/waves/v1/tts"
 
 LABEL_SCHEMA = {
-    "emotion": ["neutral", "happy", "sad", "angry", "excited", "calm", "sarcastic",
-                 "frustrated", "fearful", "surprised", "disgusted", "bored", "anxious",
-                 "confident", "amused", "empathetic", "nostalgic", "pleading", "skeptical"],
-    "pitch": ["mid-range", "high-pitched", "low-pitched", "breathy"],
-    "volume": ["normal", "shouting", "soft", "whispering", "muttering", "loud"],
-    "prosody": ["normal", "very slow", "slow", "fast", "very fast", "melodic",
-                "monotonous", "hesitant", "measured"],
-    "accent": ["general american", "british", "australian", "indian american",
-               "scottish", "irish", "southern american", "new york", "canadian"],
+    "emotion": ["neutral", "happy", "sad", "angry", "fearful"],
+    "pitch": ["low", "mid", "high"],
+    "volume": ["whisper", "soft", "normal", "loud", "shouting"],
+    "prosody": ["slow", "normal", "fast"],
+    "accent": ["general american", "indian american", "irish", "italian", "new york", "british", "canadian", "scottish", "southern american", "australian"],
 }
 
 SYSTEM_PROMPT = f"""You are a voice direction assistant. Given text, predict the most
@@ -91,7 +87,8 @@ def speak(text, labels, api_key, output_file):
         },
         json={
             "text": text,
-            "voice_id": "natalie",
+            "voice_id": "sloane",
+            "model": "lightning_v3.2",
             "sample_rate": 44100,
             "output_format": "wav",
             **labels,

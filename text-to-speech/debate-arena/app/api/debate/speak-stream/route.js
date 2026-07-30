@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 import WebSocket from "ws";
 
 const WS_URL =
-  "wss://waves-api.smallest.ai/api/v1/lightning-v3.2/get_speech/stream?timeout=180";
+  "wss://api.smallest.ai/waves/v1/tts/live?timeout=180";
 
 export async function POST(request) {
   const { text, voice_id, emotion, pitch, volume, prosody, accent } =
@@ -20,7 +20,7 @@ export async function POST(request) {
   // BYOK: accept user-provided key via header, fall back to server env
   const apiKey =
     request.headers.get("x-smallest-key") || process.env.SMALLEST_API_KEY;
-  const ttsMsg = { text: text.slice(0, 500), voice_id };
+  const ttsMsg = { text: text.slice(0, 500), voice_id, model: "lightning_v3.2" };
   // Expressive params (emotion, pitch, volume, prosody) are v3.2-only
   // and can cause playback errors on some inputs. Only send them if
   // the endpoint is confirmed to support them reliably.

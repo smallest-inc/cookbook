@@ -77,7 +77,7 @@ news-voice-app/
 ## API Reference
 
 - [Waves TTS Overview](https://waves-docs.smallest.ai/v4.0.0/content/text-to-speech/overview)
-- [Lightning v3.1 Stream endpoint](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1-stream)
+- [TTS streaming endpoint](https://docs.smallest.ai/models/api-reference/text-to-speech/synthesize-speech-sse)
 
 ## Next Steps
 

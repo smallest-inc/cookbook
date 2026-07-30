@@ -14,14 +14,14 @@ const EXAMPLE_TOPICS = [
 ];
 
 const VOICE_OPTIONS = [
-  { id: "hercules", label: "Hercules" },
-  { id: "marcus", label: "Marcus" },
-  { id: "edward", label: "Edward" },
-  { id: "daniel", label: "Daniel" },
-  { id: "robert", label: "Robert" },
-  { id: "sophia", label: "Sophia" },
-  { id: "natalie", label: "Natalie" },
-  { id: "persephone", label: "Persephone" },
+  { id: "cody", label: "Cody" },
+  { id: "kieran", label: "Kieran" },
+  { id: "scott", label: "Scott" },
+  { id: "knox", label: "Knox" },
+  { id: "lindsey", label: "Lindsey" },
+  { id: "sloane", label: "Sloane" },
+  { id: "jade", label: "Jade" },
+  { id: "wren", label: "Wren" },
 ];
 
 const QUOTES = [
@@ -53,8 +53,8 @@ const ROAST_TOPICS = [
 export default function TopicInput({ onStart, disabled }) {
   const [topic, setTopic] = useState("");
   const [rounds, setRounds] = useState(2);
-  const [socratesVoice, setSocratesVoice] = useState("hercules");
-  const [aristotleVoice, setAristotleVoice] = useState("edward");
+  const [socratesVoice, setSocratesVoice] = useState("cody");
+  const [aristotleVoice, setAristotleVoice] = useState("kieran");
   const [quoteIdx, setQuoteIdx] = useState(0);
   const [breathe, setBreathe] = useState(false);
   const [mode, setMode] = useState("philosophical"); // philosophical | roast
