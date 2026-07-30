@@ -11,7 +11,7 @@ export async function POST(request) {
   }
 
   const res = await fetch(
-    "https://api.smallest.ai/waves/v1/lightning-v3.1/get_speech",
+    "https://api.smallest.ai/waves/v1/tts",
     {
       method: "POST",
       headers: {
@@ -21,6 +21,7 @@ export async function POST(request) {
       body: JSON.stringify({
         text: text.slice(0, 1000),
         voice_id,
+        model: "lightning_v3.1",
         sample_rate: 24000,
         speed: 1.0,
         output_format: "mp3",

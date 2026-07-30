@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_URL = "https://waves-api.smallest.ai/api/v1/lightning-v3.2/get_speech"
+API_URL = "https://api.smallest.ai/waves/v1/tts"
 SAMPLE_RATE = 44100
 
 DEFAULT_TEXT = "I just found out that we're getting a brand new office, and honestly I have some very strong feelings about it."
@@ -33,46 +33,46 @@ DEFAULT_CHARACTERS = [
     {
         "name": "Excited American",
         "emoji": "😊",
-        "emotion": "excited",
-        "pitch": "high-pitched",
+        "emotion": "happy",
+        "pitch": "high",
         "volume": "loud",
         "prosody": "fast",
         "accent": "general american",
     },
     {
-        "name": "Sarcastic Brit",
+        "name": "Deadpan Brit",
         "emoji": "🇬🇧",
-        "emotion": "sarcastic",
-        "pitch": "mid-range",
+        "emotion": "neutral",
+        "pitch": "mid",
         "volume": "normal",
-        "prosody": "measured",
+        "prosody": "slow",
         "accent": "british",
     },
     {
-        "name": "Anxious Whisperer",
+        "name": "Fearful Whisperer",
         "emoji": "😰",
-        "emotion": "anxious",
-        "pitch": "high-pitched",
-        "volume": "whispering",
-        "prosody": "hesitant",
+        "emotion": "fearful",
+        "pitch": "high",
+        "volume": "whisper",
+        "prosody": "slow",
         "accent": "general american",
     },
     {
         "name": "Angry New Yorker",
         "emoji": "😤",
         "emotion": "angry",
-        "pitch": "mid-range",
+        "pitch": "mid",
         "volume": "shouting",
         "prosody": "fast",
         "accent": "new york",
     },
     {
-        "name": "Calm Storyteller",
+        "name": "Gentle Storyteller",
         "emoji": "🧘",
-        "emotion": "calm",
-        "pitch": "low-pitched",
+        "emotion": "neutral",
+        "pitch": "low",
         "volume": "soft",
-        "prosody": "melodic",
+        "prosody": "slow",
         "accent": "australian",
     },
 ]
@@ -88,9 +88,10 @@ def synthesize(text, character, api_key):
         },
         json={
             "text": text,
-            "voice_id": "natalie",
+            "voice_id": "sloane",
+            "model": "lightning_v3.2",
             "emotion": character.get("emotion", "neutral"),
-            "pitch": character.get("pitch", "mid-range"),
+            "pitch": character.get("pitch", "mid"),
             "volume": character.get("volume", "normal"),
             "prosody": character.get("prosody", "normal"),
             "accent": character.get("accent", "general american"),
@@ -142,7 +143,7 @@ def main():
     parser = argparse.ArgumentParser(description="Voice Chinese Whispers")
     parser.add_argument("text", nargs="?", default=DEFAULT_TEXT, help="Text to pass through characters")
     parser.add_argument("--characters", help="JSON file with custom character definitions")
-    parser.add_argument("--voice", default="natalie", help="Voice ID to use")
+    parser.add_argument("--voice", default="sloane", help="Voice ID to use")
     args = parser.parse_args()
 
     characters = DEFAULT_CHARACTERS

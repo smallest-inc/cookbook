@@ -45,7 +45,7 @@ export async function POST(req: Request) {
         console.log(`[API] Received request for mode: ${mode}`);
         console.log(`[API] Payload:`, { agentId, apiKeyLength: apiKey?.length });
 
-        const upstreamUrl = `https://atoms-api.smallest.ai/api/v1/conversation/${mode}`;
+        const upstreamUrl = `https://api.smallest.ai/atoms/v1/conversation/${mode}`;
         console.log(`[API] Forwarding to: ${upstreamUrl}`);
 
         const response = await fetch(

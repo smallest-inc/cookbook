@@ -10,7 +10,7 @@
 import WebSocket from "ws";
 
 const WS_URL =
-  "wss://waves-api.smallest.ai/api/v1/lightning-v3.2/get_speech/stream?timeout=180";
+  "wss://api.smallest.ai/waves/v1/tts/live?timeout=180";
 
 const MAX_POOL_SIZE = 4;
 const CONNECT_TIMEOUT = 5000;
