@@ -137,6 +137,16 @@ Generate natural-sounding speech from text with real-time latency. 80+ voices ac
 
 ---
 
+## Speech-to-Speech Examples
+
+Full-duplex voice conversations with a single model: stream microphone audio in, get spoken responses back. Powered by [Hydra](https://docs.smallest.ai/waves/documentation/speech-to-speech-hydra/overview) over `wss://api.smallest.ai/waves/v1/s2s`.
+
+- [Hydra Realtime Demo](./speech-to-speech/hydra-realtime-demo/) — Browser client with multi-agent presets, client-side tool calling, a live wire-log of every WebSocket frame, and an audio-reactive orb. Mirror of [smallest-inc/hydra_agents](https://github.com/smallest-inc/hydra_agents).
+
+**[See all Speech-to-Speech examples &rarr;](./speech-to-speech/)**
+
+---
+
 ## Voice Agents Examples
 
 Build AI voice agents that can talk to anyone on voice or text, in any language, in any voice. The Atoms SDK provides abstractions like KnowledgeBase, Campaigns, and graph-based Workflows to let you build the smartest voice agent for your use case. Powered by the [Atoms SDK](https://docs.smallest.ai/atoms/developer-guide).
