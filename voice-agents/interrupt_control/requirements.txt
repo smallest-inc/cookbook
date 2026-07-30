@@ -1,5 +1,5 @@
 # Dependencies for this example
-smallestai>=4.4.6
+smallestai>=5.3.1
 
 # Logging
 loguru>=0.7.0

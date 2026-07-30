@@ -9,7 +9,7 @@ Usage:
 
 import os
 from dotenv import load_dotenv
-from smallestai.atoms import Audience
+from smallestai.atoms.helpers import Audience
 
 load_dotenv()
 

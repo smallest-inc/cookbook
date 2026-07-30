@@ -91,6 +91,6 @@ export OPENAI_API_KEY=your_openai_key
 
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
 - Python 3.10+
-- `smallestai` SDK (`>=4.3.0`)
+- `smallestai` SDK (`>=5.3.1`)
 - OpenAI API key (for LLM)
 - Smallest API key (for platform features)

@@ -1,13 +1,10 @@
 # Dependencies for this example
-# Requires 4.4.7+ because sentiment_analyzer.py imports SDKAgentLogEvent,
-# which only exists from 4.4.7 onward.
 #
-# Known caveat: 4.4.7 also ships _validate_startup in
-# smallestai/atoms/crew/server.py which logs a spurious
-# 'Startup validation failed — pod will not accept sessions' ERROR at boot.
-# The pod still accepts sessions and the multi-node agent works; the log
-# is misleading. Tracked for an SDK fix; safe to ignore in the meantime.
-smallestai>=4.4.7
+# Known caveat: _validate_startup in smallestai/atoms/crew/server.py logs a
+# spurious 'Startup validation failed — pod will not accept sessions' ERROR
+# at boot. The pod still accepts sessions and the multi-node agent works;
+# the log is misleading. Tracked for an SDK fix; safe to ignore.
+smallestai>=5.3.1
 
 # Logging
 loguru>=0.7.0

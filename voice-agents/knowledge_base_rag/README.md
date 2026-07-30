@@ -30,7 +30,7 @@ uv run setup_kb.py
 ### PDF Upload
 
 ```python
-from smallestai.atoms import KB
+from smallestai.atoms.helpers import KB
 
 kb = KB()
 
@@ -50,7 +50,7 @@ for item in items["data"]:
 ### URL Scraping
 
 ```python
-from smallestai.atoms import KB
+from smallestai.atoms.helpers import KB
 
 kb = KB()
 
