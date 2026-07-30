@@ -189,7 +189,7 @@ campaigns/
 
 ## API Reference
 
-- [Phone Calling — Overview](https://docs.smallest.ai/atoms/developer-guide/build/calling/overview)
+- [Phone Calling — Overview](https://docs.smallest.ai/voice-agents/developer-guide/build/calling/overview)
 
 ## Next Steps
 

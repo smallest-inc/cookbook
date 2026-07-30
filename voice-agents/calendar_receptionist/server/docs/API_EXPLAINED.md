@@ -7,11 +7,11 @@ This document explains every part of each API call and how it fits into the Cale
 ## Overview: How the Web App Works
 
 ```
-Caller (phone) → Atoms Voice Agent → This API (webhooks) → Google Calendar + Email
+Caller (phone) → Voice Agent → This API (webhooks) → Google Calendar + Email
 ```
 
-1. **Caller** dials in and talks to the Atoms AI receptionist.
-2. **Atoms** calls our API when it needs to check availability or book a meeting.
+1. **Caller** dials in and talks to the AI voice receptionist.
+2. **The voice agent** calls our API when it needs to check availability or book a meeting.
 3. **Our API** talks to Google Calendar and (optionally) sends confirmation emails.
 4. **Caller** gets a calendar invite with Google Meet.
 
@@ -46,7 +46,7 @@ checkAvailabilitySchema.safeParse(req.body)
 if (targetDay && isUnsubstitutedTemplate(targetDay)) targetDay = undefined;
 ```
 
-- If Atoms sends `{{day_time_mentioned_by_user}}` literally (variable not filled), we treat it as missing and fall back to defaults.
+- If the voice agent platform sends `{{day_time_mentioned_by_user}}` literally (variable not filled), we treat it as missing and fall back to defaults.
 
 #### 3. Decide which slots to check
 
@@ -97,7 +97,7 @@ formatAvailableSummaryCompact(..., tz)  // "Monday Mar 2: 11 AM, 11:30 AM, 12 PM
 | `available` | Array of free slots `{start, end}` (ISO). |
 | `formatted` | Full readable strings per slot. |
 | `available_summary` | Compact string for the agent to speak. |
-| `first_slot_start` / `first_slot_end` | First slot for Atoms (e.g. `$.first_slot_start`). |
+| `first_slot_start` / `first_slot_end` | First slot for the platform (e.g. `$.first_slot_start`). |
 | `usedFallback` | Whether default slots were used. |
 | `usedTargetDayInference` | Whether slots came from `targetDay`. |
 
@@ -237,17 +237,17 @@ emailService.sendBookingConfirmation({
 ```
 Caller: "I'd like to meet Friday at 3 pm"
     ↓
-Atoms: POST /check-availability { targetDay: "Friday 3 pm" }
+Agent: POST /check-availability { targetDay: "Friday 3 pm" }
     ↓
 API: parseDayTimeExpression → buildSlotsFromTargetDay → findAvailableSlots
     ↓
 API: Returns { available_summary: "Friday Feb 27: 2:30 PM, 3 PM, 3:30 PM", ... }
     ↓
-Atoms: "I have 2:30, 3, 3:30. Which works?"
+Agent: "I have 2:30, 3, 3:30. Which works?"
     ↓
 Caller: "3 pm works"
     ↓
-Atoms: POST /confirm-meeting { start, end, clientEmail, purpose, attendeeName }
+Agent: POST /confirm-meeting { start, end, clientEmail, purpose, attendeeName }
     ↓
 API: createEvent → sendBookingConfirmation
     ↓

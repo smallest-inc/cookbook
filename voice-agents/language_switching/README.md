@@ -176,8 +176,8 @@ language_switching/
 
 ## API Reference
 
-- [Core Concepts — Graphs](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew-core-concepts/graphs)
-- [Core Concepts — Nodes](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew-core-concepts/nodes)
+- [Core Concepts — Graphs](https://docs.smallest.ai/voice-agents/developer-guide/get-started/agent-crew-core-concepts/graphs)
+- [Core Concepts — Nodes](https://docs.smallest.ai/voice-agents/developer-guide/get-started/agent-crew-core-concepts/nodes)
 
 ## Next Steps
 

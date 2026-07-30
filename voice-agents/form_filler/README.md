@@ -476,7 +476,7 @@ Then create a matching Jotform form with the same labels, and the `JotformClient
 | `@function_tool` | `smallestai.atoms.crew.tools` | Decorator to register tools from methods |
 | `SDKAgentEndCallEvent` | `smallestai.atoms.crew.events` | End call |
 
-- Atoms SDK docs: [docs.smallest.ai](https://docs.smallest.ai)
+- Voice Agents SDK docs: [docs.smallest.ai](https://docs.smallest.ai)
 - Jotform API docs: [api.jotform.com/docs](https://api.jotform.com/docs/)
 
 ---

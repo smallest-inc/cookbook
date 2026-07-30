@@ -61,4 +61,4 @@ Every color comes from `Theme.kt` (`BrandColors.Teal`, `BrandColors.Surface`, et
 ## Reference
 
 - [React Native widget cookbook](../react_native_voice_widget/) — same pattern, earlier implementation with transcript + mute chunk-counter.
-- [Android (Kotlin) integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/android-kotlin) — raw protocol reference.
+- [Android (Kotlin) integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/android-kotlin) — raw protocol reference.

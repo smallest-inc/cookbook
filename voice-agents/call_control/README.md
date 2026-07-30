@@ -156,8 +156,8 @@ call_control/
 
 ## API Reference
 
-- [Call Control](https://docs.smallest.ai/atoms/developer-guide/build/calling/call-control)
-- [Core Concepts — Events](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew-core-concepts/events)
+- [Call Control](https://docs.smallest.ai/voice-agents/developer-guide/build/calling/call-control)
+- [Core Concepts — Events](https://docs.smallest.ai/voice-agents/developer-guide/get-started/agent-crew-core-concepts/events)
 
 ## Next Steps
 

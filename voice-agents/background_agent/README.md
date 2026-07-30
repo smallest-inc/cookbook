@@ -227,8 +227,8 @@ background_agent/
 
 ## API Reference
 
-- [Agents — Overview](https://docs.smallest.ai/atoms/developer-guide/build/agent-crews/overview)
-- [Core Concepts — Nodes](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew-core-concepts/nodes)
+- [Agents — Overview](https://docs.smallest.ai/voice-agents/developer-guide/build/agent-crews/overview)
+- [Core Concepts — Nodes](https://docs.smallest.ai/voice-agents/developer-guide/get-started/agent-crew-core-concepts/nodes)
 
 ## Next Steps
 

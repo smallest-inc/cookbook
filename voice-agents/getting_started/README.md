@@ -1,6 +1,6 @@
 # Getting Started
 
-Your first Atoms agent — from zero to a running AI assistant.
+Your first voice agent — from zero to a running AI assistant.
 
 ## Features
 
@@ -28,7 +28,7 @@ smallestai agent-crew chat
 
 ## Recommended Usage
 
-- Your starting point — the simplest possible Atoms agent with LLM responses
+- Your starting point — the simplest possible voice agent with LLM responses
 - Learning the core concepts: `OutputCrewNode`, `generate_response()`, `AtomsCrewApp`
 - For function calling, [Agent with Tools](../agent_with_tools/) is recommended
 
@@ -90,8 +90,8 @@ Assistant: The capital of France is Paris.
 
 ## API Reference
 
-- [Atoms SDK — Quick Start](https://docs.smallest.ai/atoms/developer-guide/get-started/quickstart)
-- [Core Concepts — Nodes](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew-core-concepts/nodes)
+- [Voice Agents SDK — Quick Start](https://docs.smallest.ai/voice-agents/developer-guide/get-started/quickstart)
+- [Core Concepts — Nodes](https://docs.smallest.ai/voice-agents/developer-guide/get-started/agent-crew-core-concepts/nodes)
 
 ## Next Steps
 

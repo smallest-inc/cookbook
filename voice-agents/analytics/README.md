@@ -208,7 +208,7 @@ analytics/
 
 ## API Reference
 
-- [Analytics — Overview](https://docs.smallest.ai/atoms/developer-guide/operate/analytics/overview)
+- [Analytics — Overview](https://docs.smallest.ai/voice-agents/developer-guide/operate/analytics/overview)
 
 ## Next Steps
 

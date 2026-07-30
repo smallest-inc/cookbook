@@ -374,7 +374,7 @@ async def generate_response(self):
 | `@function_tool` | `smallestai.atoms.crew.tools` | Decorator to register tools from methods |
 | `SDKAgentEndCallEvent` | `smallestai.atoms.crew.events` | End call |
 
-- Atoms SDK docs: [docs.smallest.ai](https://docs.smallest.ai)
+- Voice Agents SDK docs: [docs.smallest.ai](https://docs.smallest.ai)
 - Cal.com API docs: [cal.com/docs/api-reference](https://cal.com/docs/api-reference/v2)
 
 ---

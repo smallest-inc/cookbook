@@ -1,6 +1,6 @@
 # iOS Swift Voice Agent
 
-A minimal native iOS sample that opens a real-time voice session with a Smallest Atoms agent over the plain WebSocket endpoint. SwiftUI, `URLSessionWebSocketTask`, `AVAudioEngine`. iOS 16+.
+A minimal native iOS sample that opens a real-time voice session with a Smallest AI voice agent over the plain WebSocket endpoint. SwiftUI, `URLSessionWebSocketTask`, `AVAudioEngine`. iOS 16+.
 
 The app has the same UX as the [React Native cookbook](../react_native_voice_agent/) — status chip, two labelled waveforms (narrator + you), mute toggle, sending counter, in-app settings sheet wired to the full `draft → publish → activate` REST flow.
 
@@ -20,7 +20,7 @@ The app has the same UX as the [React Native cookbook](../react_native_voice_age
 - **macOS** with **Xcode 15+** (iOS 16 SDK or newer)
 - **[xcodegen](https://github.com/yonaskolb/XcodeGen)** — used to generate the `.xcodeproj` from `project.yml`. Install with `brew install xcodegen`.
 - A Smallest AI account and an API key from [app.smallest.ai/dashboard/api-keys](https://app.smallest.ai/dashboard/api-keys).
-- An Atoms **agent ID**. Create one in the dashboard, or use the Python setup script from the [React Native cookbook](../react_native_voice_agent/scripts/setup_agent.py) to create a Victorian-mystery narrator end-to-end.
+- A Voice Agents **agent ID**. Create one in the dashboard, or use the Python setup script from the [React Native cookbook](../react_native_voice_agent/scripts/setup_agent.py) to create a Victorian-mystery narrator end-to-end.
 
 ## Setup
 
@@ -117,6 +117,6 @@ During a session, the "sending · N" counter under the *you* waveform increments
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/atoms/api-reference/api-reference/realtime-agent/realtime-agent) — full event protocol.
-- [iOS (Swift) integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/ios-swift) — the integration reference this cookbook implements end-to-end.
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/voice-agents/api-reference/realtime-agent/realtime-agent) — full event protocol.
+- [iOS (Swift) integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/i-os-swift) — the integration reference this cookbook implements end-to-end.
 - [React Native voice agent cookbook](../react_native_voice_agent/) — the same app pattern in React Native.

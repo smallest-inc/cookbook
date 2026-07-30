@@ -17,11 +17,11 @@
 
 # Smallest AI Cookbook
 
-Smallest AI offers an end-to-end Voice AI suite for developers building real-time voice agents. You can use our Speech-to-Text APIs through Pulse STT for high-accuracy transcription, our Text-to-Speech APIs through Lightning TTS for natural-sounding speech synthesis, or use the Atoms Client to build and operate enterprise-ready Voice Agents with features like tool calling, knowledge bases, and campaign management.
+Smallest AI offers an end-to-end Voice AI suite for developers building real-time voice agents. You can use our Speech-to-Text APIs through Pulse STT for high-accuracy transcription, our Text-to-Speech APIs through Lightning TTS for natural-sounding speech synthesis, or use the Voice Agents platform to build and operate enterprise-ready voice agents with features like tool calling, knowledge bases, and campaign management.
 
 This cookbook contains practical examples and tutorials for building with Smallest AI's APIs. Each example is self-contained and demonstrates a real-world use case — from basic transcription to fully autonomous voice agents.
 
-**Documentation:** [Waves (STT & TTS)](https://waves-docs.smallest.ai) · [Atoms (Voice Agents)](https://docs.smallest.ai/atoms/developer-guide) · [Python SDK](https://github.com/smallest-inc/smallest-python-sdk)
+**Documentation:** [Waves (STT & TTS)](https://waves-docs.smallest.ai) · [Voice Agents](https://docs.smallest.ai/voice-agents/developer-guide) · [Python SDK](https://github.com/smallest-inc/smallest-python-sdk)
 
 ---
 
@@ -149,7 +149,7 @@ Full-duplex voice conversations with a single model: stream microphone audio in,
 
 ## Voice Agents Examples
 
-Build AI voice agents that can talk to anyone on voice or text, in any language, in any voice. The Atoms SDK provides abstractions like KnowledgeBase, Campaigns, and graph-based Workflows to let you build the smartest voice agent for your use case. Powered by the [Atoms SDK](https://docs.smallest.ai/atoms/developer-guide).
+Build AI voice agents that can talk to anyone on voice or text, in any language, in any voice. The Voice Agents SDK provides abstractions like KnowledgeBase, Campaigns, and graph-based Workflows to let you build the smartest voice agent for your use case. Powered by the [Voice Agents SDK](https://docs.smallest.ai/voice-agents/developer-guide).
 
 ### Basics
 
@@ -178,7 +178,7 @@ Build AI voice agents that can talk to anyone on voice or text, in any language,
 
 - [Bank CSR](./voice-agents/bank_csr/) — Full banking agent — SQL queries, multi-round tool chaining, identity verification, FD management, audit logging
 - [Calendar Receptionist](./voice-agents/calendar_receptionist/) — Google Calendar, webhooks, agent duplication, React client
-- [Multi-Agent Voice AI Dashboard](./voice-agents/atoms_sdk_web_agent/) — Real-time dashboard with specialized agents for gaming and utility powered by Atoms SDK.
+- [Multi-Agent Voice AI Dashboard](./voice-agents/atoms_sdk_web_agent/) — Real-time dashboard with specialized agents for gaming and utility powered by the Voice Agents SDK.
 
 ### Mobile Apps
 
@@ -197,7 +197,7 @@ smallestai agent-crew deploy --entry app.py         # package + ship to the clou
 smallestai agent-crew builds                        # pick the new build → choose "Make Live"
 ```
 
-Then place a call from the [Smallest Platform](https://app.smallest.ai) dashboard. Full walkthrough in the [Agent Crew Reference](https://docs.smallest.ai/atoms/developer-guide/get-started/agent-crew-cli).
+Then place a call from the [Smallest Platform](https://app.smallest.ai) dashboard. Full walkthrough in the [Agent Crew Reference](https://docs.smallest.ai/voice-agents/developer-guide/get-started/agents-cli).
 
 > **Heads-up:** the deploy pipeline does not yet propagate `.env` values (like `OPENAI_API_KEY`) into the running pod. Examples that depend on third-party API keys work locally but currently fail on a real call with `openai.OpenAIError: Missing credentials`. See the [background_agent](./voice-agents/background_agent/#5-deploy-to-smallest-platform) example for context.
 
