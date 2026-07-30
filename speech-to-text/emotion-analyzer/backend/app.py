@@ -26,14 +26,14 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__, static_folder="../frontend", static_url_path="")
 
-API_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
+API_URL = "https://api.smallest.ai/waves/v1/stt/"
 API_KEY = os.environ.get("SMALLEST_API_KEY", "")
 MAX_WORKERS = 10
 
 
 def transcribe_with_diarization(audio_bytes: bytes) -> dict:
     headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/octet-stream"}
-    params = {"language": "en", "diarize": "true", "word_timestamps": "true"}
+    params = {"model": "pulse", "language": "en", "diarize": "true", "word_timestamps": "true"}
     logger.info("Transcribing audio (%d bytes)...", len(audio_bytes))
     resp = requests.post(API_URL, headers=headers, params=params, data=audio_bytes, timeout=600)
     resp.raise_for_status()
@@ -44,7 +44,7 @@ def transcribe_with_diarization(audio_bytes: bytes) -> dict:
 
 def detect_emotions_for_segment(segment_bytes: bytes) -> dict:
     headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/octet-stream"}
-    params = {"language": "en", "emotion_detection": "true"}
+    params = {"model": "pulse", "language": "en", "emotion_detection": "true"}
     resp = requests.post(API_URL, headers=headers, params=params, data=segment_bytes, timeout=300)
     resp.raise_for_status()
     return resp.json()

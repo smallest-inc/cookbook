@@ -68,8 +68,8 @@ Open the page, grant microphone permission, and **hold the mic button** while yo
                         │ wss              │ https             │ wss
                         ▼                  ▼                   ▼
               wss://api.smallest.ai  POST https://...  wss://api.smallest.ai
-              /waves/v1/pulse/        /waves/v1/chat/    /waves/v1/tts/live
-              get_text                completions
+              /waves/v1/stt/live      /waves/v1/chat/    /waves/v1/tts/live
+              ?model=pulse            completions
               (Pulse STT)             (Electron LLM)    (Lightning v3.1)
 ```
 
@@ -325,7 +325,7 @@ Each file is ≤ 250 lines. Read `lib/usePulseSTT.ts` first if you want to see t
 
 | Endpoint | Purpose | Auth |
 |---|---|---|
-| `wss://api.smallest.ai/waves/v1/pulse/get_text` | Live STT | `Authorization: Bearer <SMALLEST_API_KEY>` |
+| `wss://api.smallest.ai/waves/v1/stt/live?model=pulse` | Live STT | `Authorization: Bearer <SMALLEST_API_KEY>` |
 | `wss://api.smallest.ai/waves/v1/tts/live` | Streaming TTS (Lightning v3.1) | `Authorization: Bearer <SMALLEST_API_KEY>` |
 | `https://api.smallest.ai/waves/v1/chat/completions` | LLM (Electron, OpenAI-compatible) | `Authorization: Bearer <SMALLEST_API_KEY>` |
 

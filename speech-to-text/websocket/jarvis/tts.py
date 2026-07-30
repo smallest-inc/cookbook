@@ -17,7 +17,7 @@ import threading
 import httpx
 import pyaudio
 
-TTS_URL = "https://waves-api.smallest.ai/api/v1/lightning-v3.1/get_speech"
+TTS_URL = "https://api.smallest.ai/waves/v1/tts"
 TTS_VOICE = "sophia"
 TTS_SAMPLE_RATE = 24000
 PLAYBACK_CHUNK_SIZE = 4800
@@ -86,6 +86,7 @@ class TTSClient:
             "Content-Type": "application/json",
         }
         payload = {
+            "model": "lightning_v3.1",
             "text": text,
             "voice_id": self.voice,
             "sample_rate": self.sample_rate,

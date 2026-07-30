@@ -21,7 +21,7 @@ def transcribe_from_url(audio_url: str, language: str = "en") -> dict:
     if not api_key:
         raise ValueError("SMALLEST_API_KEY environment variable not set")
 
-    url = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
+    url = "https://api.smallest.ai/waves/v1/stt/"
 
     print(f"🔗 URL: {audio_url}")
     print(f"🌐 Language: {language}")

@@ -36,11 +36,12 @@ load_dotenv()
 RECALL_API_URL = "https://us-west-2.recall.ai/api/v1"
 RECALL_API_KEY = os.environ.get("RECALL_API_KEY")
 
-PULSE_API_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
+PULSE_API_URL = "https://api.smallest.ai/waves/v1/stt/"
 SMALLEST_API_KEY = os.environ.get("SMALLEST_API_KEY")
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
+MODEL = "pulse"
 LANGUAGE = "en"
 DIARIZE = True
 
@@ -314,6 +315,7 @@ def transcribe_with_pulse(audio_path: str) -> dict:
             "Content-Type": "application/octet-stream",
         },
         params={
+            "model": MODEL,
             "language": LANGUAGE,
             "diarize": str(DIARIZE).lower(),
         },

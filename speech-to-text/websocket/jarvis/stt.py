@@ -20,7 +20,7 @@ from urllib.parse import urlencode
 import pyaudio
 import websockets
 
-STT_WS_URL = "wss://waves-api.smallest.ai/api/v1/pulse/get_text"
+STT_WS_URL = "wss://api.smallest.ai/waves/v1/stt/live"
 STT_SAMPLE_RATE = 16000
 STT_LANGUAGE = "en"
 
@@ -76,6 +76,7 @@ class STTClient:
     async def connect(self):
         """Connect to STT WebSocket and start audio capture."""
         params = {
+            "model": "pulse",
             "language": self.language,
             "encoding": "linear16",
             "sample_rate": self.sample_rate,

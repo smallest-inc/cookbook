@@ -45,6 +45,7 @@ class PulseStreamingClient {
 
   private buildUrl(): string {
     const params = new URLSearchParams({
+      model: 'pulse',
       language: this.language,
       encoding: 'linear16',
       sample_rate: this.sampleRate.toString(),
@@ -52,7 +53,7 @@ class PulseStreamingClient {
       full_transcript: 'true'
     });
 
-    return `wss://waves-api.smallest.ai/api/v1/pulse/get_text?${params}`;
+    return `wss://api.smallest.ai/waves/v1/stt/live?${params}`;
   }
 
   async connect(
@@ -107,7 +108,7 @@ class PulseStreamingClient {
 
   sendEnd(): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ type: 'end' }));
+      this.ws.send(JSON.stringify({ type: 'close_stream' }));
     }
   }
 

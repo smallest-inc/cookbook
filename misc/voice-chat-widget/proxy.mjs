@@ -3,7 +3,7 @@
  * headers) to Smallest's WSS endpoints (which require Authorization: Bearer).
  *
  * Listens on ws://localhost:3031 with two routes:
- *   /stt?language=en   →  wss://api.smallest.ai/waves/v1/pulse/get_text?language=en
+ *   /stt?model=pulse&language=en   →  wss://api.smallest.ai/waves/v1/stt/live?model=pulse&language=en
  *   /tts               →  wss://api.smallest.ai/waves/v1/tts/live
  *
  * Both upstream connections are opened with the SMALLEST_API_KEY env var set
@@ -24,7 +24,7 @@ if (!API_KEY) {
 }
 
 const ROUTES = {
-  "/stt": "wss://api.smallest.ai/waves/v1/pulse/get_text",
+  "/stt": "wss://api.smallest.ai/waves/v1/stt/live",
   "/tts": "wss://api.smallest.ai/waves/v1/tts/live",
 };
 
@@ -113,7 +113,7 @@ http.on("upgrade", (req, socket, head) => {
 
 http.listen(PORT, () => {
   console.log(`[proxy] listening on ws://localhost:${PORT}`);
-  console.log(`[proxy]   /stt → wss://api.smallest.ai/waves/v1/pulse/get_text`);
+  console.log(`[proxy]   /stt → wss://api.smallest.ai/waves/v1/stt/live`);
   console.log(`[proxy]   /tts → wss://api.smallest.ai/waves/v1/tts/live`);
 });
 

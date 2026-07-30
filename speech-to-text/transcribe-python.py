@@ -16,8 +16,8 @@ API_KEY = os.environ["SMALLEST_API_KEY"]
 SAMPLE_URL = "https://github.com/smallest-inc/cookbook/raw/main/speech-to-text/getting-started/samples/audio.wav"
 
 response = requests.post(
-    "https://api.smallest.ai/waves/v1/pulse/get_text",
-    params={"language": "en"},
+    "https://api.smallest.ai/waves/v1/stt/",
+    params={"model": "pulse", "language": "en"},
     headers={
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json",

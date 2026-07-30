@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SMALLEST_API_KEY = os.getenv("SMALLEST_API_KEY")
-SMALLEST_STT_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
+SMALLEST_STT_URL = "https://api.smallest.ai/waves/v1/stt/"
 
 # Global session to reuse TCP connections (Keep-Alive)
 session = requests.Session()

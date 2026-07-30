@@ -10,8 +10,8 @@ import { createServer } from 'http';
 import { parse } from 'url';
 
 const WS_PORT = 3001;
-// Pulse STT WebSocket endpoint (official v4.0.0 endpoint)
-const PULSE_WS_URL = 'wss://waves-api.smallest.ai/api/v1/pulse/get_text';
+// Pulse STT WebSocket endpoint (unified STT route)
+const PULSE_WS_URL = 'wss://api.smallest.ai/waves/v1/stt/live';
 
 // Get API key from environment
 const API_KEY = process.env.SMALLEST_API_KEY;
@@ -40,6 +40,7 @@ wss.on('connection', (clientWs, req) => {
   
   // Build Lightning STT WebSocket URL with parameters
   const pulseParams = new URLSearchParams({
+    model: 'pulse',
     language: language,
     sample_rate: sampleRate,
     encoding: 'linear16',
@@ -105,7 +106,7 @@ wss.on('connection', (clientWs, req) => {
           console.log('📤 Control message:', message);
           if (message.type === 'end') {
             // Signal end of audio stream
-            pulseWs.send(JSON.stringify({ type: 'end' }));
+            pulseWs.send(JSON.stringify({ type: 'close_stream' }));
           }
         } catch (e) {
           // Not JSON, treat as audio data

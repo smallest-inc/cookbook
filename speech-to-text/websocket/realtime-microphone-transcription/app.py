@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-WS_URL = "wss://waves-api.smallest.ai/api/v1/pulse/get_text"
+WS_URL = "wss://api.smallest.ai/waves/v1/stt/live"
 SAMPLE_RATE = 16000
 API_KEY = os.environ.get("SMALLEST_API_KEY")
 if API_KEY is None:
@@ -45,6 +45,7 @@ class TranscriptionSession:
             return
 
         params = {
+            "model": "pulse",
             "language": "en",
             "encoding": "linear16",
             "sample_rate": SAMPLE_RATE,
@@ -89,7 +90,7 @@ class TranscriptionSession:
     def end_session(self):
         if self.ws and self.is_active:
             try:
-                self.ws.send(json.dumps({"type": "end"}))
+                self.ws.send(json.dumps({"type": "close_stream"}))
             except Exception:
                 pass
 

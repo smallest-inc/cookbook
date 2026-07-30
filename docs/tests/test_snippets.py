@@ -17,7 +17,7 @@ import pytest
 API_KEY = os.environ.get("SMALLEST_API_KEY")
 SAMPLE_URL = "https://github.com/smallest-inc/cookbook/raw/main/speech-to-text/getting-started/samples/audio.wav"
 TTS_ENDPOINT = "https://api.smallest.ai/waves/v1/lightning-v3.1/get_speech"
-STT_ENDPOINT = "https://api.smallest.ai/waves/v1/pulse/get_text"
+STT_ENDPOINT = "https://api.smallest.ai/waves/v1/stt/"
 VOICES_ENDPOINT = "https://api.smallest.ai/waves/v1/lightning-v3.1/get_voices"
 SSE_ENDPOINT = "https://api.smallest.ai/waves/v1/lightning-v3.1/stream"
 
@@ -106,7 +106,7 @@ class TestSTT:
     def test_transcribe_url(self, auth_headers):
         r = _retry(lambda: requests.post(
             STT_ENDPOINT,
-            params={"language": "en"},
+            params={"model": "pulse", "language": "en"},
             headers={**auth_headers, "Content-Type": "application/json"},
             json={"url": SAMPLE_URL},
             timeout=120,
@@ -122,7 +122,7 @@ class TestSTT:
 
         r = _retry(lambda: requests.post(
             STT_ENDPOINT,
-            params={"language": "en"},
+            params={"model": "pulse", "language": "en"},
             headers={**auth_headers, "Content-Type": "audio/wav"},
             data=audio,
             timeout=120,
@@ -135,7 +135,7 @@ class TestSTT:
         audio = requests.get(SAMPLE_URL).content
         r = _retry(lambda: requests.post(
             STT_ENDPOINT,
-            params={"language": "en", "word_timestamps": "true", "diarize": "true"},
+            params={"model": "pulse", "language": "en", "word_timestamps": "true", "diarize": "true"},
             headers={**auth_headers, "Content-Type": "audio/wav"},
             data=audio,
             timeout=120,

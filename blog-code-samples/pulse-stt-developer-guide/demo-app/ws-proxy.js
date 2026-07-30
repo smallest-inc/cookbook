@@ -37,6 +37,7 @@ wss.on('connection', (clientWs, req) => {
   
   // Build Pulse STT WebSocket URL
   const params = new URLSearchParams({
+    model: 'pulse',
     language: language,
     encoding: 'linear16',
     sample_rate: '16000',
@@ -44,7 +45,7 @@ wss.on('connection', (clientWs, req) => {
     full_transcript: 'true'
   });
   
-  const pulseUrl = `wss://waves-api.smallest.ai/api/v1/pulse/get_text?${params}`;
+  const pulseUrl = `wss://api.smallest.ai/waves/v1/stt/live?${params}`;
   
   // Connect to Pulse STT
   const pulseWs = new WebSocket(pulseUrl, {
@@ -96,7 +97,7 @@ wss.on('connection', (clientWs, req) => {
         try {
           const msg = JSON.parse(data.toString());
           if (msg.type === 'end') {
-            pulseWs.send(JSON.stringify({ type: 'end' }));
+            pulseWs.send(JSON.stringify({ type: 'close_stream' }));
           }
         } catch (e) {
           // Binary data, forward as-is
