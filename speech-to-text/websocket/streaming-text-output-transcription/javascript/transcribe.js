@@ -17,7 +17,7 @@ const path = require("path");
 const WebSocket = require("ws");
 const wav = require("wav");
 
-const WS_URL = "wss://waves-api.smallest.ai/api/v1/pulse/get_text";
+const WS_URL = "wss://api.smallest.ai/waves/v1/stt/live";
 const OUTPUT_DIR = ".";
 
 // The following are all the features supported by the WebSocket endpoint (Streaming API)
@@ -68,6 +68,7 @@ async function loadAudio(audioFile) {
 
 async function transcribe(audioFile, apiKey, onResponse) {
   const params = new URLSearchParams({
+    model: "pulse",
     language: LANGUAGE,
     encoding: ENCODING,
     sample_rate: SAMPLE_RATE,
@@ -100,7 +101,7 @@ async function transcribe(audioFile, apiKey, onResponse) {
         ws.send(Buffer.from(chunk.buffer, chunk.byteOffset, chunk.byteLength));
         await new Promise((r) => setTimeout(r, chunkDuration * 1000));
       }
-      ws.send(JSON.stringify({ type: "end" }));
+      ws.send(JSON.stringify({ type: "close_stream" }));
     });
 
     ws.on("message", (data) => {

@@ -119,7 +119,7 @@ import websockets
 from jiwer import process_words
 from tqdm import tqdm
 
-PULSE_WS_URL = os.environ.get("PULSE_WS_URL", "wss://api.smallest.ai/waves/v1/pulse/get_text")
+PULSE_WS_URL = os.environ.get("PULSE_WS_URL", "wss://api.smallest.ai/waves/v1/stt/live")
 
 SAMPLE_RATE = 16000
 ENCODING = "linear16"        # 16-bit signed little-endian PCM — what Pulse expects on the wire
@@ -164,7 +164,7 @@ async def stream_clip(audio_path: Path, language: str, api_key: str) -> dict[str
     audio, _ = librosa.load(audio_path.as_posix(), sr=SAMPLE_RATE, mono=True)
     audio_seconds = len(audio) / SAMPLE_RATE
 
-    params = f"language={language}&encoding={ENCODING}&sample_rate={SAMPLE_RATE}"
+    params = f"model=pulse&language={language}&encoding={ENCODING}&sample_rate={SAMPLE_RATE}"
     ws_url = f"{PULSE_WS_URL}?{params}"
 
     segments: list[str] = []

@@ -26,7 +26,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-WS_URL = "wss://waves-api.smallest.ai/api/v1/pulse/get_text"
+WS_URL = "wss://api.smallest.ai/waves/v1/stt/live"
 OUTPUT_DIR = "."
 
 # The following are all the features supported by the WebSocket endpoint (Streaming API)
@@ -45,6 +45,7 @@ KEYWORDS = []
 
 async def transcribe(audio_file: str, api_key: str, on_response):
     params = {
+        "model": "pulse",
         "language": LANGUAGE,
         "encoding": ENCODING,
         "sample_rate": SAMPLE_RATE,
@@ -73,7 +74,7 @@ async def transcribe(audio_file: str, api_key: str, on_response):
                 pcm16 = (chunk * 32768.0).astype(np.int16).tobytes()
                 await ws.send(pcm16)
                 await asyncio.sleep(chunk_duration)
-            await ws.send(json.dumps({"type": "end"}))
+            await ws.send(json.dumps({"type": "close_stream"}))
 
         async def receive_responses():
             async for message in ws:

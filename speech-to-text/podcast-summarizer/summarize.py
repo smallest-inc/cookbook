@@ -29,8 +29,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
+API_URL = "https://api.smallest.ai/waves/v1/stt/"
 
+MODEL = "pulse"
 LANGUAGE = "en"  # Use ISO 639-1 codes or "multi" for auto-detect
 
 SUMMARIZE_PROMPT = """You are an expert podcast summarizer. Analyze the following podcast transcript and create a concise, well-structured summary.
@@ -78,6 +79,7 @@ def transcribe(input_file: str, api_key: str) -> str:
             "Content-Type": "application/octet-stream",
         },
         params={
+            "model": MODEL,
             "language": LANGUAGE,
         },
         data=file_data,

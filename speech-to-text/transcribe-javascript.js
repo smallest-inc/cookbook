@@ -11,9 +11,9 @@
 
 const SAMPLE_URL = "https://github.com/smallest-inc/cookbook/raw/main/speech-to-text/getting-started/samples/audio.wav";
 
-const params = new URLSearchParams({ language: "en" });
+const params = new URLSearchParams({ model: "pulse", language: "en" });
 const response = await fetch(
-  `https://api.smallest.ai/waves/v1/pulse/get_text?${params}`,
+  `https://api.smallest.ai/waves/v1/stt/?${params}`,
   {
     method: "POST",
     headers: {

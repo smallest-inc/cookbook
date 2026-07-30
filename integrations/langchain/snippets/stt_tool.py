@@ -18,7 +18,7 @@ import requests
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 
-PULSE_API_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
+PULSE_API_URL = "https://api.smallest.ai/waves/v1/stt/"
 
 
 class STTInput(BaseModel):
@@ -57,7 +57,7 @@ class PulseSTTTool(BaseTool):
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/octet-stream",
             },
-            params={"language": language},
+            params={"model": "pulse", "language": language},
             data=audio_data,
             timeout=120,
         )
@@ -86,7 +86,7 @@ class PulseSTTTool(BaseTool):
                     "Authorization": f"Bearer {self.api_key}",
                     "Content-Type": "application/octet-stream",
                 },
-                params={"language": language},
+                params={"model": "pulse", "language": language},
                 content=audio_data,
                 timeout=120,
             )

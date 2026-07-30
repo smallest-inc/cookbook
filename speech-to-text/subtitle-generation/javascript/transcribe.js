@@ -15,8 +15,9 @@
 const fs = require("fs");
 const path = require("path");
 
-const API_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text";
+const API_URL = "https://api.smallest.ai/waves/v1/stt/";
 
+const MODEL = "pulse";
 const LANGUAGE = "en"; // Use ISO 639-1 codes or "multi" for auto-detect
 const WORDS_PER_SEGMENT = 10; // Maximum words per subtitle segment
 const MAX_SEGMENT_DURATION = 5.0; // Maximum duration per segment in seconds
@@ -25,6 +26,7 @@ async function transcribe(inputFile, apiKey) {
   const fileData = fs.readFileSync(inputFile);
 
   const params = new URLSearchParams({
+    model: MODEL,
     language: LANGUAGE,
     word_timestamps: "true",
   });

@@ -21,8 +21,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
+API_URL = "https://api.smallest.ai/waves/v1/stt/"
 
+MODEL = "pulse"
 LANGUAGE = "en"  # Use ISO 639-1 codes or "multi" for auto-detect
 WORDS_PER_SEGMENT = 10  # Maximum words per subtitle segment
 MAX_SEGMENT_DURATION = 5.0  # Maximum duration per segment in seconds
@@ -39,6 +40,7 @@ def transcribe(audio_file: str, api_key: str) -> dict:
             "Content-Type": "application/octet-stream",
         },
         params={
+            "model": MODEL,
             "language": LANGUAGE,
             "word_timestamps": "true",
         },

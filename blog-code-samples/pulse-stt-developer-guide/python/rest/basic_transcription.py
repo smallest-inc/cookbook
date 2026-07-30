@@ -30,7 +30,7 @@ def transcribe_audio_file(
     if not api_key:
         raise ValueError("SMALLEST_API_KEY environment variable not set")
 
-    url = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
+    url = "https://api.smallest.ai/waves/v1/stt/"
 
     # Determine content type based on file extension
     ext = file_path.lower().split('.')[-1]

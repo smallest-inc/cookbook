@@ -97,7 +97,7 @@ npm run dev
                                     │                  │ POST          │ wss
                                     ▼                  ▼               ▼
             wss://api.smallest.ai/waves/v1     /waves/v1/chat/   wss://api.smallest.ai/
-            /pulse/get_text                    completions       waves/v1/tts/live
+            /stt/live?model=pulse              completions       waves/v1/tts/live
             (Pulse STT, SDK-managed)           (Electron LLM)    (Lightning v3.1)
 ```
 
@@ -159,7 +159,7 @@ Both folders share the same UI files and produce identical UX. The diff is purel
 
 | Endpoint | Reached via | Auth |
 |---|---|---|
-| `wss://api.smallest.ai/waves/v1/pulse/get_text` | `smallestai.transcriptionStream` (browser-direct) | `?token=…` query param (demo) or signed URL (prod) |
+| `wss://api.smallest.ai/waves/v1/stt/live?model=pulse` | `smallestai.transcriptionStream` (browser-direct) | `?token=…` query param (demo) or signed URL (prod) |
 | `https://api.smallest.ai/waves/v1/chat/completions` | `streamText` + `@ai-sdk/openai-compatible` (server-side) | `Authorization: Bearer` from server env |
 | `wss://api.smallest.ai/waves/v1/tts/live` | Raw WS via `proxy.mjs` (server-side) | `Authorization: Bearer` from proxy env |
 

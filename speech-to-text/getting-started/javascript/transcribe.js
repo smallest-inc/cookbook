@@ -12,15 +12,17 @@
 
 const fs = require("fs");
 
-const API_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text";
+const API_URL = "https://api.smallest.ai/waves/v1/stt/";
 
 // Features
+const MODEL = "pulse";
 const LANGUAGE = "en"; // Use ISO 639-1 codes or "multi" for auto-detect
 
 async function transcribe(audioFile, apiKey) {
   const audioData = fs.readFileSync(audioFile);
 
   const params = new URLSearchParams({
+    model: MODEL,
     language: LANGUAGE,
   });
 
