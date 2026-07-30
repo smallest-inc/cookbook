@@ -19,9 +19,12 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from subtitle_utils import format_timestamp_srt, format_timestamp_vtt, generate_srt, generate_vtt
+
 load_dotenv()
 
-API_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
+API_URL = "https://api.smallest.ai/waves/v1/pulse/get_text"
 
 LANGUAGE = "en"  # Use ISO 639-1 codes or "multi" for auto-detect
 WORDS_PER_SEGMENT = 10  # Maximum words per subtitle segment
@@ -50,24 +53,6 @@ def transcribe(audio_file: str, api_key: str) -> dict:
         raise Exception(f"API request failed with status {response.status_code}: {response.text}")
 
     return response.json()
-
-
-def format_time_srt(seconds: float) -> str:
-    """Format seconds to SRT timestamp: HH:MM:SS,mmm"""
-    hours = int(seconds // 3600)
-    minutes = int((seconds % 3600) // 60)
-    secs = int(seconds % 60)
-    millis = int((seconds % 1) * 1000)
-    return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
-
-
-def format_time_vtt(seconds: float) -> str:
-    """Format seconds to VTT timestamp: HH:MM:SS.mmm"""
-    hours = int(seconds // 3600)
-    minutes = int((seconds % 3600) // 60)
-    secs = int(seconds % 60)
-    millis = int((seconds % 1) * 1000)
-    return f"{hours:02d}:{minutes:02d}:{secs:02d}.{millis:03d}"
 
 
 def create_segments(words: list) -> list:
@@ -101,32 +86,6 @@ def create_segments(words: list) -> list:
         })
 
     return segments
-
-
-def generate_srt(segments: list) -> str:
-    """Generate SRT format subtitles."""
-    lines = []
-    for i, segment in enumerate(segments, 1):
-        start = format_time_srt(segment["start"])
-        end = format_time_srt(segment["end"])
-        lines.append(f"{i}")
-        lines.append(f"{start} --> {end}")
-        lines.append(segment["text"])
-        lines.append("")
-    return "\n".join(lines)
-
-
-def generate_vtt(segments: list) -> str:
-    """Generate WebVTT format subtitles."""
-    lines = ["WEBVTT", ""]
-    for i, segment in enumerate(segments, 1):
-        start = format_time_vtt(segment["start"])
-        end = format_time_vtt(segment["end"])
-        lines.append(f"{i}")
-        lines.append(f"{start} --> {end}")
-        lines.append(segment["text"])
-        lines.append("")
-    return "\n".join(lines)
 
 
 def process_response(result: dict, audio_path: Path):

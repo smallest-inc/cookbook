@@ -6,23 +6,24 @@ Convert audio to text using Smallest AI's Pulse Speech-to-Text API. Supports 30+
 
 ## Examples
 
-| Example | Description |
-|---------|-------------|
-| [Getting Started](./getting-started/) | Basic transcription - the simplest way to get started |
-| [Word-Level Outputs](./word-level-outputs/) | Word timestamps and speaker diarization |
-| [Subtitle Generation](./subtitle-generation/) | Generate SRT/VTT subtitles from audio or video |
-| [Meeting Notes](./meeting-notes/) | Join meetings via Recall.ai, auto-identify speakers by name |
-| [Podcast Summarizer](./podcast-summarizer/) | Transcribe and summarize podcasts with GPT-4o |
-| [File Transcription](./file-transcription/) | Transcribe files with all advanced features |
-| [Emotion Analyzer](./emotion-analyzer/) | Visualize speaker emotions across a conversation with interactive charts |
+| Example                                                               | Description                                                              |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [Getting Started](./getting-started/)                                 | Basic transcription - the simplest way to get started                    |
+| [Word-Level Outputs](./word-level-outputs/)                           | Word timestamps and speaker diarization                                  |
+| [Subtitle Generation](./subtitle-generation/)                         | Generate SRT/VTT subtitles from audio or video                           |
+| [Multilingual Live Captions](./websocket/multilingual-live-captions/) | Auto-detect language, translate, and preview live SRT captions           |
+| [Meeting Notes](./meeting-notes/)                                     | Join meetings via Recall.ai, auto-identify speakers by name              |
+| [Podcast Summarizer](./podcast-summarizer/)                           | Transcribe and summarize podcasts with GPT-4o                            |
+| [File Transcription](./file-transcription/)                           | Transcribe files with all advanced features                              |
+| [Emotion Analyzer](./emotion-analyzer/)                               | Visualize speaker emotions across a conversation with interactive charts |
 
 ### WebSocket Examples
 
-| Example | Description |
-|---------|-------------|
-| [Streaming Transcription](./websocket/streaming-text-output-transcription/) | Stream audio files via WebSocket |
-| [Realtime Microphone](./websocket/realtime-microphone-transcription/) | Gradio web UI with live microphone transcription |
-| [Jarvis Voice Assistant](./websocket/jarvis/) | Always-on assistant with wake word, LLM, and TTS |
+| Example                                                                     | Description                                      |
+| --------------------------------------------------------------------------- | ------------------------------------------------ |
+| [Streaming Transcription](./websocket/streaming-text-output-transcription/) | Stream audio files via WebSocket                 |
+| [Realtime Microphone](./websocket/realtime-microphone-transcription/)       | Gradio web UI with live microphone transcription |
+| [Jarvis Voice Assistant](./websocket/jarvis/)                               | Always-on assistant with wake word, LLM, and TTS |
 
 ## Quick Start
 
