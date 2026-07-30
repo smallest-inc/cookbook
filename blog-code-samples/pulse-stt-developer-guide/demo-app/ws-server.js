@@ -91,10 +91,11 @@ wss.on('connection', (clientWs, req) => {
   
   // Forward audio data from client to Pulse STT
   let audioChunkCount = 0;
-  clientWs.on('message', (data) => {
+  clientWs.on('message', (data, isBinary) => {
     if (pulseWs.readyState === WebSocket.OPEN) {
-      // Check if it's a control message (JSON) or audio data (binary)
-      if (Buffer.isBuffer(data) || data instanceof ArrayBuffer) {
+      // ws delivers text frames as Buffers too, so use the isBinary flag
+      // to tell audio (binary) apart from JSON control messages (text)
+      if (isBinary) {
         audioChunkCount++;
         if (audioChunkCount % 50 === 1) {
           console.log(`🎵 Sending audio chunk #${audioChunkCount}, size: ${data.length} bytes`);

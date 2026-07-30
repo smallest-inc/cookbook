@@ -30,6 +30,7 @@ interface ASRResponse {
 class PulseStreamingClient {
   private ws: WebSocket | null = null;
   private apiKey: string;
+  private lastReceived: (() => void) | null = null;
   private language: string;
   private sampleRate: number;
 
@@ -83,6 +84,10 @@ class PulseStreamingClient {
 
           if (response.transcript) {
             onTranscript(response.transcript, response.is_final || false);
+          }
+
+          if (response.is_last) {
+            this.lastReceived?.();
           }
         } catch (err) {
           console.error('❌ Parse error:', err);
@@ -140,11 +145,13 @@ class PulseStreamingClient {
       await new Promise(r => setTimeout(r, 50));
     }
 
-    // Signal end of audio
-    this.sendEnd();
-
-    // Wait for final transcripts
-    await new Promise(r => setTimeout(r, 3000));
+    // Signal end of audio, then wait for the terminal is_last message
+    // (with a timeout fallback in case the connection drops first)
+    await new Promise<void>(r => {
+      const timer = setTimeout(r, 10000);
+      this.lastReceived = () => { clearTimeout(timer); r(); };
+      this.sendEnd();
+    });
     this.close();
 
     return transcripts;
