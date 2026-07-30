@@ -78,9 +78,9 @@ uv run export_transcripts.py --agent agent_123 --limit 50 --output data.json
 Define custom metrics that are extracted from every call:
 
 ```python
-from smallestai.atoms import Call
+from smallestai.atoms.helpers import CallAnalytics
 
-call = Call()
+call = CallAnalytics()
 
 call.set_post_call_config(
     agent_id="agent_123",
@@ -89,18 +89,18 @@ call.set_post_call_config(
         {
             "identifier": "outcome",
             "dispositionMetricPrompt": "What was the call outcome?",
-            "dispositionValues": {"type": "ENUM"},
+            "dispositionMetricType": "ENUM",
             "choices": ["Resolved", "Escalated", "Callback"]
         },
         {
             "identifier": "customer_name",
             "dispositionMetricPrompt": "What is the customer's name?",
-            "dispositionValues": {"type": "STRING"}
+            "dispositionMetricType": "STRING"
         },
         {
             "identifier": "satisfied",
             "dispositionMetricPrompt": "Was the customer satisfied?",
-            "dispositionValues": {"type": "BOOLEAN"}
+            "dispositionMetricType": "BOOLEAN"
         }
     ]
 )
@@ -134,9 +134,9 @@ print(f"Satisfied: {disposition.get('satisfied')}")
 ### Get Calls with Filters
 
 ```python
-from smallestai.atoms import Call
+from smallestai.atoms.helpers import CallAnalytics
 
-call = Call()
+call = CallAnalytics()
 
 # Get completed calls for an agent
 result = call.get_calls(

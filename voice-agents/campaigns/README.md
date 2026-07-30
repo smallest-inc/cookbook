@@ -87,7 +87,7 @@ uv run add_contacts.py
 ### Creating an Audience
 
 ```python
-from smallestai.atoms import Audience
+from smallestai.atoms.helpers import Audience
 
 audience = Audience()
 
@@ -104,7 +104,7 @@ audience_id = result["data"]["_id"]
 ### Creating a Campaign
 
 ```python
-from smallestai.atoms import Campaign
+from smallestai.atoms.helpers import Campaign
 
 campaign = Campaign()
 
@@ -112,7 +112,7 @@ result = campaign.create(
     name="My Campaign",
     agent_id="agent_123",
     audience_id="audience_456",
-    phone_ids=["phone_789"],  # Get from get_phone_numbers()
+    phone_ids=["phone_789"],  # Get from client.atoms.phone_numbers.list()
     max_retries=3,
     retry_delay=15
 )
@@ -138,24 +138,24 @@ campaign.stop(campaign_id)
 status = campaign.get(campaign_id)
 ```
 
-### Using AtomsClient
+### Using the unified client
 
-You can also use the unified client:
+You can also use the unified `SmallestAI` client:
 
 ```python
-from smallestai.atoms import AtomsClient
+from smallestai import SmallestAI
 
-client = AtomsClient()
+client = SmallestAI()
 
 # Audience operations
-client.audience.create(...)
+client.atoms.audience.create_audience_with_csv_upload(...)
 
 # Campaign operations
-client.campaign.create(...)
-client.campaign.start(campaign_id)
+client.atoms.campaigns.create(...)
+client.atoms.campaigns.start_or_resume(id=campaign_id)
 
 # Get phone numbers
-phones = client.get_phone_numbers()
+phones = client.atoms.phone_numbers.list()
 ```
 
 ## Campaign Settings

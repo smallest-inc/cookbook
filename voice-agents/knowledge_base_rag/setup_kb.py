@@ -11,7 +11,7 @@ Usage:
 
 import os
 from dotenv import load_dotenv
-from smallestai.atoms import KB
+from smallestai.atoms.helpers import KB
 
 load_dotenv()
 

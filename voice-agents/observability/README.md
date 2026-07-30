@@ -47,7 +47,7 @@ Each call creates a **trace** with nested spans for every tool call, LLM generat
 ### Dependencies
 
 ```
-smallestai >= 4.3.0
+smallestai >= 5.3.1
 langfuse   >= 2.0.0
 ```
 

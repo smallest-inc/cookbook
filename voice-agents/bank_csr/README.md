@@ -106,7 +106,7 @@ Rekha:  I'll brief my supervisor and connect you right away.
 Only one direct dependency — the Atoms SDK bundles everything else:
 
 ```
-smallestai >= 4.3.0
+smallestai >= 5.3.1
 ```
 
 > Make sure you've run `uv venv && uv pip install -r requirements.txt` at the repo root first. See the [main README](../../README.md#usage).

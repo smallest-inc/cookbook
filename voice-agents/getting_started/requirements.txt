@@ -1,11 +1,11 @@
 # Dependencies for this example
-# On smallestai>=4.4.7, startup includes a validation routine that
+# On smallestai>=5.3.1, startup includes a validation routine that
 # exercises the setup_handler before any client connects. The dry-run
 # reaches `await session.start()` and logs at ERROR level:
 #   "Startup validation failed — pod will not accept sessions. ValueError: Session not initialized"
 # The server proceeds past this point; `Application startup complete.`
 # follows and real connections handshake normally.
-smallestai>=4.4.6
+smallestai>=5.3.1
 
 # Logging
 loguru>=0.7.0

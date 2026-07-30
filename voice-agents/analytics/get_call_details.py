@@ -10,7 +10,7 @@ Usage:
 import os
 import sys
 from dotenv import load_dotenv
-from smallestai.atoms import Call
+from smallestai.atoms.helpers import CallAnalytics
 
 load_dotenv()
 
@@ -25,7 +25,7 @@ def main():
     
     call_id = sys.argv[1]
     
-    call = Call()
+    call = CallAnalytics()
     
     print(f"Fetching details for: {call_id}\n")
     

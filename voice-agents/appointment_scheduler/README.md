@@ -98,7 +98,7 @@ The agent **always** calls `resolve_date` first — it never constructs dates on
 ### Dependencies
 
 ```
-smallestai >= 4.3.0
+smallestai >= 5.3.1
 httpx
 dateparser
 ```
