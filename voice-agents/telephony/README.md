@@ -83,12 +83,16 @@ candidates = client.atoms.phone_numbers.search_rentable(
 
 # 2. Rent the first one
 target = candidates[0].phone_number
-rented = client.atoms.phone_numbers.rent(
+client.atoms.phone_numbers.rent(
     phone_number=target,
     provider="plivo",
-).data
+)
 
-product_id = rented.product_id  # attach this to the agent
+# The rent response doesn't carry the product id; find it in your numbers
+product_id = next(
+    n.id for n in client.atoms.phone_numbers.list().data
+    if n.attributes.phone_number == target
+)
 
 # 3. Attach to the agent and enable inbound
 client.atoms.agents.update_agent(
@@ -107,7 +111,7 @@ resp = client.atoms.calls.start_outbound_call(
     from_product_id=product_id,      # the number rented above
 ).data
 
-print(resp.call_id)                  # track with client.atoms.calls.get(id=call_id)
+print(resp.conversation_id)          # track with client.atoms.calls.get(id=resp.conversation_id)
 ```
 
 ### The crew (unchanged, `server.py` + `assistant.py`)

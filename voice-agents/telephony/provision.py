@@ -46,12 +46,16 @@ def main():
     target = candidates[0].phone_number
     print(f"Renting {target} from {args.provider} ...")
 
-    # 2. Rent it.
-    rented = client.atoms.phone_numbers.rent(
+    # 2. Rent it. The rent response doesn't carry the product id, so look
+    # it up in the account's numbers afterwards.
+    client.atoms.phone_numbers.rent(
         phone_number=target,
         provider=args.provider,
-    ).data
-    product_id = rented.product_id
+    )
+    product_id = next(
+        n.id for n in client.atoms.phone_numbers.list().data
+        if n.attributes.phone_number == target
+    )
 
     # 3. Attach to the agent and enable inbound.
     client.atoms.agents.update_agent(

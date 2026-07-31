@@ -35,7 +35,7 @@ def main():
         phone_number=args.to,
         from_product_id=args.from_product_id,
     ).data
-    call_id = call.call_id
+    call_id = call.conversation_id
     print(f"Queued call {call_id} → {args.to}")
 
     if not args.poll:
