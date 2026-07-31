@@ -69,7 +69,7 @@ tts-as-langchain-tool/
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `voice_id` | `"leon"` | Voice to use for synthesis |
+| `voice_id` | `"magnus"` | Voice to use for synthesis |
 | `sample_rate` | `24000` | Audio sample rate in Hz |
 | `output_dir` | `"output"` | Directory to save generated audio files |
 

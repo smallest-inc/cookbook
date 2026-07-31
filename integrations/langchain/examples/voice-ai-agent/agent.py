@@ -36,8 +36,8 @@ load_dotenv()
 
 from voice_chain import VoiceAgent
 
-PULSE_STT_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
-LIGHTNING_TTS_URL = "https://waves-api.smallest.ai/api/v1/lightning-v2/get_speech"
+PULSE_STT_URL = "https://api.smallest.ai/waves/v1/stt/"
+LIGHTNING_TTS_URL = "https://api.smallest.ai/waves/v1/tts"
 SMALLEST_API_KEY = os.environ.get("SMALLEST_API_KEY", "")
 
 
@@ -64,7 +64,7 @@ def transcribe_audio(audio_path: str, language: str = "en") -> str:
             "Authorization": f"Bearer {SMALLEST_API_KEY}",
             "Content-Type": "application/octet-stream",
         },
-        params={"language": language},
+        params={"model": "pulse", "language": language},
         data=audio_data,
         timeout=120,
     )
@@ -93,7 +93,7 @@ def wrap_wav(pcm_data: bytes, sample_rate: int = 24000) -> bytes:
 def synthesize_speech(
     text: str,
     output_dir: str = "output",
-    voice_id: str = "leon",
+    voice_id: str = "magnus",
     sample_rate: int = 24000,
 ) -> str:
     """Generate speech using Lightning TTS. Returns path to audio file."""

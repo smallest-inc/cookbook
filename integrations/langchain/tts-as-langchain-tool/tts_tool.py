@@ -31,12 +31,12 @@ from pydantic import BaseModel, Field
 
 load_dotenv()
 
-LIGHTNING_API_URL = "https://waves-api.smallest.ai/api/v1/lightning-v2/get_speech"
+LIGHTNING_API_URL = "https://api.smallest.ai/waves/v1/tts"
 
 
 class LightningTTSInput(BaseModel):
     text: str = Field(description="Text to convert to speech")
-    voice_id: str = Field(default="leon", description="Voice ID for synthesis")
+    voice_id: str = Field(default="magnus", description="Voice ID for synthesis")
 
 
 class LightningTTSTool(BaseTool):
@@ -65,7 +65,7 @@ class LightningTTSTool(BaseTool):
         self.output_dir = output_dir
         self.sample_rate = sample_rate
 
-    def _synthesize(self, text: str, voice_id: str = "leon") -> bytes:
+    def _synthesize(self, text: str, voice_id: str = "magnus") -> bytes:
         """Call Lightning TTS API and return raw PCM audio bytes."""
         resp = requests.post(
             LIGHTNING_API_URL,
@@ -96,7 +96,7 @@ class LightningTTSTool(BaseTool):
             wav_file.writeframes(pcm_data)
         return buffer.getvalue()
 
-    def _run(self, text: str, voice_id: str = "leon") -> str:
+    def _run(self, text: str, voice_id: str = "magnus") -> str:
         """Generate speech and save to file. Returns file path."""
         if not text.strip():
             return "Error: empty text"
@@ -114,7 +114,7 @@ class LightningTTSTool(BaseTool):
 
         return str(out_path)
 
-    async def _arun(self, text: str, voice_id: str = "leon") -> str:
+    async def _arun(self, text: str, voice_id: str = "magnus") -> str:
         """Async version using httpx."""
         import httpx
 
@@ -151,7 +151,7 @@ class LightningTTSTool(BaseTool):
 
         return str(out_path)
 
-    def synthesize_bytes(self, text: str, voice_id: str = "leon") -> bytes:
+    def synthesize_bytes(self, text: str, voice_id: str = "magnus") -> bytes:
         """Get raw audio bytes without saving to file."""
         return self._synthesize(text, voice_id)
 

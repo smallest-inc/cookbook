@@ -6,7 +6,7 @@ Translate text between 40+ languages and hear results spoken aloud. Type or spea
 
 - **Type or speak** — Enter text or use the mic to speak (Pulse STT)
 - **40+ source languages** — Chinese, Japanese, Korean, Spanish, French, and many more
-- **16 target languages** — Translate and hear results with Lightning v2/v3.1 TTS
+- **15 target languages** — Translate and hear results with Lightning v3.1 TTS
 - **Voice selector** — Choose from language-specific TTS voices
 - **Copy & download** — Copy text or save audio as WAV
 - **History** — Last 10 translations
@@ -62,8 +62,8 @@ language-translation-app/
 ├── backend/
 │   └── app/
 │       ├── main.py      # FastAPI routes: translate, TTS, STT, voices
-│       ├── config.py    # Language config, Lightning v2/v3.1 split
-│       ├── tts.py       # Lightning TTS (v3.1 for en/hi/ta/es, v2 for others)
+│       ├── config.py    # Language config
+│       ├── tts.py       # Lightning TTS (unified /waves/v1/tts endpoint)
 │       ├── stt.py       # Pulse STT
 │       ├── translator.py # Google Translate via deep-translator
 │       └── database.py  # SQLite history
@@ -80,13 +80,13 @@ language-translation-app/
 ## How It Works
 
 1. **Translation** — Text is sent to the backend, translated via Google (deep-translator, free), and returned.
-2. **TTS** — Lightning v3.1 for English, Hindi, Tamil, Spanish; Lightning v2 for other target languages. Voices are filtered by language tag from the API.
+2. **TTS** — Lightning v3.1 via the unified `/waves/v1/tts` endpoint for all target languages. Voices are filtered by language tag from the API.
 3. **STT** — Pulse STT transcribes mic input; only languages supported by both Pulse and Lightning are enabled for speech input.
 
 ## API Reference
 
-- [Lightning TTS](https://waves-docs.smallest.ai/v4.0.0/content/text-to-speech/overview)
-- [Pulse STT](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/overview)
+- [Lightning TTS](https://docs.smallest.ai/waves/documentation/text-to-speech-lightning/overview)
+- [Pulse STT](https://docs.smallest.ai/waves/documentation/speech-to-text-pulse/overview)
 
 ## Next Steps
 

@@ -130,11 +130,10 @@ def to_wav_bytes(audio: np.ndarray) -> bytes:
 
 def transcribe(audio: np.ndarray) -> str:
     client = SmallestAI(api_key=SMALLEST_KEY)
-    result = client.waves.transcribe_pulse(
-        request=to_wav_bytes(audio),
+    result = client.waves.speech_to_text.transcribe(
+        model="pulse",
         language="en",
-        punctuate="true",
-        capitalize="true",
+        request=to_wav_bytes(audio),
     )
     return (result.transcription or "").strip()
 
