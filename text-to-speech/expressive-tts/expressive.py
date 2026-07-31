@@ -2,7 +2,7 @@
 """
 Expressive TTS — Generate speech with emotion, pitch, volume, prosody, and accent.
 
-Uses Lightning v3.2 on waves-api.smallest.ai.
+Uses Lightning v3.2 on the unified api.smallest.ai/waves/v1/tts endpoint.
 
 Usage:
     python expressive.py                           # Generate all demo samples
@@ -19,11 +19,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_URL = "https://waves-api.smallest.ai/api/v1/lightning-v3.2/get_speech"
+API_URL = "https://api.smallest.ai/waves/v1/tts"
 SAMPLE_RATE = 44100  # v3.2 uses 44100, NOT 24000
 
 
-def synthesize(text, voice_id="natalie", emotion="neutral", pitch="mid-range",
+def synthesize(text, voice_id="sloane", emotion="neutral", pitch="mid-range",
                volume="normal", prosody="normal", accent="general american",
                api_key=None):
     """Generate expressive speech. Returns audio bytes."""
@@ -36,6 +36,7 @@ def synthesize(text, voice_id="natalie", emotion="neutral", pitch="mid-range",
         json={
             "text": text,
             "voice_id": voice_id,
+            "model": "lightning_v3.2",
             "emotion": emotion,
             "pitch": pitch,
             "volume": volume,
@@ -53,35 +54,31 @@ def synthesize(text, voice_id="natalie", emotion="neutral", pitch="mid-range",
 # Demo samples — showcases the range of expressive controls
 DEMOS = [
     {
-        "name": "happy_excited",
+        "name": "happy_fast",
         "text": "Oh my goodness, I just got the best news ever! This is absolutely incredible!",
-        "emotion": "excited", "pitch": "high-pitched", "volume": "normal", "prosody": "fast",
+        "emotion": "happy", "pitch": "high", "volume": "normal", "prosody": "fast",
     },
     {
         "name": "sad_slow",
         "text": "Everything we built together... it's all just gone now. I don't know what to do.",
-        "emotion": "sad", "pitch": "low-pitched", "volume": "soft", "prosody": "slow",
+        "emotion": "sad", "pitch": "low", "volume": "soft", "prosody": "slow",
     },
     {
         "name": "angry_british",
         "text": "This is absolutely unacceptable! How could you possibly let this happen?",
-        "emotion": "angry", "pitch": "mid-range", "volume": "loud", "prosody": "normal",
+        "emotion": "angry", "pitch": "mid", "volume": "loud", "prosody": "normal",
         "accent": "british",
     },
     {
-        "name": "sarcastic",
-        "text": "Oh sure, what could possibly go wrong? Everything always works out perfectly.",
-        "emotion": "sarcastic", "pitch": "mid-range", "volume": "normal", "prosody": "measured",
-    },
-    {
-        "name": "anxious_whisper",
+        "name": "fearful_whisper",
         "text": "Shh... did you hear that? I think there's someone outside the window.",
-        "emotion": "anxious", "pitch": "high-pitched", "volume": "whispering", "prosody": "hesitant",
+        "emotion": "fearful", "pitch": "high", "volume": "whisper", "prosody": "slow",
     },
     {
         "name": "confident_presenter",
         "text": "Welcome everyone to our product launch! Today, we're going to change everything.",
-        "emotion": "confident", "pitch": "mid-range", "volume": "normal", "prosody": "melodic",
+        "emotion": "happy", "pitch": "mid", "volume": "loud", "prosody": "normal",
+        "accent": "general american",
     },
 ]
 
@@ -95,11 +92,11 @@ def main():
     parser = argparse.ArgumentParser(description="Expressive TTS (Lightning v3.2)")
     parser.add_argument("--text", help="Text to synthesize (runs all demos if omitted)")
     parser.add_argument("--emotion", default="neutral")
-    parser.add_argument("--pitch", default="mid-range")
+    parser.add_argument("--pitch", default="mid")
     parser.add_argument("--volume", default="normal")
     parser.add_argument("--prosody", default="normal")
     parser.add_argument("--accent", default="general american")
-    parser.add_argument("--voice", default="natalie")
+    parser.add_argument("--voice", default="sloane")
     parser.add_argument("--output", "-o", default=None)
     args = parser.parse_args()
 

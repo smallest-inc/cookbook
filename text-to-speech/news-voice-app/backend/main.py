@@ -23,7 +23,7 @@ load_dotenv()
 SMALLEST_API_KEY = os.getenv("SMALLEST_API_KEY")
 OPENAI_API_KEY   = os.getenv("OPENAI_API_KEY")
 
-STREAM_URL  = "https://waves-api.smallest.ai/api/v1/lightning-v3.1/stream"
+STREAM_URL  = "https://api.smallest.ai/waves/v1/tts/live"
 VOICE_ID    = "olivia"
 SAMPLE_RATE = 24000
 
@@ -92,6 +92,7 @@ def _generate_pcm(text: str) -> bytes:
         json={
             "text":          text,
             "voice_id":      VOICE_ID,
+            "model":         "lightning_v3.1",
             "sample_rate":   SAMPLE_RATE,
             "speed":         1.0,
             "output_format": "pcm",

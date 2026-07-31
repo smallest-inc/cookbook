@@ -1,21 +1,20 @@
 # Expressive TTS (Lightning v3.2)
 
-Control emotion, pitch, volume, speaking rate, and accent — make the same voice sound happy, angry, whispering, sarcastic, or anything in between.
-
-> **Note:** v3.2 is currently available on `waves-api.smallest.ai` only.
+Control emotion, pitch, volume, speaking rate, and accent — make the same voice sound happy, angry, whispering, fearful, or anything in between.
 
 ## Try It Now
 
 ```bash
 curl -o happy.wav \
-  -X POST "https://waves-api.smallest.ai/api/v1/lightning-v3.2/get_speech" \
+  -X POST "https://api.smallest.ai/waves/v1/tts" \
   -H "Authorization: Bearer $SMALLEST_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "This is absolutely incredible! I cannot believe how amazing this sounds!",
-    "voice_id": "natalie",
-    "emotion": "excited",
-    "pitch": "high-pitched",
+    "voice_id": "sloane",
+    "model": "lightning_v3.2",
+    "emotion": "happy",
+    "pitch": "high",
     "volume": "normal",
     "prosody": "fast",
     "accent": "general american",
@@ -26,11 +25,11 @@ curl -o happy.wav \
 
 ## Features
 
-- **19 emotions**: happy, sad, angry, excited, calm, sarcastic, frustrated, fearful, surprised, disgusted, bored, anxious, confident, amused, empathetic, nostalgic, pleading, skeptical, neutral
-- **4 pitch styles**: mid-range, high-pitched, low-pitched, breathy
-- **6 volume levels**: normal, shouting, soft, whispering, muttering, loud
-- **9 speaking rates**: normal, very slow, slow, fast, very fast, melodic, monotonous, hesitant, measured
-- **9 accents**: general american, british, australian, indian american, scottish, irish, southern american, new york, canadian
+- **5 emotions**: neutral, happy, sad, angry, fearful
+- **3 pitch levels**: low, mid, high
+- **5 volume levels**: whisper, soft, normal, loud, shouting
+- **3 speaking rates**: slow, normal, fast
+- **10 accents**: general american, indian american, irish, italian, new york, british, canadian, scottish, southern american, australian
 
 ## Usage
 
@@ -39,7 +38,7 @@ curl -o happy.wav \
 ```bash
 export SMALLEST_API_KEY="your-key"
 
-# Generate 6 different emotional styles
+# Generate the demo set of emotional styles
 python expressive.py
 
 # Or specific emotion
@@ -55,14 +54,8 @@ export SMALLEST_API_KEY="your-key"
 export OPENAI_API_KEY="your-openai-key"
 
 python llm_predict_and_speak.py "WHAT DID YOU JUST SAY TO ME?!"
-# → Predicts: angry, high-pitched, shouting, fast
+# → Predicts: angry, high, shouting, fast
 # → Generates angry_shouting_fast.wav
-```
-
-### WebSocket Streaming
-
-```bash
-python stream_expressive.py "Take a deep breath. Everything is going to be fine." --emotion calm --volume soft
 ```
 
 ## Important: Sample Rate
