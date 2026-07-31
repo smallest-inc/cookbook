@@ -154,6 +154,7 @@ Build AI voice agents that can talk to anyone on voice or text, in any language,
 ### Basics
 
 - [Getting Started](./voice-agents/getting_started/) — Create your first agent with `OutputCrewNode`, `generate_response()`, and `AtomsCrewApp`
+- [BYOM (Bring Your Own Model)](./voice-agents/byom/). Swap the LLM for hosted Claude, local Ollama, self-hosted vLLM via `OpenAIClient(base_url=...)`.
 - [Agent with Tools](./voice-agents/agent_with_tools/) — Add tool calling with `@function_tool` and `ToolRegistry`
 - [Call Control](./voice-agents/call_control/) — Cold/warm transfers and ending a call with `SDKAgentTransferConversationEvent`
 
@@ -165,6 +166,7 @@ Build AI voice agents that can talk to anyone on voice or text, in any language,
 
 ### Call Handling
 
+- [Telephony](./voice-agents/telephony/). Rent a phone number, attach it to a crew, take inbound calls and place outbound. Same crew code both directions.
 - [Inbound IVR](./voice-agents/inbound_ivr/) — Intent routing, department transfers, mute/unmute control
 - [Interrupt Control](./voice-agents/interrupt_control/) — Mute/unmute events, blocking user interruptions during critical speech
 
