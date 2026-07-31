@@ -1,7 +1,7 @@
 /**
  * Live STT over Pulse WebSocket. Mic → 16 kHz PCM16 → WSS.
  *
- * Smallest endpoint: wss://api.smallest.ai/waves/v1/pulse/get_text
+ * Smallest endpoint: wss://api.smallest.ai/waves/v1/stt/live (model=pulse)
  * Auth: the proxy can't get a header from the browser, and we don't want a
  * shared server-side key (bring-your-own-key), so the very first frame we
  * send is {"type":"auth","key":apiKey} — the proxy reads that and opens the
@@ -56,6 +56,7 @@ export function usePulseSTT({ apiKey, language = "en", onEvent, proxyUrl }: UseS
 
     const base = proxyUrl || `ws://${location.hostname}:3051/stt`;
     const qs = new URLSearchParams({
+      model: "pulse",
       language,
       encoding: "linear16",
       sample_rate: "16000",

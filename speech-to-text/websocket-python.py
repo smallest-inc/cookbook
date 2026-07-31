@@ -22,12 +22,13 @@ SAMPLE_URL = "https://github.com/smallest-inc/cookbook/raw/main/speech-to-text/g
 CHUNK_SIZE = 4096
 
 params = {
+    "model": "pulse",
     "language": "en",
     "encoding": "linear16",
     "sample_rate": "16000",
     "word_timestamps": "true",
 }
-WS_URL = f"wss://api.smallest.ai/waves/v1/pulse/get_text?{urlencode(params)}"
+WS_URL = f"wss://api.smallest.ai/waves/v1/stt/live?{urlencode(params)}"
 
 
 async def transcribe():

@@ -175,11 +175,11 @@ See [demo-app/README.md](./demo-app/README.md) for detailed instructions.
 
 ### REST API (Pre-Recorded)
 
-**Endpoint:** `POST https://waves-api.smallest.ai/api/v1/pulse/get_text`
+**Endpoint:** `POST https://api.smallest.ai/waves/v1/stt/`
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `model` | string | `pulse` |
+| `model` | string | `pulse` (required) |
 | `language` | string | `en`, `hi`, `multi` (auto-detect) |
 | `word_timestamps` | boolean | Include word-level timing |
 | `diarize` | boolean | Speaker diarization |
@@ -187,10 +187,11 @@ See [demo-app/README.md](./demo-app/README.md) for detailed instructions.
 
 ### WebSocket API (Real-Time)
 
-**Endpoint:** `wss://waves-api.smallest.ai/api/v1/pulse/get_text`
+**Endpoint:** `wss://api.smallest.ai/waves/v1/stt/live`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
+| `model` | string | - | `pulse` (required) |
 | `language` | string | `en` | Language code or `multi` |
 | `encoding` | string | `linear16` | Audio encoding format |
 | `sample_rate` | string | `16000` | Sample rate in Hz |

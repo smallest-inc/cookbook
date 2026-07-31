@@ -32,8 +32,8 @@ from pydantic import BaseModel, Field
 
 load_dotenv()
 
-PULSE_REST_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
-PULSE_WS_URL = "wss://waves-api.smallest.ai/api/v1/pulse/get_text"
+PULSE_REST_URL = "https://api.smallest.ai/waves/v1/stt/"
+PULSE_WS_URL = "wss://api.smallest.ai/waves/v1/stt/live"  # connect with ?model=pulse plus stream params
 
 
 class PulseSTTInput(BaseModel):
@@ -77,6 +77,7 @@ class PulseSTTTool(BaseTool):
             audio_data = f.read()
 
         params = {
+            "model": "pulse",
             "language": language,
             "word_timestamps": str(word_timestamps).lower(),
             "diarize": str(diarize).lower(),
@@ -138,6 +139,7 @@ class PulseSTTTool(BaseTool):
             audio_data = f.read()
 
         params = {
+            "model": "pulse",
             "language": language,
             "word_timestamps": str(word_timestamps).lower(),
             "diarize": str(diarize).lower(),

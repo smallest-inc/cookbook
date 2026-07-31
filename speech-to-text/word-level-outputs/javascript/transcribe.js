@@ -15,8 +15,9 @@
 const fs = require("fs");
 const path = require("path");
 
-const API_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text";
+const API_URL = "https://api.smallest.ai/waves/v1/stt/";
 
+const MODEL = "pulse";
 const LANGUAGE = "en"; // Use ISO 639-1 codes or "multi" for auto-detect
 const WORD_TIMESTAMPS = true;
 const DIARIZE = true;
@@ -25,6 +26,7 @@ async function transcribe(audioFile, apiKey) {
   const audioData = fs.readFileSync(audioFile);
 
   const params = new URLSearchParams({
+    model: MODEL,
     language: LANGUAGE,
     word_timestamps: String(WORD_TIMESTAMPS).toLowerCase(),
     diarize: String(DIARIZE).toLowerCase(),

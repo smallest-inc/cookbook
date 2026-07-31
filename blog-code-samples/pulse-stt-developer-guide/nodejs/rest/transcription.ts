@@ -66,7 +66,7 @@ async function transcribeAudioFile(
   console.log();
 
   const response = await fetch(
-    `https://waves-api.smallest.ai/api/v1/pulse/get_text?${params}`,
+    `https://api.smallest.ai/waves/v1/stt/?${params}`,
     {
       method: 'POST',
       headers: {

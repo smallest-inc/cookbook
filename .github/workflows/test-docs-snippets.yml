@@ -74,7 +74,9 @@ jobs:
           out=$(python speech-to-text/websocket-python.py)
           echo "$out"
           echo "$out" | grep -q "Full Transcript:" || { echo "missing Full Transcript line"; exit 1; }
-          echo "$out" | grep -q "Pulse API" || { echo "transcript content missing"; exit 1; }
+          # Case-insensitive: the live STT route does not capitalize by default,
+          # so the sample comes back as "pulse api" rather than "Pulse API".
+          echo "$out" | grep -qi "pulse api" || { echo "transcript content missing"; exit 1; }
 
       # mic-input-python.py needs microphone hardware which CI runners
       # do not have. We at least verify the script imports and parses,

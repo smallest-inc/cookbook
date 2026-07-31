@@ -23,10 +23,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_URL = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
+API_URL = "https://api.smallest.ai/waves/v1/stt/"
 OUTPUT_DIR = "."
 
 # The following are all the features supported by the POST endpoint (Pre-Recorded API)
+MODEL = "pulse"
 LANGUAGE = "en"  # Use ISO 639-1 codes or "multi" for auto-detect
 WORD_TIMESTAMPS = False
 DIARIZE = False
@@ -46,6 +47,7 @@ def transcribe(audio_file: str, api_key: str) -> dict:
             "Content-Type": "application/octet-stream",
         },
         params={
+            "model": MODEL,
             "language": LANGUAGE,
             "word_timestamps": str(WORD_TIMESTAMPS).lower(),
             "diarize": str(DIARIZE).lower(),

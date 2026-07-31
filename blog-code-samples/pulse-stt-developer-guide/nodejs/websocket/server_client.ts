@@ -30,6 +30,7 @@ interface ASRResponse {
 class PulseStreamingClient {
   private ws: WebSocket | null = null;
   private apiKey: string;
+  private lastReceived: (() => void) | null = null;
   private language: string;
   private sampleRate: number;
 
@@ -45,6 +46,7 @@ class PulseStreamingClient {
 
   private buildUrl(): string {
     const params = new URLSearchParams({
+      model: 'pulse',
       language: this.language,
       encoding: 'linear16',
       sample_rate: this.sampleRate.toString(),
@@ -52,7 +54,7 @@ class PulseStreamingClient {
       full_transcript: 'true'
     });
 
-    return `wss://waves-api.smallest.ai/api/v1/pulse/get_text?${params}`;
+    return `wss://api.smallest.ai/waves/v1/stt/live?${params}`;
   }
 
   async connect(
@@ -83,6 +85,10 @@ class PulseStreamingClient {
           if (response.transcript) {
             onTranscript(response.transcript, response.is_final || false);
           }
+
+          if (response.is_last) {
+            this.lastReceived?.();
+          }
         } catch (err) {
           console.error('❌ Parse error:', err);
         }
@@ -107,7 +113,7 @@ class PulseStreamingClient {
 
   sendEnd(): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ type: 'end' }));
+      this.ws.send(JSON.stringify({ type: 'close_stream' }));
     }
   }
 
@@ -139,11 +145,13 @@ class PulseStreamingClient {
       await new Promise(r => setTimeout(r, 50));
     }
 
-    // Signal end of audio
-    this.sendEnd();
-
-    // Wait for final transcripts
-    await new Promise(r => setTimeout(r, 3000));
+    // Signal end of audio, then wait for the terminal is_last message
+    // (with a timeout fallback in case the connection drops first)
+    await new Promise<void>(r => {
+      const timer = setTimeout(r, 10000);
+      this.lastReceived = () => { clearTimeout(timer); r(); };
+      this.sendEnd();
+    });
     this.close();
 
     return transcripts;

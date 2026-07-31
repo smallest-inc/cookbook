@@ -24,11 +24,12 @@ SAMPLE_RATE = 16000
 CHUNK_SIZE = 4096
 
 params = {
+    "model": "pulse",
     "language": "en",
     "encoding": "linear16",
     "sample_rate": str(SAMPLE_RATE),
 }
-WS_URL = f"wss://api.smallest.ai/waves/v1/pulse/get_text?{urlencode(params)}"
+WS_URL = f"wss://api.smallest.ai/waves/v1/stt/live?{urlencode(params)}"
 
 
 async def transcribe_mic():

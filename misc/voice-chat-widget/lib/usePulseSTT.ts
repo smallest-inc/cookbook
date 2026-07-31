@@ -1,7 +1,7 @@
 /**
  * Live STT over Pulse WebSocket. Mic → 16 kHz PCM16 → WSS.
  *
- * Smallest endpoint: wss://api.smallest.ai/waves/v1/pulse/get_text
+ * Smallest endpoint: wss://api.smallest.ai/waves/v1/stt/live (model=pulse)
  * Auth: token query parameter (browsers can't set WS Authorization headers).
  */
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -61,6 +61,7 @@ export function usePulseSTT({ apiKey, language = "en", onEvent, proxyUrl }: UseS
     //
     // Query params sent upstream — this is the RECOMMENDED ITN config from
     // Smallest's docs for agentic / chat flows:
+    //   model               - "pulse". Required on the unified STT route.
     //   language            - English ('en') by default
     //   encoding            - linear16 = raw 16-bit PCM little-endian
     //   sample_rate         - 16000 Hz, matches our AudioWorklet downsampler
@@ -74,6 +75,7 @@ export function usePulseSTT({ apiKey, language = "en", onEvent, proxyUrl }: UseS
     //                         the client (or close_stream) wins the race.
     const base = proxyUrl || `ws://${location.hostname}:3031/stt`;
     const qs = new URLSearchParams({
+      model: "pulse",
       language,
       encoding: "linear16",
       sample_rate: "16000",

@@ -29,7 +29,7 @@ class AsyncPulseClient:
         self.api_key = api_key or os.getenv("SMALLEST_API_KEY")
         if not self.api_key:
             raise ValueError("SMALLEST_API_KEY environment variable not set")
-        self.base_url = "https://waves-api.smallest.ai/api/v1/pulse/get_text"
+        self.base_url = "https://api.smallest.ai/waves/v1/stt/"
 
     async def transcribe_batch(
         self,

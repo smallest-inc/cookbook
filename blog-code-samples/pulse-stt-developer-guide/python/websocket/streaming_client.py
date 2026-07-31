@@ -64,6 +64,7 @@ class PulseStreamingClient:
 
     def _build_url(self) -> str:
         params = {
+            "model": "pulse",
             "language": self.language,
             "encoding": "linear16",
             "sample_rate": str(self.sample_rate),
@@ -71,7 +72,7 @@ class PulseStreamingClient:
             "full_transcript": "true"
         }
         query = "&".join(f"{k}={v}" for k, v in params.items())
-        return f"wss://waves-api.smallest.ai/api/v1/pulse/get_text?{query}"
+        return f"wss://api.smallest.ai/waves/v1/stt/live?{query}"
 
     async def _receive_transcripts(self):
         """Handle incoming transcription messages."""
@@ -157,7 +158,7 @@ class PulseStreamingClient:
         # Signal end of audio
         if self.ws:
             try:
-                await self.ws.send(json.dumps({"type": "end"}))
+                await self.ws.send(json.dumps({"type": "close_stream"}))
             except websockets.exceptions.ConnectionClosed:
                 pass
 
