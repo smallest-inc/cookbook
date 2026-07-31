@@ -13,7 +13,7 @@ Usage:
 import os
 import sys
 from dotenv import load_dotenv
-from smallestai.atoms import Campaign
+from smallestai.atoms.helpers import Campaign
 
 load_dotenv()
 

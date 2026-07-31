@@ -15,7 +15,7 @@ import json
 import argparse
 from datetime import datetime
 from dotenv import load_dotenv
-from smallestai.atoms import Call
+from smallestai.atoms.helpers import CallAnalytics
 
 load_dotenv()
 
@@ -33,7 +33,7 @@ def main():
     
     args = parser.parse_args()
     
-    call = Call()
+    call = CallAnalytics()
     
     print(f"Fetching up to {args.limit} calls...")
     

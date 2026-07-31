@@ -148,7 +148,7 @@ The agent **never** reads out format codes to the caller — no "YYYY-MM-DD", no
 ### Dependencies
 
 ```
-smallestai >= 4.3.0
+smallestai >= 5.3.1
 httpx
 ```
 

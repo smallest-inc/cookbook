@@ -9,7 +9,8 @@ Usage:
 
 import os
 from dotenv import load_dotenv
-from smallestai.atoms import Campaign, AtomsClient
+from smallestai import SmallestAI
+from smallestai.atoms.helpers import Campaign
 
 load_dotenv()
 
@@ -30,16 +31,16 @@ def main():
         return
     
     # Get available phone numbers
-    client = AtomsClient()
-    phone_numbers = client.get_phone_numbers()
-    
-    if not phone_numbers.get("data"):
+    client = SmallestAI()
+    phone_numbers = client.atoms.phone_numbers.list()
+
+    if not phone_numbers.data:
         print("Error: No phone numbers available. Acquire a number first.")
         return
-    
+
     # Use the first available phone number
-    phone_id = phone_numbers["data"][0]["_id"]
-    phone_display = phone_numbers["data"][0]["attributes"]["phoneNumber"]
+    phone_id = phone_numbers.data[0].id
+    phone_display = phone_numbers.data[0].attributes.phone_number
     print(f"Using phone number: {phone_display}")
     
     # Create campaign
@@ -66,7 +67,7 @@ def main():
         f.write(f"CAMPAIGN_ID={campaign_id}\n")
     
     print(f"✓ CAMPAIGN_ID saved to .env")
-    print(f"\nNext: Run start_campaign.py to start dialing")
+    print(f"\nNext: Run manage_campaign.py start to start dialing")
     
     return campaign_id
 
