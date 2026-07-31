@@ -115,5 +115,5 @@ The TTS implementation uses HTTP POST intentionally, returning the complete audi
 
 ## Next Steps
 
-- [Voice Agents](../../../voice-agents/) — Build deployed telephony agents with the Atoms SDK
+- [Voice Agents](../../../voice-agents/) — Build deployed telephony agents with the Voice Agents SDK
 - [Realtime Microphone](../realtime-microphone-transcription/) — Simpler Gradio UI for live transcription

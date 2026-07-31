@@ -1,6 +1,6 @@
 # Mobile voice agent cookbooks — how to test and use
 
-Four end-to-end voice-agent apps live under `voice-agents/`, all implementing the **same UX pattern** against the Smallest Atoms realtime WebSocket. Pick the one matching your stack; the protocol is identical.
+Four end-to-end voice-agent apps live under `voice-agents/`, all implementing the **same UX pattern** against the Smallest AI Voice Agents realtime WebSocket. Pick the one matching your stack; the protocol is identical.
 
 | Cookbook | Stack | Tested on |
 |---|---|---|
@@ -84,7 +84,7 @@ flutter run \
 
 ### iOS Swift
 - ✅ `xcodebuild -sdk iphonesimulator build` → `** BUILD SUCCEEDED **`, no warnings after cleanup
-- ✅ Code pasted verbatim from the [iOS Swift integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/ios-swift)
+- ✅ Code pasted verbatim from the [iOS Swift integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/i-os-swift)
 - Not yet executed on device (scheme team-signing is a manual one-time step); validated by compile + by equivalence to the RN cookbook which tested cleanly on a physical iPhone 13 today
 
 ### Android Kotlin
@@ -139,8 +139,8 @@ If you have no existing app and are starting fresh, Hearthside (RN) is the recom
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/atoms/api-reference/api-reference/realtime-agent/realtime-agent) — full event protocol.
-- [React Native integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/react-native)
-- [iOS (Swift) integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/ios-swift)
-- [Android (Kotlin) integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/android-kotlin)
-- [Flutter integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/flutter)
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/voice-agents/api-reference/realtime-agent/realtime-agent) — full event protocol.
+- [React Native integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/react-native)
+- [iOS (Swift) integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/i-os-swift)
+- [Android (Kotlin) integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/android-kotlin)
+- [Flutter integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/flutter)

@@ -2,19 +2,19 @@
 
 ## "Can't fetch backend data" troubleshooting
 
-When the agent says "can't fetch backend data" or "not getting backend calendar info", the API call from Atoms to your server is failing.
+When the agent says "can't fetch backend data" or "not getting backend calendar info", the API call from the Smallest AI Voice Agents platform to your server is failing.
 
 ### Use ngrok
 
 1. **Start ngrok** – `ngrok http 4000` (keep it running in a separate terminal)
-2. **URL in Atoms** – Both getAvailableSlots and confirmMeeting must use your ngrok URL (e.g. `https://xxxx.ngrok-free.dev`). Free ngrok URLs change when you restart.
+2. **URL in the Voice Agents dashboard** – Both getAvailableSlots and confirmMeeting must use your ngrok URL (e.g. `https://xxxx.ngrok-free.dev`). Free ngrok URLs change when you restart.
 3. **Header** – Add `ngrok-skip-browser-warning: true` to both API calls. Required.
 4. **Timeout** – Set to **10000** (10 seconds) for both API calls.
 5. **See ATOMS_CONFIG_NOW.txt** – Exact URLs and headers to copy.
 
 ## check-availability
 
-Request body (from Smallest.ai Atoms to your webhook):
+Request body (from the Voice Agents platform to your webhook):
 
 ```json
 {
@@ -24,7 +24,7 @@ Request body (from Smallest.ai Atoms to your webhook):
 ```
 
 - **proposedSlots**: Array of `{ start, end }` ISO strings to check.
-- **targetDay**: Optional. Natural language like `"Thursday 2 pm"` or `"Friday 10 am"`. If Atoms sends an unsubstituted variable (e.g. `"{{day_time_mentioned_by_user}}"`), the backend falls back to the next 3 days (9am–5pm) so the agent still gets availability.
+- **targetDay**: Optional. Natural language like `"Thursday 2 pm"` or `"Friday 10 am"`. If the platform sends an unsubstituted variable (e.g. `"{{day_time_mentioned_by_user}}"`), the backend falls back to the next 3 days (9am–5pm) so the agent still gets availability.
 
 Example with proposed slots:
 
@@ -61,11 +61,11 @@ Request body (from Smallest.ai when the agent finalizes the booking):
 }
 ```
 
-**Fallback when Atoms sends unsubstituted variables:** If `start`, `end`, or `clientEmail` contain `{{...}}` (e.g. `{{selected_slot_start_iso}}`), the backend will:
+**Fallback when the platform sends unsubstituted variables:** If `start`, `end`, or `clientEmail` contain `{{...}}` (e.g. `{{selected_slot_start_iso}}`), the backend will:
 - Use the first slot from the last check-availability response for `start`/`end`
 - Use `guest@example.com` for `clientEmail`
 
-This lets calendar invites be created even when Atoms variable mapping isn't configured. For correct slot selection and real attendee emails, see the Atoms setup guide below.
+This lets calendar invites be created even when variable mapping isn't configured on the platform. For correct slot selection and real attendee emails, see the Voice Agents setup guide below.
 
 Response (your server):
 
@@ -78,17 +78,17 @@ Response (your server):
 }
 ```
 
-**confirmationMessage** – A ready-to-say string for the agent. In Atoms, add Response Variable Extraction: path `$.confirmationMessage` → variable `confirmation_message`, then use it in your prompt or closing message so the agent says it to the caller.
+**confirmationMessage** – A ready-to-say string for the agent. In the Voice Agents dashboard, add Response Variable Extraction: path `$.confirmationMessage` → variable `confirmation_message`, then use it in your prompt or closing message so the agent says it to the caller.
 
 ---
 
-## Atoms setup: passing caller email and slot to confirm-meeting
+## Voice Agents setup: passing caller email and slot to confirm-meeting
 
-To get the caller's real email (and correct slot) into the calendar invite, configure Atoms so variables are substituted before the confirm-meeting API is called.
+To get the caller's real email (and correct slot) into the calendar invite, configure the platform so variables are substituted before the confirm-meeting API is called.
 
 ### If you use a Single Prompt agent
 
-1. Open your agent in the Atoms dashboard.
+1. Open your agent in the Voice Agents dashboard.
 2. In the **Config Panel** (right sidebar), find **API Calls** and toggle it ON.
 3. Click the ⚙️ (gear) icon to open API call settings.
 4. Find the **confirm-meeting** (or confirmMeeting) API call and click to edit it. If it doesn't exist, click **+ Add API Call** and create it with:

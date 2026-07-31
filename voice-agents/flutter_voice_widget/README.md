@@ -58,4 +58,4 @@ Validated with `flutter analyze` → **No issues found.** on Flutter 3.32.5 / Da
 ## Reference
 
 - [React Native widget cookbook](../react_native_voice_widget/)
-- [Flutter integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/flutter)
+- [Flutter integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/flutter)

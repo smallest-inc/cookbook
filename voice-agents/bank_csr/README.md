@@ -1,6 +1,6 @@
 # 🏦 Bank CSR — AI Voice Banking Agent
 
-A production-grade voice-based Customer Support Representative (**"Rekha"**) for an India-based bank, built with the [Atoms SDK](https://docs.smallest.ai). Rekha handles identity verification, live SQL queries against a real database, deterministic number-crunching, banking actions (FD creation/breaking, TDS certificates), compliance audit logging, and call transfers — all over a phone call.
+A production-grade voice-based Customer Support Representative (**"Rekha"**) for an India-based bank, built with the [Voice Agents SDK](https://docs.smallest.ai). Rekha handles identity verification, live SQL queries against a real database, deterministic number-crunching, banking actions (FD creation/breaking, TDS certificates), compliance audit logging, and call transfers — all over a phone call.
 
 > **"How much did I spend on Amazon in the last 2 years, and how is it trending?"**
 >
@@ -103,7 +103,7 @@ Rekha:  I'll brief my supervisor and connect you right away.
 
 ### Dependencies
 
-Only one direct dependency — the Atoms SDK bundles everything else:
+Only one direct dependency — the Voice Agents SDK bundles everything else:
 
 ```
 smallestai >= 5.3.1
@@ -552,7 +552,7 @@ Rekha:  [warm_transfer_to_supervisor("credit limit inquiry")]
 
 ## API Reference
 
-This example uses the following Atoms SDK components:
+This example uses the following Voice Agents SDK components:
 
 | Component | Import | Purpose |
 |-----------|--------|---------|

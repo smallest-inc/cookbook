@@ -329,7 +329,7 @@ Meanwhile, in your Langfuse dashboard — every tool call, LLM round, and transc
 | `SDKAgentEndCallEvent` | `smallestai.atoms.crew.events` | End call |
 | `Langfuse` | `langfuse` | Langfuse Python SDK client |
 
-- Atoms SDK docs: [docs.smallest.ai](https://docs.smallest.ai)
+- Voice Agents SDK docs: [docs.smallest.ai](https://docs.smallest.ai)
 - Langfuse docs: [langfuse.com/docs](https://langfuse.com/docs)
 
 ---

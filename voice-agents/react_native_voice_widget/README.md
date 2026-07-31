@@ -1,4 +1,4 @@
-# Atoms Voice Widget (React Native)
+# React Native Voice Widget
 
 A drop-in voice-agent widget for existing React Native apps. Adds a floating **Ask AI** pill in the corner; tapping it opens a bottom sheet with a live voice session (transcript, status, waveform, mic button). The host app keeps rendering underneath — this is not a full-screen takeover.
 
@@ -146,11 +146,11 @@ Drop the component at the **root of your screen tree** (not inside a scrollview)
 - **iOS simulator audio is distorted.** Validate quality on a physical iPhone.
 - **Android emulator mic is silent** without the host-audio-input toggle. Real Android device is fine.
 - **Backgrounding tears the session down.** This is intentional for a demo — a production widget needs VoIP entitlements on iOS and a foreground service on Android, neither of which are in scope here.
-- **Transcript rows only appear if the server emits `transcript` events.** Most Atoms agents do by default; if yours doesn't you'll see the empty-state placeholder. The status + waveform are still live.
+- **Transcript rows only appear if the server emits `transcript` events.** Most voice agents do by default; if yours doesn't you'll see the empty-state placeholder. The status + waveform are still live.
 - **No keyboard / text input** yet — the keyboard icon in the action row is a stub. The server supports `input_text.send` for chat-mode; wiring it up is ~30 lines.
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/atoms/api-reference/api-reference/realtime-agent/realtime-agent) — full wire protocol.
-- [React Native integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/react-native) — the drop-in code samples that this widget composes.
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/voice-agents/api-reference/realtime-agent/realtime-agent) — full wire protocol.
+- [React Native integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/react-native) — the drop-in code samples that this widget composes.
 - [Hearthside (RN voice agent cookbook)](../react_native_voice_agent/) — the same engine rendered as a full-screen storytelling app, with an in-app settings sheet for voice/speed/language.

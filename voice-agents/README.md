@@ -1,6 +1,6 @@
 # Voice Agents Cookbook
 
-Build AI voice agents with the [Atoms SDK](https://docs.smallest.ai/atoms/developer-guide) or [Pipecat](https://github.com/pipecat-ai/pipecat).
+Build AI voice agents with the [Voice Agents SDK](https://docs.smallest.ai/voice-agents/developer-guide) or [Pipecat](https://github.com/pipecat-ai/pipecat).
 
 ## Pipecat
 

@@ -1,6 +1,6 @@
 # Calendar Receptionist
 
-A voice receptionist that schedules meetings via phone. Callers speak to an Atoms agent, which checks **Google Calendar** availability and books meetings through webhook APIs. Includes a React web client with the Atoms widget and one-command agent duplication.
+A voice receptionist that schedules meetings via phone. Callers speak to a voice agent, which checks **Google Calendar** availability and books meetings through webhook APIs. Includes a React web client with the Voice Agents widget and one-command agent duplication.
 
 ## Demo
 
@@ -11,7 +11,7 @@ https://github.com/user-attachments/assets/daee2c15-8687-4ee9-b04c-43f9a1524c89
 
 - **Google Calendar** — Live availability and booking; events appear on your calendar
 - **Agent duplication** — `npm run setup-atoms` creates a new agent with workflow, voice, and prompt
-- **Web client** — React app with Atoms widget for testing
+- **Web client** — React app with the Voice Agents widget for testing
 - **Webhooks** — Express server: `/webhooks/check-availability`, `/webhooks/confirm-meeting`
 - **Optional emails** — SMTP config for booking confirmations
 
@@ -78,7 +78,7 @@ Open the client in your browser and test the voice agent.
 ```
 calendar_receptionist/
 ├── server/           # Express + Google Calendar + webhooks
-├── client/           # React + Atoms widget
+├── client/           # React + Voice Agents widget
 ├── scripts/          # setup-atoms, export-atoms, list-agents
 ├── atoms-agent-config.json
 ├── atoms-agent-workflow.json   # Fallback for setup script
@@ -109,9 +109,9 @@ calendar_receptionist/
 
 ## Documentation
 
-- [Atoms docs](https://docs.smallest.ai/atoms/developer-guide)
+- [Voice Agents docs](https://docs.smallest.ai/voice-agents/developer-guide)
 
 ## Next Steps
 
-- [appointment_scheduler](../appointment_scheduler/) — Cal.com integration with Atoms SDK (Python)
-- [getting_started](../getting_started/) — Create your first Atoms agent
+- [appointment_scheduler](../appointment_scheduler/) — Cal.com integration with the Voice Agents SDK (Python)
+- [getting_started](../getting_started/) — Create your first voice agent

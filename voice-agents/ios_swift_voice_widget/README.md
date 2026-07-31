@@ -62,7 +62,7 @@ xcodebuild -project AtomsVoiceWidget.xcodeproj -scheme AtomsVoiceWidget \
 
 ## iOS audio session
 
-`.playAndRecord` + `.default` mode + `.defaultToSpeaker`. Full-speaker volume, clean continuous playback. No hardware AEC by default — on hands-free the user should mute between turns (mic button) or wear headphones. See the [iOS Swift integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/ios-swift) for the three-way audio-session trade-off.
+`.playAndRecord` + `.default` mode + `.defaultToSpeaker`. Full-speaker volume, clean continuous playback. No hardware AEC by default — on hands-free the user should mute between turns (mic button) or wear headphones. See the [iOS Swift integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/i-os-swift) for the three-way audio-session trade-off.
 
 ## iOS simulator caveat
 
@@ -77,4 +77,4 @@ Audio goes through the macOS CoreAudio resampler and sounds buzzy. This is an Ap
 ## Reference
 
 - [React Native widget cookbook](../react_native_voice_widget/)
-- [iOS (Swift) integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/ios-swift)
+- [iOS (Swift) integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/i-os-swift)

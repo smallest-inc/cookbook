@@ -1,4 +1,4 @@
-# Atoms Agent Scripts
+# Voice Agent Scripts
 
 Quick reference for duplicating the Calendar Receptionist agent. See the main [README](../README.md) for full setup.
 

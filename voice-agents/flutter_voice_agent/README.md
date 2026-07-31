@@ -1,6 +1,6 @@
 # Flutter Voice Agent
 
-A minimal Flutter sample that opens a real-time voice session with a Smallest Atoms agent over the plain WebSocket endpoint. Dart + Material 3, `web_socket_channel`, `mic_stream`, `flutter_pcm_sound`. iOS + Android.
+A minimal Flutter sample that opens a real-time voice session with a Smallest AI voice agent over the plain WebSocket endpoint. Dart + Material 3, `web_socket_channel`, `mic_stream`, `flutter_pcm_sound`. iOS + Android.
 
 Same UX pattern as the [React Native](../react_native_voice_agent/), [iOS Swift](../ios_swift_voice_agent/), and [Android Kotlin](../android_kotlin_voice_agent/) cookbooks — status chip, two labelled waveforms, mute toggle, transport counter, call button.
 
@@ -20,7 +20,7 @@ Same UX pattern as the [React Native](../react_native_voice_agent/), [iOS Swift]
 - Flutter SDK ≥ 3.22 (Dart ≥ 3.4). Earlier versions work if you loosen the pubspec constraints.
 - Xcode 15+ for iOS, Android Studio + SDK 35 for Android.
 - A Smallest AI account and an API key from [app.smallest.ai/dashboard/api-keys](https://app.smallest.ai/dashboard/api-keys).
-- An Atoms **agent ID** from the dashboard (or use the Python script from the [RN cookbook](../react_native_voice_agent/scripts/setup_agent.py)).
+- A Voice Agents **agent ID** from the dashboard (or use the Python script from the [RN cookbook](../react_native_voice_agent/scripts/setup_agent.py)).
 
 ## Setup
 
@@ -93,6 +93,6 @@ The `sending · N` counter under the *you* waveform increments per outbound chun
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/atoms/api-reference/api-reference/realtime-agent/realtime-agent) — full event protocol.
-- [Flutter integration guide](https://docs.smallest.ai/atoms/developer-guide/integrate/mobile/flutter) — the docs pattern this cookbook implements end-to-end.
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/voice-agents/api-reference/realtime-agent/realtime-agent) — full event protocol.
+- [Flutter integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/flutter) — the docs pattern this cookbook implements end-to-end.
 - [`mic_stream`](https://pub.dev/packages/mic_stream), [`flutter_pcm_sound`](https://pub.dev/packages/flutter_pcm_sound), [`web_socket_channel`](https://pub.dev/packages/web_socket_channel) — the three libraries doing the heavy lifting.
