@@ -1,28 +1,59 @@
 "use client";
 
 import mixpanel from "mixpanel-browser";
+import posthog from "posthog-js";
 import { sendGTMEvent } from "@next/third-parties/google";
 
 const MIXPANEL_TOKEN = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
 
+// PostHog project tokens are public by design (they ship in the page JS),
+// so a hardcoded default is safe. The default guarantees tracking works even
+// when the deploy environment forgets the env var: NEXT_PUBLIC_* values are
+// inlined at build time and a missing one silently disables tracking.
+// Project: "New Smallest Inc" (381512).
+const POSTHOG_KEY =
+  process.env.NEXT_PUBLIC_POSTHOG_KEY ||
+  "phc_vqBpz5cQHFjsmfFix6KuCjf8iwtH2hJaeReHPSq46PyH";
+const POSTHOG_HOST =
+  process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
+
 let initialized = false;
+let posthogReady = false;
 
 export function initAnalytics() {
-  if (initialized || !MIXPANEL_TOKEN) return;
-  mixpanel.init(MIXPANEL_TOKEN, {
-    track_pageview: false,
-    persistence: "localStorage",
-    ignore_dnt: false,
-  });
-  initialized = true;
+  if (typeof window === "undefined") return;
+
+  if (MIXPANEL_TOKEN && !initialized) {
+    mixpanel.init(MIXPANEL_TOKEN, {
+      track_pageview: false,
+      persistence: "localStorage",
+      ignore_dnt: false,
+    });
+    initialized = true;
+  }
+
+  if (POSTHOG_KEY && !posthogReady) {
+    posthog.init(POSTHOG_KEY, {
+      api_host: POSTHOG_HOST,
+      person_profiles: "identified_only",
+      capture_pageview: true,
+      capture_pageleave: true,
+      autocapture: false,
+    });
+    posthogReady = true;
+  }
 }
 
 function track(
   event: string,
   properties?: Record<string, string | number | boolean>
 ) {
-  if (!initialized || !MIXPANEL_TOKEN) return;
-  mixpanel.track(event, { ...properties, app: "showcase" });
+  if (initialized && MIXPANEL_TOKEN) {
+    mixpanel.track(event, { ...properties, app: "showcase" });
+  }
+  if (posthogReady) {
+    posthog.capture(event, { ...properties, app: "showcase" });
+  }
 }
 
 function gtm(event: string, params?: Record<string, string | number | boolean>) {
