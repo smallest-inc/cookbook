@@ -111,10 +111,6 @@ fresh inbound call to Agent B from this agent's number.) Agent B can be any agen
 - **Transfer never fires at all:** check the log for `transfer_call requested but
   TRANSFER_CALL_NUMBER is not set`, confirm the system prompt is present, and
   (custom engine) confirm the engine emits the `transfer_call` action.
-- **Numbers read out wrong / "sentences look dropped":** if the agent has PII
-  redaction enabled, numbers are rewritten (e.g. an order id "zero zero one" →
-  `[ACCOUNTNUMBER_1]`) — the content is intact, only the number is normalized.
-  Turn redaction off in the agent config if you don't want it.
 - **`InternalServerError … ERR_NGROK_8012`:** your custom LLM's local server is
   down. If `CUSTOM_LLM_BASE_URL` points at an ngrok tunnel to your laptop, the
   tunnel is up but the upstream process isn't reachable — bring it up (or test off
