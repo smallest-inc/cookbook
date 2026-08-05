@@ -90,9 +90,27 @@ fresh inbound call to Agent B from this agent's number.) Agent B can be any agen
 
 ## Troubleshooting
 
+- **Transfer fires but the far end rejects instantly (busy / rejected in a few
+  seconds):** the transfer worked; the **destination isn't accepting the call.**
+  Make sure `TRANSFER_CALL_NUMBER` is a number that will actually answer, and
+  **don't transfer to your own line while you're the caller** (you can't answer a
+  call you're already on, and DND will reject it). Test the destination by dialing
+  it from a separate phone.
+- **The agent says "let me transfer you" but never transfers:** the model narrated
+  the handoff instead of calling the tool (LLM determinism). Tighten the prompt,
+  or force the tool call — `self.llm.chat(...)` forwards extra kwargs, so you can
+  pass `tool_choice="required"` on the turn where a transfer is expected.
 - **Transfers but caller hears silence:** keep the `speak("please hold …")` before
   the event (both examples do).
-- **Transfer never fires:** check the log for `transfer_call requested but
+- **Transfer never fires at all:** check the log for `transfer_call requested but
   TRANSFER_CALL_NUMBER is not set`, confirm the system prompt is present, and
   (custom engine) confirm the engine emits the `transfer_call` action.
+- **Numbers read out wrong / "sentences look dropped":** if the agent has PII
+  redaction enabled, numbers are rewritten (e.g. an order id "zero zero one" →
+  `[ACCOUNTNUMBER_1]`) — the content is intact, only the number is normalized.
+  Turn redaction off in the agent config if you don't want it.
+- **`InternalServerError … ERR_NGROK_8012`:** your custom LLM's local server is
+  down. If `CUSTOM_LLM_BASE_URL` points at an ngrok tunnel to your laptop, the
+  tunnel is up but the upstream process isn't reachable — bring it up (or test off
+  ngrok). The agent surfaces this as a fatal `agent_error` and hangs up cleanly.
 - **First call right after a deploy is silent:** a known pod warm-up flake — call again.
