@@ -2,6 +2,12 @@
 
 Comprehensive call control: end calls, cold transfers, and warm transfers.
 
+> **A transfer only fires if the system prompt tells the LLM to call the tool.**
+> The prompt in `support_agent.py` maps "human / real person" → cold transfer and
+> "supervisor / manager" → warm transfer. Without that instruction the model just
+> keeps chatting and never transfers. For a focused, deploy-ready transfer sample
+> (cold / warm / inbound / agent-to-agent) see [`call_transfer`](../call_transfer).
+
 ## Features
 
 - **SDKAgentEndCallEvent** — End calls gracefully
