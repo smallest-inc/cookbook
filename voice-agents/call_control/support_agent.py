@@ -153,6 +153,10 @@ Before warm transfer: Say "I'll brief my supervisor and connect you."
         The call is transferred immediately without briefing.
         User will hear hold music while connecting.
         """
+        # Announce before the event: the destination takes ~15-30s to dial, so
+        # without this the caller sits in silence. Speaking here (rather than
+        # relying on the LLM to say it) guarantees it plays.
+        await self.speak("Sure, I'll connect you now — please hold.")
         await self.send_event(
             SDKAgentTransferConversationEvent(
                 transfer_call_number=self.cold_transfer_number,
@@ -174,6 +178,8 @@ Before warm transfer: Say "I'll brief my supervisor and connect you."
         Args:
             reason: Brief summary of the issue for the supervisor.
         """
+        # Announce before the event (see cold_transfer).
+        await self.speak("Let me connect you to my supervisor — please hold.")
         await self.send_event(
             SDKAgentTransferConversationEvent(
                 transfer_call_number=self.warm_transfer_number,

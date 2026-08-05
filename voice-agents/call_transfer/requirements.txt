@@ -1,0 +1,2 @@
+smallestai>=5.5.0
+python-dotenv
