@@ -44,6 +44,12 @@ pip install -r requirements.txt
 cp .env.example .env   # then fill it in
 ```
 
+> **Adapting this with an AI coding agent (Claude Code, Codex, Cursor, …)?**
+> Give it [`AGENTS.md`](AGENTS.md) — a short list of the non-obvious rules that
+> break transfers (the prompt must instruct the tool call, the destination must
+> answer, deploy via the crew CLI, etc.). It's the exact set of mistakes real
+> users hit; handing it to the agent up front avoids them.
+
 ## Run — outbound
 
 ```bash
