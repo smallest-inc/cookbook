@@ -68,10 +68,17 @@ Then **dial that number** and ask to be transferred.
 
 ## Agent-to-agent transfer
 
-Nothing new: set `TRANSFER_CALL_NUMBER` to **another agent's inbound number**.
-Your agent transfers the caller to that number, and the other agent (which needs
-`allow_inbound_call` + that number) picks up. An AI receptionist handing off to
-an AI specialist.
+Nothing new — the destination just happens to be **another agent's inbound
+number**. An AI receptionist hands off to an AI specialist. Setup:
+
+1. Have a second agent (Agent B) — any agent (single-prompt or crew) — with a
+   greeting, `allow_inbound_call=True`, and a phone number assigned (its inbound
+   number). Same `enable_inbound.py` idea, or set it on the dashboard.
+2. In this agent's `.env`, set `TRANSFER_CALL_NUMBER` to **Agent B's number**.
+
+Now when the caller asks for a specialist, this agent cold/warm-transfers to
+Agent B, which answers as the specialist. (Verified live: the transfer creates a
+fresh inbound call to Agent B from this agent's number.)
 
 ## Cold vs warm
 
