@@ -22,6 +22,14 @@ Two things must both be true, or the transfer silently does nothing:
 2. **A destination number must be set** (`TRANSFER_CALL_NUMBER`). Without it,
    `transfer_call` logs a warning and returns without transferring.
 
+And one thing must **not** be true:
+
+3. **Do not also enable `transfer_call` in the dashboard's Tools panel.** This is a
+   **crew** agent — the tool lives in code (`@function_tool transfer_call`). The
+   dashboard Tools panel is a single-prompt control; for a crew agent the platform
+   reads your code's tool and ignores the panel. Toggling it there does nothing
+   useful and is a common source of confusion. Leave it off.
+
 ## Do I need the dashboard?
 
 For a **crew** agent, transfer and inbound are done in **code / via the API** —
@@ -105,7 +113,16 @@ fresh inbound call to Agent B from this agent's number.) Agent B can be any agen
 - **The agent says "let me transfer you" but never transfers:** the model narrated
   the handoff instead of calling the tool (LLM determinism). Tighten the prompt,
   or force the tool call — `self.llm.chat(...)` forwards extra kwargs, so you can
-  pass `tool_choice="required"` on the turn where a transfer is expected.
+  pass `tool_choice="required"` on the turn where a transfer is expected. Also
+  confirm this is a **crew** agent and that your `transfer_call` still *emits*
+  `SDKAgentTransferConversationEvent` (not just `speak()`); and check you didn't
+  enable `transfer_call` in the dashboard Tools panel (a no-op for crew agents, see
+  "Why a transfer doesn't fire" above).
+- **The transcript is missing words like "my email address" or shows `[USERNAME_1]`
+  / `[URL_1]`:** that's **PII redaction**, not transcription. It rewrites detected
+  emails/URLs/numbers and can trim a few leading words around them. Dashboard-created
+  agents have redaction **ON by default** — set `redactionConfig.isEnabled` to false
+  in the agent settings if you don't want it (effective next call, no redeploy).
 - **Transfers but caller hears silence:** keep the `speak("please hold …")` before
   the event (both examples do).
 - **Transfer never fires at all:** check the log for `transfer_call requested but
