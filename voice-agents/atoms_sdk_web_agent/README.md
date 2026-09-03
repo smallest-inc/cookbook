@@ -20,8 +20,8 @@ First, you need to set up your voice agents on the Smallest.ai platform:
 
 ### 3. Installation
 ```bash
-git clone https://github.com/smallest-ai/smallestai-cookbook.git
-cd smallestai-cookbook/voice-agents/atoms_sdk_web_agent
+git clone https://github.com/smallest-inc/cookbook.git
+cd cookbook/voice-agents/atoms_sdk_web_agent
 npm install
 ```
 
