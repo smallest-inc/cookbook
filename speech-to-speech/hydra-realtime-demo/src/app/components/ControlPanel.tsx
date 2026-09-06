@@ -3,12 +3,12 @@
 import { AGENT_PRESETS, findPreset } from "@/app/agents/presets";
 
 const VOICES = [
-  { value: "wren", label: "Wren" },
-  { value: "sloane", label: "Sloane" },
-  { value: "marlowe", label: "Marlowe" },
-  { value: "reed", label: "Reed" },
-  { value: "knox", label: "Knox" },
-  { value: "tate", label: "Tate" },
+  { value: "aria", label: "Aria" },
+  { value: "maya", label: "Maya" },
+  { value: "marin", label: "Marin" },
+  { value: "sterling", label: "Sterling" },
+  { value: "kai", label: "Kai" },
+  { value: "zoe", label: "Zoe" },
 ];
 
 export interface ControlPanelProps {

@@ -1,0 +1,2 @@
+# Web call session API requires a recent SDK
+smallestai>=5.12.0

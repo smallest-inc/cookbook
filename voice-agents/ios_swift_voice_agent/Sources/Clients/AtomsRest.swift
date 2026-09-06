@@ -1,13 +1,11 @@
 import Foundation
 
 /// Thin wrapper around the Atoms REST surface the app needs to update a live
-/// agent's voice / speed / language. Full dance:
-///   1. GET   /agent/{id}                       read current
-///   2. GET   /agent/{id}/versions?limit=1       find source version
-///   3. POST  /agent/{id}/drafts                 open draft
-///   4. PATCH /agent/{id}/drafts/{d}/config      write new values
-///   5. POST  /agent/{id}/drafts/{d}/publish     publish as new version
-///   6. PATCH /agent/{id}/versions/{v}/activate  make it live
+/// agent's voice / speed / language. Full dance (v2 branches flow):
+///   1. GET  /agent/{id}                              read current
+///   2. GET  /agent/{id}/branches                     find the live branch
+///   3. PUT  /agent/{id}/branches/{b}/draft           write new values into the open draft
+///   4. POST /agent/{id}/branches/{b}/draft/publish   publish; the revision goes live
 enum AtomsRest {
     private static let base = "https://api.smallest.ai/atoms/v1"
 
@@ -30,9 +28,8 @@ enum AtomsRest {
     enum RestError: Error {
         case http(status: Int, body: String)
         case parse
-        case noSourceVersion
-        case noDraftId
-        case noVersionId
+        case noBranch
+        case noRevisionId
     }
 
     static func fetchAgent(apiKey: String, agentId: String) async throws -> AgentSnapshot {
@@ -54,26 +51,19 @@ enum AtomsRest {
     @discardableResult
     static func updateAgentConfig(apiKey: String, agentId: String,
                                   current: AgentSnapshot, patch: UpdateInput) async throws -> String {
-        let versionsJson = try await request(method: "GET",
-                                             path: "/agent/\(agentId)/versions?limit=1",
+        let branchesJson = try await request(method: "GET",
+                                             path: "/agent/\(agentId)/branches",
                                              apiKey: apiKey)
-        let versionsData = (versionsJson["data"] as? [String: Any]) ?? versionsJson
-        let versions = (versionsData["versions"] as? [[String: Any]]) ?? []
-        guard let sourceVersion = versions.first?["_id"] as? String else {
-            throw RestError.noSourceVersion
+        let branchesData = (branchesJson["data"] as? [String: Any]) ?? branchesJson
+        let branches = (branchesData["branches"] as? [[String: Any]]) ?? []
+        // Pick the live branch; fall back to the default branch, then the first.
+        let entry = branches.first { (($0["isLive"] ?? $0["is_live"]) as? Bool) == true }
+            ?? branches.first { ((($0["branch"] as? [String: Any])?["isDefault"] ?? ($0["branch"] as? [String: Any])?["is_default"]) as? Bool) == true }
+            ?? branches.first
+        let branchObj = entry?["branch"] as? [String: Any]
+        guard let branchId = (branchObj?["_id"] ?? branchObj?["id"]) as? String else {
+            throw RestError.noBranch
         }
-
-        let draftJson = try await request(
-            method: "POST",
-            path: "/agent/\(agentId)/drafts",
-            apiKey: apiKey,
-            body: [
-                "draftName": "live-config-\(Int(Date().timeIntervalSince1970))",
-                "sourceVersionId": sourceVersion,
-            ]
-        )
-        let draftData = (draftJson["data"] as? [String: Any]) ?? draftJson
-        guard let draftId = draftData["draftId"] as? String else { throw RestError.noDraftId }
 
         let nextVoiceId     = patch.voiceId    ?? current.voiceId
         let nextVoiceModel  = patch.voiceModel ?? current.voiceModel
@@ -94,24 +84,39 @@ enum AtomsRest {
                 "speed":       nextSpeed,
             ],
         ]
-        _ = try await request(method: "PATCH",
-                              path: "/agent/\(agentId)/drafts/\(draftId)/config",
+        // PUT creates the branch's open draft when there is none, otherwise
+        // updates it in place.
+        _ = try await request(method: "PUT",
+                              path: "/agent/\(agentId)/branches/\(branchId)/draft",
                               apiKey: apiKey,
                               body: configBody)
 
+        // Publishing the draft makes the new revision live; no activate step in v2.
         let publishJson = try await request(
             method: "POST",
-            path: "/agent/\(agentId)/drafts/\(draftId)/publish",
+            path: "/agent/\(agentId)/branches/\(branchId)/draft/publish",
             apiKey: apiKey,
             body: ["label": "ios-\(Int(Date().timeIntervalSince1970))"]
         )
         let publishData = (publishJson["data"] as? [String: Any]) ?? publishJson
-        guard let newVersion = publishData["_id"] as? String else { throw RestError.noVersionId }
-
-        _ = try await request(method: "PATCH",
-                              path: "/agent/\(agentId)/versions/\(newVersion)/activate",
-                              apiKey: apiKey)
-        return newVersion
+        if let newRevision = (publishData["_id"] as? String) ?? (publishData["id"] as? String) {
+            return newRevision
+        }
+        // Publishing runs an async security scan; poll until the draft closes.
+        if publishData["state"] != nil {
+            for _ in 0..<60 {
+                try await Task.sleep(nanoseconds: 2_000_000_000)
+                let branchJson = try await request(method: "GET",
+                                                   path: "/agent/\(agentId)/branches/\(branchId)",
+                                                   apiKey: apiKey)
+                let data = (branchJson["data"] as? [String: Any]) ?? branchJson
+                let branch = (data["branch"] as? [String: Any]) ?? data
+                if branch["openDraftId"] == nil || branch["openDraftId"] is NSNull {
+                    return (branch["headRevisionId"] as? String) ?? "published"
+                }
+            }
+        }
+        throw RestError.noRevisionId
     }
 
     // MARK: - Private
