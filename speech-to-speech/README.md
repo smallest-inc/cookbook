@@ -22,4 +22,5 @@ with client.waves.speech_to_speech.connect() as socket:
 
 ## Examples
 
+- [Python Quickstart](./python-quickstart/): minimal headless client. Streams a WAV file as paced live audio, prints the reply transcript, saves the spoken response to `reply.wav`.
 - [Hydra Realtime Demo](./hydra-realtime-demo/) — Next.js browser client with multi-agent presets (companion, restaurant, banking), client-side tool calling, a wire-log of every WebSocket frame, and persona/voice editing. Mirror of [smallest-inc/hydra_agents](https://github.com/smallest-inc/hydra_agents).

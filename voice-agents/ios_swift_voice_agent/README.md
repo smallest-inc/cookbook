@@ -2,7 +2,7 @@
 
 A minimal native iOS sample that opens a real-time voice session with a Smallest AI voice agent over the plain WebSocket endpoint. SwiftUI, `URLSessionWebSocketTask`, `AVAudioEngine`. iOS 16+.
 
-The app has the same UX as the [React Native cookbook](../react_native_voice_agent/) — status chip, two labelled waveforms (narrator + you), mute toggle, sending counter, in-app settings sheet wired to the full `draft → publish → activate` REST flow.
+The app has the same UX as the [React Native cookbook](../react_native_voice_agent/) — status chip, two labelled waveforms (narrator + you), mute toggle, sending counter, in-app settings sheet wired to the full branch `draft → publish` REST flow.
 
 ## What it shows
 
@@ -11,7 +11,7 @@ The app has the same UX as the [React Native cookbook](../react_native_voice_age
 - Gapless playback of `output_audio.delta` chunks via `AVAudioPlayerNode.scheduleBuffer`.
 - Full protocol: `input_audio_buffer.append` streaming, `agent_start_talking` / `agent_stop_talking` / `interruption` / `session.closed` / `error` handling.
 - Exponential-backoff reconnect on transient network errors; hard-stop on auth failures.
-- In-app settings sheet: voice / speed / language pickers that drive the five-step `draft → publish → activate` REST dance.
+- In-app settings sheet: voice / speed / language pickers that drive the branch `draft → publish` REST dance.
 - Mute toggle gates the mic-upload path client-side — useful during narration when room noise is tripping server VAD.
 - Transport diagnostics: a live "sending · N" counter under the you waveform, independent of mic level.
 
@@ -48,7 +48,7 @@ In Xcode:
 | Layer | File | Responsibility |
 |---|---|---|
 | Transport | `Sources/Clients/AtomsClient.swift` | `URLSessionWebSocketTask` wrapper with exponential-backoff reconnect, event dispatch, auth-close hard-stop. |
-| REST | `Sources/Clients/AtomsRest.swift` | Thin `URLSession` wrapper for the `draft → publish → activate` flow used by the settings sheet. |
+| REST | `Sources/Clients/AtomsRest.swift` | Thin `URLSession` wrapper for the branch `draft → publish` flow used by the settings sheet. |
 | Audio | `Sources/Audio/AudioEngine.swift` | `AVAudioEngine` setup (`.playAndRecord` + `.voiceChat` + `defaultToSpeaker`), mic tap with inline resample to Int16 @ 24 kHz, `AVAudioPlayerNode` for gapless playback. |
 | State machine | `Sources/ViewModels/SessionViewModel.swift` | `@MainActor ObservableObject`. Owns lifecycle, permission flow, mute gating, mic-chunk counter, error classification. |
 | UI | `Sources/Views/*.swift` | SwiftUI single-screen app — title card, status chip, two labelled waveforms, mute pill, send counter, settings sheet, call button, error banner. |
@@ -71,7 +71,7 @@ Tap **settings** (top-right, idle screen) to open the agent configuration sheet:
 - **Speed** — 0.85× / 1.00× / 1.15× / 1.30×.
 - **Language** — English, Hindi, Multi (auto-detect).
 
-**Apply & publish** runs the five-step REST flow (`GET /versions` → `POST /drafts` → `PATCH /drafts/.../config` → `POST /drafts/.../publish` → `PATCH /versions/.../activate`) against your live agent. End the current session and start a new one to hear the change.
+**Apply & publish** runs the branch REST flow (`GET /branches` → `PUT /branches/.../draft` → `POST /branches/.../draft/publish`, which makes the new revision live) against your live agent. End the current session and start a new one to hear the change.
 
 ## Testing
 
