@@ -69,4 +69,5 @@ clones = client.waves.list_voice_clones()
 ## API Reference
 
 - [Python SDK on GitHub](https://github.com/smallest-inc/smallest-python-sdk)
-- [TTS documentation](https://docs.smallest.ai/waves/documentation/text-to-speech-lightning/quickstart)
+- [TTS documentation](https://docs.smallest.ai/models/text-to-speech/quickstart)
+- [Lightning v3.1 API](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)

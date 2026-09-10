@@ -76,8 +76,8 @@ news-voice-app/
 
 ## API Reference
 
-- [Waves TTS Overview](https://waves-docs.smallest.ai/v4.0.0/content/text-to-speech/overview)
-- [TTS streaming endpoint](https://docs.smallest.ai/models/api-reference/text-to-speech/synthesize-speech-sse)
+- [Waves TTS Overview](https://waves-docs.smallest.ai/models/text-to-speech/overview)
+- [TTS streaming endpoint](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech-sse)
 
 ## Next Steps
 

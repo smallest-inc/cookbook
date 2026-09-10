@@ -51,7 +51,7 @@ You can modify `process_pulse_metadata` to re-enable paralinguistic features (Ag
 
 ## API Reference
 
-- [Pulse STT API Reference](https://waves-docs.smallest.ai/v4.0.0/content/api-references/pulse-asr)
+- [Pulse STT API Reference](https://waves-docs.smallest.ai/api-reference/models/speech-to-text/transcribe)
 - [Groq API Docs](https://console.groq.com/docs/api-reference)
 
 ## Next Steps

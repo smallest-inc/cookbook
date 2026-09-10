@@ -98,7 +98,7 @@ This example is intentionally kept simple to serve as a starting point for build
 - **Code Execution**: Run Python snippets for calculations or data analysis
 
 ### TTS Streaming
-The TTS implementation uses HTTP POST intentionally, returning the complete audio before playback. For lower latency, you can upgrade to the [Lightning TTS WebSocket API](https://waves-docs.smallest.ai/content/api-references/lightning-v3.1-ws) which streams audio chunks as they're generated. This is left as an exercise to help developers understand the difference between batch and streaming approaches when building voice assistants.
+The TTS implementation uses HTTP POST intentionally, returning the complete audio before playback. For lower latency, you can upgrade to the [Lightning TTS WebSocket API](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/tts) which streams audio chunks as they're generated. This is left as an exercise to help developers understand the difference between batch and streaming approaches when building voice assistants.
 
 ### Other Improvements
 - Add interrupt handling (stop speaking when user starts talking)
@@ -108,9 +108,9 @@ The TTS implementation uses HTTP POST intentionally, returning the complete audi
 
 ## API Reference
 
-- [Pulse STT WebSocket](https://waves-docs.smallest.ai/content/api-references/pulse-stt-ws)
-- [Lightning TTS HTTP](https://waves-docs.smallest.ai/content/api-references/lightning-v3.1)
-- [Lightning TTS WebSocket](https://waves-docs.smallest.ai/content/api-references/lightning-v3.1-ws)
+- [Pulse STT WebSocket](https://waves-docs.smallest.ai/api-reference/models/speech-to-text/speech-to-text)
+- [Lightning TTS HTTP](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Lightning TTS WebSocket](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/tts)
 - [Groq API](https://console.groq.com/docs/api-reference)
 
 ## Next Steps

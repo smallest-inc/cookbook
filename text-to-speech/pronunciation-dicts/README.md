@@ -47,7 +47,7 @@ node javascript/pronunciation.js
 
 ## API Reference
 
-- [Pronunciation Dicts API](https://waves-docs.smallest.ai/v4.0.0/content/api-references/pronunciation-dicts-api)
+- [Pronunciation Dicts API](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/get-pronunciation-dicts)
 
 ## Next Steps
 

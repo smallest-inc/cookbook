@@ -6,7 +6,7 @@ is generated server-side and returned in one response, then played back locally.
 
 For lower latency, you can upgrade to the WebSocket streaming API which delivers
 audio chunks as they're generated. See:
-https://waves-docs.smallest.ai/content/api-references/lightning-v3.1-ws
+https://waves-docs.smallest.ai/api-reference/models/text-to-speech/tts
 """
 
 import asyncio

@@ -96,11 +96,11 @@ Same `./gradlew installDebug` with a plugged-in device. Real mic works out of th
 - **Emulator mic is silent by default on Apple Silicon.** You must enable Virtual microphone uses host audio input in Extended Controls. Even then the routing is flaky on some Android Studio versions. Real device is the reliable path for mic testing.
 - **Emulator output routing is sticky.** If you plug in or unplug headphones while the emulator is running, the qemu CoreAudio backend can lose the output route. Reboot the emulator to recover. Real device unaffected.
 - **No settings picker** for voice / speed / language in this cookbook. The [React Native](../react_native_voice_agent/) and [iOS Swift](../ios_swift_voice_agent/) cookbooks have one; this one is kept minimal. To change voice, use the dashboard or the Python `setup_agent.py` script.
-- **Background mode.** The session tears down on app backgrounding. Keeping the socket + mic open requires a foreground service with `foregroundServiceType="phoneCall"` (Android 14+), which is out of scope here. See the [Android Kotlin integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/android-kotlin) for the foreground-service pattern.
+- **Background mode.** The session tears down on app backgrounding. Keeping the socket + mic open requires a foreground service with `foregroundServiceType="phoneCall"` (Android 14+), which is out of scope here. See the [Android Kotlin integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/android-kotlin) for the foreground-service pattern.
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/voice-agents/api-reference/realtime-agent/realtime-agent) — full event protocol.
-- [Android (Kotlin) integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/android-kotlin) — the protocol snippets this cookbook builds on.
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent) — full event protocol.
+- [Android (Kotlin) integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/android-kotlin) — the protocol snippets this cookbook builds on.
 - [React Native voice agent cookbook](../react_native_voice_agent/) — the same app pattern in React Native.
 - [iOS Swift voice agent cookbook](../ios_swift_voice_agent/) — the same app pattern in SwiftUI.

@@ -1,6 +1,6 @@
 # Speech-to-Speech
 
-Full-duplex voice conversations with [Hydra](https://docs.smallest.ai/waves/documentation/speech-to-speech-hydra/overview): stream microphone audio in, receive streamed spoken responses back over one WebSocket. No separate STT/LLM/TTS pipeline to wire up.
+Full-duplex voice conversations with [Hydra](https://docs.smallest.ai/models/speech-to-speech/overview): stream microphone audio in, receive streamed spoken responses back over one WebSocket. No separate STT/LLM/TTS pipeline to wire up.
 
 ## Endpoint
 
@@ -8,7 +8,7 @@ Full-duplex voice conversations with [Hydra](https://docs.smallest.ai/waves/docu
 wss://api.smallest.ai/waves/v1/s2s?model=hydra&api_key=<SMALLEST_API_KEY>
 ```
 
-Every frame is JSON, discriminated by `type` (`session.*`, `input_audio_buffer.*`, `response.*`, `conversation.item.*`, `error`). Audio travels as base64 PCM16 at 16 kHz. See the [Hydra realtime guide](https://docs.smallest.ai/waves/documentation/speech-to-speech-hydra/overview) for the full event reference.
+Every frame is JSON, discriminated by `type` (`session.*`, `input_audio_buffer.*`, `response.*`, `conversation.item.*`, `error`). Audio travels as base64 PCM16 at 16 kHz. See the [Hydra realtime guide](https://docs.smallest.ai/models/speech-to-speech/overview) for the full event reference.
 
 With the Python SDK:
 

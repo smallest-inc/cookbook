@@ -11,7 +11,7 @@ Both scripts are single-file, no imports from this repo. Copy either one anywher
 | [`ping_pulse_offline.py`](./ping_pulse_offline.py) | `POST /waves/v1/stt/` (pre-recorded HTTP) | WER (corpus-level), per-clip latency, RTF (real-time factor) at p50 / p90 / p95 |
 | [`ping_pulse_streaming.py`](./ping_pulse_streaming.py) | `WSS /waves/v1/stt/live` (real-time WebSocket) | WER (corpus-level), tail latency at p50 / p90 / p95 |
 
-For the methodology behind each metric — what tail latency means, how RTF is computed, which transcripts to sample from — see the [Measuring Latency docs page](https://docs.smallest.ai/waves/documentation/speech-to-text-pulse/benchmarks/measuring-latency).
+For the methodology behind each metric — what tail latency means, how RTF is computed, which transcripts to sample from — see the [Measuring Latency docs page](https://docs.smallest.ai/models/speech-to-text/benchmarks/measuring-latency).
 
 ## Quick start — using the bundled samples
 
@@ -117,7 +117,7 @@ jq '.aggregate' /path/to/data/results_batch_pulse-pro_en.json
 
 ## What this measures vs. what it doesn't
 
-These scripts measure **wall-clock client-observed latency**, which includes network transit + server processing + client overhead. They do **not** attribute latency by component. For component attribution (network vs model vs client), see the [docs page](https://docs.smallest.ai/waves/documentation/speech-to-text-pulse/benchmarks/measuring-latency#component-breakdown).
+These scripts measure **wall-clock client-observed latency**, which includes network transit + server processing + client overhead. They do **not** attribute latency by component. For component attribution (network vs model vs client), see the [docs page](https://docs.smallest.ai/models/speech-to-text/benchmarks/measuring-latency#component-breakdown).
 
 For streaming, the script reports **tail latency** — the time from the last audio chunk being sent to the final transcript landing. It does **not** report transcript latency (the running gap during the session) or end-of-utterance latency (silence → final). Both of those require client-side instrumentation; see the docs page for measurement patterns.
 

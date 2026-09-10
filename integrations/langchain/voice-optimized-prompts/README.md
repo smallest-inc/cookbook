@@ -123,7 +123,7 @@ chain = prompt | llm | (lambda resp: clean_for_voice(resp.content))
 
 ## API Reference
 
-- [Lightning TTS Overview](https://waves-docs.smallest.ai/v4.0.0/content/text-to-speech-new/overview)
+- [Lightning TTS Overview](https://waves-docs.smallest.ai/models/text-to-speech/overview)
 - [LangChain Prompts](https://python.langchain.com/docs/concepts/prompt_templates/)
 
 ## Next Steps

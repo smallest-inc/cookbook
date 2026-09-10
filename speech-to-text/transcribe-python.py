@@ -6,7 +6,7 @@ Usage:
     export SMALLEST_API_KEY="your-api-key"
     python transcribe-python.py
 
-Docs: https://docs.smallest.ai/waves/documentation/speech-to-text-pulse/quickstart
+Docs: https://docs.smallest.ai/models/speech-to-text/quickstart
 """
 
 import os

@@ -45,5 +45,5 @@ Reusable code snippets live in [snippets](./snippets/).
 ## Documentation
 
 - [LangChain Docs](https://python.langchain.com/docs/)
-- [Pulse STT (Smallest AI)](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/overview)
-- [Lightning TTS (Smallest AI)](https://waves-docs.smallest.ai/v4.0.0/content/text-to-speech-new/overview)
+- [Pulse STT (Smallest AI)](https://waves-docs.smallest.ai/models/speech-to-text/overview)
+- [Lightning TTS (Smallest AI)](https://waves-docs.smallest.ai/models/text-to-speech/overview)

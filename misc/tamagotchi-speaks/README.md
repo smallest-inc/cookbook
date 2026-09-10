@@ -251,8 +251,8 @@ GPT-4o is given a tightly scoped system prompt: only PIL drawing primitives, exa
 
 ## API reference
 
-- [Pulse STT — Pre-recorded Quickstart](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/pre-recorded/quickstart)
-- [Pulse STT API Reference](https://waves-docs.smallest.ai/v4.0.0/content/api-references/pulse-asr)
-- [Lightning TTS — Quickstart](https://waves-docs.smallest.ai/v4.0.0/content/text-to-speech/lightning/quickstart)
-- [Lightning TTS API Reference](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-tts)
+- [Pulse STT — Pre-recorded Quickstart](https://waves-docs.smallest.ai/models/speech-to-text/pre-recorded/quickstart)
+- [Pulse STT API Reference](https://waves-docs.smallest.ai/api-reference/models/speech-to-text/transcribe)
+- [Lightning TTS — Quickstart](https://waves-docs.smallest.ai/models/text-to-speech/quickstart)
+- [Lightning TTS API Reference](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
 - [gochi hardware + daemon setup](https://github.com/devfolioco/gochi/blob/main/HOW-TO-SETUP.md)
