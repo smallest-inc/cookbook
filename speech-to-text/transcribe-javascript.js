@@ -6,7 +6,7 @@
  *     export SMALLEST_API_KEY="your-api-key"
  *     node transcribe-javascript.js
  *
- * Docs: https://docs.smallest.ai/waves/documentation/speech-to-text-pulse/quickstart
+ * Docs: https://docs.smallest.ai/models/speech-to-text/quickstart
  */
 
 const SAMPLE_URL = "https://github.com/smallest-inc/cookbook/raw/main/speech-to-text/getting-started/samples/audio.wav";

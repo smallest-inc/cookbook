@@ -52,7 +52,7 @@ Your key is persisted to `localStorage` so you only have to enter it once per br
 
 ## Wire protocol — at a glance
 
-Every frame is JSON. Events are discriminated by `type`. See the [Hydra docs](https://docs.smallest.ai/waves/documentation/speech-to-speech-hydra/managing-sessions) for the full event reference.
+Every frame is JSON. Events are discriminated by `type`. See the [Hydra docs](https://docs.smallest.ai/models/speech-to-speech/managing-sessions) for the full event reference.
 
 ### Handshake
 

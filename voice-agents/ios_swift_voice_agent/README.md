@@ -117,6 +117,6 @@ During a session, the "sending · N" counter under the *you* waveform increments
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/voice-agents/api-reference/realtime-agent/realtime-agent) — full event protocol.
-- [iOS (Swift) integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/i-os-swift) — the integration reference this cookbook implements end-to-end.
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent) — full event protocol.
+- [iOS (Swift) integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/i-os-swift) — the integration reference this cookbook implements end-to-end.
 - [React Native voice agent cookbook](../react_native_voice_agent/) — the same app pattern in React Native.

@@ -9,7 +9,7 @@ Usage:
 
 Note: On macOS, install portaudio first: brew install portaudio
 
-Docs: https://docs.smallest.ai/waves/documentation/speech-to-text-pulse/realtime-web-socket/quickstart
+Docs: https://docs.smallest.ai/models/speech-to-text/realtime-web-socket/quickstart
 """
 
 import asyncio
