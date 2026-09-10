@@ -151,6 +151,6 @@ Drop the component at the **root of your screen tree** (not inside a scrollview)
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/voice-agents/api-reference/realtime-agent/realtime-agent) — full wire protocol.
-- [React Native integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/react-native) — the drop-in code samples that this widget composes.
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent) — full wire protocol.
+- [React Native integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/react-native) — the drop-in code samples that this widget composes.
 - [Hearthside (RN voice agent cookbook)](../react_native_voice_agent/) — the same engine rendered as a full-screen storytelling app, with an in-app settings sheet for voice/speed/language.

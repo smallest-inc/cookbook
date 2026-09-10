@@ -12,7 +12,7 @@ Clone any voice from a short audio sample (5–15 seconds) and use it for text-t
 
 ## API Reference
 
-- [Voice Cloning API](https://waves-docs.smallest.ai/v4.0.0/content/api-references/voice-cloning-api)
+- [Voice Cloning API](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/create-voice-clone)
 - [Python SDK — add_voice()](https://github.com/smallest-inc/smallest-python-sdk)
 
 ## In the Meantime

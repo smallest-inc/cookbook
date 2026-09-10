@@ -75,8 +75,8 @@ Agent: Let me look that up. Order forty five six seven eight shipped
 
 ## API Reference
 
-- [Pulse STT Overview](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/overview)
-- [Lightning TTS Overview](https://waves-docs.smallest.ai/v4.0.0/content/text-to-speech-new/overview)
+- [Pulse STT Overview](https://waves-docs.smallest.ai/models/speech-to-text/overview)
+- [Lightning TTS Overview](https://waves-docs.smallest.ai/models/text-to-speech/overview)
 - [LangChain Agents](https://python.langchain.com/docs/concepts/agents/)
 
 ## Next Steps

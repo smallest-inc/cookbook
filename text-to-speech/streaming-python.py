@@ -11,7 +11,7 @@ Usage:
     pip install requests
     python streaming-python.py
 
-Docs: https://docs.smallest.ai/waves/documentation/text-to-speech-lightning/streaming
+Docs: https://docs.smallest.ai/models/text-to-speech/streaming
 """
 
 import base64
