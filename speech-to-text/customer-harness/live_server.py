@@ -24,6 +24,7 @@ import asyncio
 import json
 import os
 import time
+import traceback
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -60,6 +61,9 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
     upstream_url = f"{upstream_base}?{urlencode(query)}"
     headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
 
+    peer = request.remote or "?"
+    print(f"[{peer}] → connecting upstream: {upstream_url}", flush=True)
+
     t_connect_start = time.monotonic()
     connect_kwargs = {"max_size": 10 * 1024 * 1024, "ping_interval": None}
     if headers:
@@ -67,14 +71,22 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
     try:
         upstream = await websockets.connect(upstream_url, **connect_kwargs)
     except Exception as e:
+        err_type = type(e).__name__
+        print(
+            f"[{peer}] ✗ upstream connect FAILED ({err_type}): {e}",
+            flush=True,
+        )
+        traceback.print_exc()
         await client_ws.send_json({
             "_srv_event": "upstream_connect_failed",
+            "error_type": err_type,
             "error": str(e),
         })
         await client_ws.close()
         return client_ws
 
     connect_ms = int((time.monotonic() - t_connect_start) * 1000)
+    print(f"[{peer}] ✓ upstream connected in {connect_ms}ms", flush=True)
     await client_ws.send_json({
         "_srv_event": "upstream_connected",
         "upstream_url": upstream_url,
@@ -107,6 +119,10 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
                 payload["_srv_recv_ms"] = srv_ms
                 await client_ws.send_json(payload)
         except websockets.ConnectionClosed as e:
+            print(
+                f"[{peer}] upstream closed: code={e.code} reason={e.reason!r}",
+                flush=True,
+            )
             await client_ws.send_json({
                 "_srv_event": "upstream_closed",
                 "code": e.code,
