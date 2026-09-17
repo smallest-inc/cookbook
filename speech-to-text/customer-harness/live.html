@@ -1,0 +1,540 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Smallest STT — live mic tester</title>
+<style>
+  body { font: 14px/1.4 -apple-system, sans-serif; margin: 16px; color: #222; }
+  h1 { font-size: 18px; margin: 0 0 12px; }
+  .row { display: flex; gap: 16px; align-items: flex-start; }
+  .col { flex: 1; min-width: 0; }
+  fieldset { border: 1px solid #ddd; border-radius: 6px; padding: 10px; margin: 0 0 12px; }
+  legend { font-weight: 600; padding: 0 6px; }
+  label { display: block; font-size: 12px; color: #555; margin-top: 6px; }
+  input[type=text], input[type=number], select {
+    width: 100%; box-sizing: border-box; padding: 4px 6px; font: inherit;
+    border: 1px solid #ccc; border-radius: 4px;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+  .grid label { margin-top: 0; }
+  button { padding: 6px 12px; margin-right: 6px; font: inherit; cursor: pointer; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #transcript {
+    height: 260px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px;
+    padding: 8px; font-family: ui-monospace, monospace; font-size: 13px; white-space: pre-wrap;
+  }
+  .final { color: #000; font-weight: 600; }
+  .partial { color: #888; }
+  .info { color: #888; font-style: italic; }
+  .err { color: #b00; }
+  #log {
+    height: 220px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px;
+    padding: 6px; font-family: ui-monospace, monospace; font-size: 11px;
+    background: #fafafa; white-space: pre;
+  }
+  #latency { font-family: ui-monospace, monospace; font-size: 12px; }
+  #latency table { border-collapse: collapse; width: 100%; }
+  #latency td { padding: 2px 6px; border-bottom: 1px dashed #eee; }
+  #latency td:last-child { text-align: right; font-weight: 600; }
+  .status { font-size: 12px; padding: 2px 8px; border-radius: 4px; display: inline-block; }
+  .status.on { background: #d4edda; color: #155724; }
+  .status.off { background: #f8d7da; color: #721c24; }
+</style>
+</head>
+<body>
+
+<h1>Smallest STT — live mic tester <span id="status" class="status off">disconnected</span></h1>
+
+<div class="row">
+  <div class="col" style="flex: 0 0 360px;">
+
+    <fieldset>
+      <legend>Preset</legend>
+      <select id="preset"></select>
+      <div style="font-size:11px;color:#666;margin-top:4px;" id="preset-note"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Session params (query string)</legend>
+      <div class="grid" id="params"></div>
+      <label style="margin-top:8px;">keywords (word:boost,word:boost)</label>
+      <input type="text" id="p_keywords" placeholder="Rahul:2,Choudhary:2" />
+    </fieldset>
+
+    <fieldset>
+      <legend>Controls</legend>
+      <button id="btn-connect">Connect</button>
+      <button id="btn-mic" disabled>Start mic</button>
+      <button id="btn-finalize" disabled>Finalize turn</button>
+      <button id="btn-close" disabled>Close stream</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Latency</legend>
+      <div id="latency"></div>
+    </fieldset>
+
+  </div>
+
+  <div class="col">
+    <fieldset>
+      <legend>Transcript</legend>
+      <div id="transcript"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Raw events</legend>
+      <div id="log"></div>
+    </fieldset>
+  </div>
+</div>
+
+<script>
+// --------------------------------------------------------------------------
+// Param spec — one entry per streaming query param. `type` drives the input;
+// `send: false` fields are omitted when empty/default (e.g. max_words=0).
+// --------------------------------------------------------------------------
+const PARAM_SPEC = [
+  { name: "model",              type: "select", options: ["pulse"], default: "pulse" },
+  { name: "language",           type: "select",
+    options: ["en","hi","de","es","ru","it","fr","nl","pt","zh","yue","ja","ko",
+              "gu","mr","or","bn","ta","te","kn","ml",
+              "north_indic","multi-asian","multi-south-indic"],
+    default: "en" },
+  { name: "sample_rate",        type: "select", options: ["8000","16000","24000","44100","48000"], default: "16000" },
+  { name: "encoding",           type: "select", options: ["linear16","linear32","alaw","mulaw","opus","ogg_opus"], default: "linear16" },
+  { name: "format",             type: "bool",   default: "true"  },
+  { name: "punctuate",          type: "bool",   default: "true"  },
+  { name: "capitalize",         type: "bool",   default: "true"  },
+  { name: "itn_normalize",      type: "bool",   default: "false" },
+  { name: "endpointing",        type: "bool",   default: "true"  },
+  { name: "eou_timeout_ms",     type: "number", default: 800 },
+  { name: "vad_events",         type: "bool",   default: "false" },
+  { name: "word_timestamps",    type: "bool",   default: "false" },
+  { name: "sentence_timestamps",type: "bool",   default: "false" },
+  { name: "diarize",            type: "bool",   default: "false" },
+  { name: "finalize_on_words",  type: "bool",   default: "true"  },
+  { name: "max_words",          type: "number", default: 0, hideIfZero: true },
+  { name: "redact_pii",         type: "bool",   default: "false" },
+  { name: "redact_pci",         type: "bool",   default: "false" },
+  { name: "full_transcript",    type: "bool",   default: "false" },
+];
+
+// --------------------------------------------------------------------------
+// Presets — each patches the defaults above. Keep the tuned voice-agent /
+// dictation ones aligned with run_matrix.py so results are comparable.
+// --------------------------------------------------------------------------
+const PRESETS = {
+  default: {
+    note: "Server defaults. Good baseline.",
+    overrides: {}
+  },
+  voice_agent_open: {
+    note: "Open-ended user turns (support / sales agent). Longer EOU tolerance.",
+    overrides: { eou_timeout_ms: 800, endpointing: "true", itn_normalize: "true" }
+  },
+  voice_agent_short_reply: {
+    note: "yes/no/digit confirmations. Tight EOU. ITN off. Boosted keywords.",
+    overrides: {
+      eou_timeout_ms: 550, endpointing: "true", itn_normalize: "false",
+      keywords: "yes:3,no:3,one:2,two:2,three:2,four:2,five:2"
+    }
+  },
+  dictation: {
+    note: "Long-form monologue. Loose EOU, ITN on.",
+    overrides: { eou_timeout_ms: 1400, endpointing: "true", itn_normalize: "true" }
+  },
+  meeting_diarize: {
+    note: "Word + sentence timestamps and speaker diarization for meetings.",
+    overrides: {
+      diarize: "true", word_timestamps: "true", sentence_timestamps: "true",
+      full_transcript: "true", eou_timeout_ms: 1000
+    }
+  },
+  pci_redacted_agent: {
+    note: "Voice-agent flow with PII + PCI redaction (en/hi only).",
+    overrides: {
+      eou_timeout_ms: 700, endpointing: "true", itn_normalize: "true",
+      redact_pii: "true", redact_pci: "true"
+    }
+  },
+  keywords_demo: {
+    note: "Force entity biasing so proper nouns land. Edit keywords freely.",
+    overrides: { keywords: "Rahul:3,Choudhary:3,Chaudhary:3,Choudhari:3" }
+  },
+  raw_no_formatting: {
+    note: "format=false forces lowercase, no punctuation, no ITN.",
+    overrides: { format: "false" }
+  },
+};
+
+// --------------------------------------------------------------------------
+// Build the param form
+// --------------------------------------------------------------------------
+const paramsEl = document.getElementById("params");
+for (const spec of PARAM_SPEC) {
+  if (spec.name === "keywords") continue; // rendered separately
+  const label = document.createElement("label");
+  label.textContent = spec.name;
+  paramsEl.appendChild(label);
+
+  let el;
+  if (spec.type === "select" || spec.type === "bool") {
+    el = document.createElement("select");
+    const opts = spec.type === "bool" ? ["true","false"] : spec.options;
+    for (const o of opts) {
+      const opt = document.createElement("option");
+      opt.value = o; opt.textContent = o;
+      el.appendChild(opt);
+    }
+    el.value = String(spec.default);
+  } else if (spec.type === "number") {
+    el = document.createElement("input");
+    el.type = "number";
+    el.value = String(spec.default);
+  }
+  el.id = "p_" + spec.name;
+  paramsEl.appendChild(el);
+}
+
+// Preset dropdown
+const presetEl = document.getElementById("preset");
+const presetNote = document.getElementById("preset-note");
+for (const name of Object.keys(PRESETS)) {
+  const opt = document.createElement("option");
+  opt.value = name; opt.textContent = name;
+  presetEl.appendChild(opt);
+}
+function applyPreset(name) {
+  const p = PRESETS[name];
+  presetNote.textContent = p.note || "";
+  // reset to spec defaults
+  for (const spec of PARAM_SPEC) {
+    const el = document.getElementById("p_" + spec.name);
+    if (!el) continue;
+    el.value = String(spec.default);
+  }
+  // apply overrides
+  for (const [k, v] of Object.entries(p.overrides)) {
+    const el = document.getElementById("p_" + k);
+    if (el) el.value = String(v);
+  }
+}
+presetEl.addEventListener("change", () => applyPreset(presetEl.value));
+applyPreset("default");
+
+// --------------------------------------------------------------------------
+// Collect params → query string
+// --------------------------------------------------------------------------
+function collectQuery() {
+  const q = new URLSearchParams();
+  for (const spec of PARAM_SPEC) {
+    const el = document.getElementById("p_" + spec.name);
+    if (!el) continue;
+    const v = el.value;
+    if (spec.hideIfZero && Number(v) === 0) continue;
+    q.set(spec.name, v);
+  }
+  const kw = document.getElementById("p_keywords").value.trim();
+  if (kw) q.set("keywords", kw);
+  return q.toString();
+}
+
+// --------------------------------------------------------------------------
+// UI helpers
+// --------------------------------------------------------------------------
+const $ = (id) => document.getElementById(id);
+const statusEl = $("status");
+function setStatus(text, on) {
+  statusEl.textContent = text;
+  statusEl.className = "status " + (on ? "on" : "off");
+}
+function logLine(obj) {
+  const el = $("log");
+  el.textContent += JSON.stringify(obj) + "\n";
+  el.scrollTop = el.scrollHeight;
+}
+function transcriptLine(text, cls) {
+  const el = $("transcript");
+  const line = document.createElement("div");
+  line.className = cls;
+  line.textContent = text;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+function clearTranscript() { $("transcript").innerHTML = ""; }
+function clearLog() { $("log").textContent = ""; }
+
+// --------------------------------------------------------------------------
+// Latency tracking
+// --------------------------------------------------------------------------
+const L = {
+  ws_connect_ms: null,
+  upstream_connect_ms: null,
+  first_audio_ms: null,
+  first_partial_ms: null,
+  first_final_ms: null,
+  last_audio_ms: null,
+  last_finalize_ms: null,
+  last_final_ms: null,
+  partial_count: 0,
+  final_count: 0,
+  partial_gaps: [],
+  last_partial_recv_ms: null,
+  audio_end_to_final_ms: null,   // last audio → most recent final
+  finalize_to_final_ms: null,    // finalize button → next final
+};
+function renderLatency() {
+  const rows = [
+    ["ws connect", L.ws_connect_ms],
+    ["upstream connect", L.upstream_connect_ms],
+    ["mic → first audio sent", L.first_audio_ms != null ? 0 : null],
+    ["first audio → first partial", L.first_partial_ms],
+    ["first audio → first final", L.first_final_ms],
+    ["last audio → last final", L.audio_end_to_final_ms],
+    ["finalize → next final", L.finalize_to_final_ms],
+    ["partial count", L.partial_count],
+    ["final count", L.final_count],
+    ["avg partial gap (ms)", L.partial_gaps.length
+      ? Math.round(L.partial_gaps.reduce((a,b)=>a+b,0) / L.partial_gaps.length)
+      : null],
+  ];
+  const tbl = ["<table>"];
+  for (const [k, v] of rows) {
+    tbl.push(`<tr><td>${k}</td><td>${v == null ? "—" : v}</td></tr>`);
+  }
+  tbl.push("</table>");
+  $("latency").innerHTML = tbl.join("");
+}
+renderLatency();
+
+// --------------------------------------------------------------------------
+// WebSocket + mic
+// --------------------------------------------------------------------------
+let ws = null;
+let audioCtx = null;
+let workletNode = null;
+let mediaStream = null;
+let micActive = false;
+
+async function connect() {
+  clearTranscript(); clearLog();
+  Object.assign(L, {
+    ws_connect_ms: null, upstream_connect_ms: null,
+    first_audio_ms: null, first_partial_ms: null, first_final_ms: null,
+    last_audio_ms: null, last_finalize_ms: null, last_final_ms: null,
+    partial_count: 0, final_count: 0,
+    partial_gaps: [], last_partial_recv_ms: null,
+    audio_end_to_final_ms: null, finalize_to_final_ms: null,
+  });
+  renderLatency();
+
+  const q = collectQuery();
+  const wsUrl = `ws://${location.host}/ws?${q}`;
+  logLine({event: "connect", url: wsUrl});
+
+  const t0 = performance.now();
+  ws = new WebSocket(wsUrl);
+  ws.binaryType = "arraybuffer";
+
+  ws.addEventListener("open", () => {
+    L.ws_connect_ms = Math.round(performance.now() - t0);
+    setStatus("connected", true);
+    $("btn-connect").textContent = "Disconnect";
+    $("btn-mic").disabled = false;
+    $("btn-finalize").disabled = false;
+    $("btn-close").disabled = false;
+    renderLatency();
+  });
+
+  ws.addEventListener("message", (ev) => {
+    let payload; try { payload = JSON.parse(ev.data); }
+    catch { logLine({event: "non_json", raw: String(ev.data).slice(0,200)}); return; }
+    logLine(payload);
+
+    if (payload._srv_event === "upstream_connected") {
+      L.upstream_connect_ms = payload.connect_ms;
+      transcriptLine(`↳ upstream connected (${payload.connect_ms}ms)`, "info");
+      renderLatency();
+      return;
+    }
+    if (payload._srv_event === "upstream_closed") {
+      transcriptLine(`↳ upstream closed (${payload.code} ${payload.reason||""})`, "info");
+      return;
+    }
+    if (payload._srv_event === "upstream_connect_failed") {
+      transcriptLine(`upstream connect failed: ${payload.error}`, "err");
+      return;
+    }
+    if (payload.type === "error" || payload.error) {
+      transcriptLine(`error: ${payload.error || payload.message || JSON.stringify(payload)}`, "err");
+      return;
+    }
+
+    const now = performance.now();
+    const text = payload.transcript ?? payload.text ?? "";
+
+    if (payload.is_final) {
+      L.final_count++;
+      L.last_final_ms = now;
+      if (L.first_final_ms == null && L.first_audio_ms != null) {
+        L.first_final_ms = Math.round(now - L.first_audio_ms);
+      }
+      if (L.last_audio_ms != null) {
+        L.audio_end_to_final_ms = Math.round(now - L.last_audio_ms);
+      }
+      if (L.last_finalize_ms != null) {
+        L.finalize_to_final_ms = Math.round(now - L.last_finalize_ms);
+        L.last_finalize_ms = null;
+      }
+      transcriptLine(text, "final");
+    } else if (text) {
+      L.partial_count++;
+      if (L.first_partial_ms == null && L.first_audio_ms != null) {
+        L.first_partial_ms = Math.round(now - L.first_audio_ms);
+      }
+      if (L.last_partial_recv_ms != null) {
+        L.partial_gaps.push(Math.round(now - L.last_partial_recv_ms));
+        if (L.partial_gaps.length > 200) L.partial_gaps.shift();
+      }
+      L.last_partial_recv_ms = now;
+      // Show latest partial as the last line (replace previous partial).
+      const el = $("transcript");
+      if (el.lastChild && el.lastChild.className === "partial") el.removeChild(el.lastChild);
+      transcriptLine(text, "partial");
+    }
+    renderLatency();
+  });
+
+  ws.addEventListener("close", () => {
+    setStatus("disconnected", false);
+    $("btn-connect").textContent = "Connect";
+    $("btn-mic").disabled = true;
+    $("btn-finalize").disabled = true;
+    $("btn-close").disabled = true;
+    stopMic();
+  });
+
+  ws.addEventListener("error", (e) => {
+    transcriptLine("ws error (see console)", "err");
+    console.error(e);
+  });
+}
+
+function disconnect() {
+  stopMic();
+  if (ws && ws.readyState === WebSocket.OPEN) ws.close();
+}
+
+// AudioWorklet as a Blob so this HTML stays single-file.
+const WORKLET_SRC = `
+class PCM16Processor extends AudioWorkletProcessor {
+  process(inputs) {
+    const ch = inputs[0][0];
+    if (ch) this.port.postMessage(ch.slice(0));
+    return true;
+  }
+}
+registerProcessor('pcm16', PCM16Processor);
+`;
+
+async function startMic() {
+  const targetSr = Number(document.getElementById("p_sample_rate").value) || 16000;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: targetSr });
+  mediaStream = await navigator.mediaDevices.getUserMedia({ audio: {
+    channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true,
+  }});
+  const src = audioCtx.createMediaStreamSource(mediaStream);
+
+  const blob = new Blob([WORKLET_SRC], { type: "application/javascript" });
+  await audioCtx.audioWorklet.addModule(URL.createObjectURL(blob));
+  workletNode = new AudioWorkletNode(audioCtx, "pcm16");
+
+  const actualSr = audioCtx.sampleRate;
+  const needResample = actualSr !== targetSr;
+  logLine({event: "mic_start", requested_sr: targetSr, actual_sr: actualSr,
+           resample: needResample});
+
+  let ratio = actualSr / targetSr;
+  let carry = new Float32Array(0);
+
+  workletNode.port.onmessage = (ev) => {
+    if (!micActive || !ws || ws.readyState !== WebSocket.OPEN) return;
+    let f32 = ev.data;
+
+    if (needResample) {
+      // Naive linear-interp downsample. Fine for testing.
+      const merged = new Float32Array(carry.length + f32.length);
+      merged.set(carry); merged.set(f32, carry.length);
+      const outLen = Math.floor(merged.length / ratio);
+      const out = new Float32Array(outLen);
+      for (let i = 0; i < outLen; i++) {
+        const idx = i * ratio;
+        const i0 = Math.floor(idx), i1 = Math.min(i0 + 1, merged.length - 1);
+        const t = idx - i0;
+        out[i] = merged[i0] * (1 - t) + merged[i1] * t;
+      }
+      const consumed = Math.floor(outLen * ratio);
+      carry = merged.slice(consumed);
+      f32 = out;
+    }
+
+    // Float32 -> Int16 linear PCM
+    const i16 = new Int16Array(f32.length);
+    for (let i = 0; i < f32.length; i++) {
+      let s = Math.max(-1, Math.min(1, f32[i]));
+      i16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    }
+    ws.send(i16.buffer);
+    if (L.first_audio_ms == null) L.first_audio_ms = performance.now();
+    L.last_audio_ms = performance.now();
+  };
+
+  src.connect(workletNode);
+  // Node needs to be in the graph; route to a muted gain so we don't echo the mic.
+  const sink = audioCtx.createGain(); sink.gain.value = 0;
+  workletNode.connect(sink); sink.connect(audioCtx.destination);
+
+  micActive = true;
+  $("btn-mic").textContent = "Stop mic";
+  setStatus("streaming", true);
+}
+
+function stopMic() {
+  micActive = false;
+  if (workletNode) { try { workletNode.disconnect(); } catch {} workletNode = null; }
+  if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
+  if (audioCtx) { try { audioCtx.close(); } catch {} audioCtx = null; }
+  $("btn-mic").textContent = "Start mic";
+  if (ws && ws.readyState === WebSocket.OPEN) setStatus("connected", true);
+}
+
+// --------------------------------------------------------------------------
+// Wire up buttons
+// --------------------------------------------------------------------------
+$("btn-connect").addEventListener("click", () => {
+  if (ws && ws.readyState === WebSocket.OPEN) disconnect();
+  else connect();
+});
+$("btn-mic").addEventListener("click", async () => {
+  try {
+    if (micActive) stopMic();
+    else await startMic();
+  } catch (e) { transcriptLine("mic error: " + e.message, "err"); console.error(e); }
+});
+$("btn-finalize").addEventListener("click", () => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    L.last_finalize_ms = performance.now();
+    ws.send(JSON.stringify({type: "finalize"}));
+    logLine({event: "sent_finalize"});
+  }
+});
+$("btn-close").addEventListener("click", () => {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({type: "close_stream"}));
+    logLine({event: "sent_close_stream"});
+  }
+});
+</script>
+</body>
+</html>
