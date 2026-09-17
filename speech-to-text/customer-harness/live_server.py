@@ -34,6 +34,13 @@ from aiohttp import WSMsgType, web
 DEFAULT_UPSTREAM = "wss://api.smallest.ai/waves/v1/stt/live"
 HERE = Path(__file__).parent
 
+# websockets>=13 renamed extra_headers -> additional_headers.
+_HEADERS_KW = (
+    "additional_headers"
+    if int(websockets.__version__.split(".")[0]) >= 13
+    else "extra_headers"
+)
+
 
 async def index(_request: web.Request) -> web.Response:
     return web.Response(
@@ -54,13 +61,11 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
     headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
 
     t_connect_start = time.monotonic()
+    connect_kwargs = {"max_size": 10 * 1024 * 1024, "ping_interval": None}
+    if headers:
+        connect_kwargs[_HEADERS_KW] = headers
     try:
-        upstream = await websockets.connect(
-            upstream_url,
-            additional_headers=headers,
-            max_size=10 * 1024 * 1024,
-            ping_interval=None,
-        )
+        upstream = await websockets.connect(upstream_url, **connect_kwargs)
     except Exception as e:
         await client_ws.send_json({
             "_srv_event": "upstream_connect_failed",

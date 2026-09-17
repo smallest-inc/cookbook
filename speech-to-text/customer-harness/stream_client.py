@@ -27,6 +27,13 @@ from urllib.parse import urlencode
 import numpy as np
 import websockets
 
+# websockets>=13 renamed extra_headers -> additional_headers.
+_HEADERS_KW = (
+    "additional_headers"
+    if int(websockets.__version__.split(".")[0]) >= 13
+    else "extra_headers"
+)
+
 from augmentations import (
     add_noise,
     clip_head,
@@ -235,11 +242,10 @@ def _print_finals(events: list[dict]) -> None:
 
 async def _stream(ws_url: str, api_key: str, pcm: np.ndarray, sr: int, args, log) -> None:
     headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
-    async with websockets.connect(
-        ws_url,
-        max_size=10 * 1024 * 1024,
-        additional_headers=headers,
-    ) as ws:
+    kwargs = {"max_size": 10 * 1024 * 1024}
+    if headers:
+        kwargs[_HEADERS_KW] = headers
+    async with websockets.connect(ws_url, **kwargs) as ws:
         start_mono = time.monotonic()
         recv = asyncio.create_task(recv_loop(ws, log, start_mono))
         await send_audio(
