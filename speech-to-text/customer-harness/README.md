@@ -1,10 +1,17 @@
 # Customer STT Harness
 
-Mic → augmentation → Smallest STT (streaming or offline) → JSONL/CSV.
+A sandbox for playing with Smallest STT settings and presets before you wire
+them into production. Point it at your own recordings, flip knobs (EOU
+timeout, endpointing, keywords, ITN, word timestamps, …) or pick a preset
+that matches your use case, and see exactly what the API returns.
 
-Reproduces the four failure classes customers file tickets about, all from the
-customer's side of the wire so we can isolate whether the problem is upstream
-audio, transport, endpointing, or the model.
+The goal is to help you **get your integration right the first time**: dial
+in the right settings for voice agents, IVR menus, or long-form dictation,
+and see side-by-side how each knob and augmentation (head/tail clipping,
+noise, jitter, early finalization, bad resampling) changes the transcript,
+first-final latency, and duplicate-final count.
+
+Mic → optional augmentation → Smallest STT (streaming or offline) → JSONL/CSV.
 
 ## Install
 
@@ -76,9 +83,13 @@ open); **Close stream** to end the session.
 For East Asian languages (`zh`, `yue`, `ja`, `ko`, `multi-asian`), start the
 server with `--upstream wss://api.us.smallest.ai/waves/v1/stt/live`.
 
-## Reproduction recipes
+## Try it: what each setting actually does
 
-### 1. Prove head-clipping causes short-utterance deletions
+Each recipe below is a small A/B: run the "before" command, note the
+transcript / latency, then run the "after" and compare. Use these as
+templates for your own integration questions.
+
+### 1. See how head-clipping deletes short utterances (and how EOU timeout fixes it)
 
 ```
 python mic_record.py -o scenarios/yes.wav --seconds 2
@@ -92,7 +103,7 @@ python stream_client.py --wav scenarios/yes.wav --eou-timeout-ms 800 --verbose
 # expect: correct "yes" final.
 ```
 
-### 2. Prove client `finalize` racing server EOU produces duplicate finals
+### 2. See how a client `finalize` racing the server can produce duplicate finals
 
 ```
 python stream_client.py \
@@ -103,7 +114,7 @@ grep is_final /tmp/race.jsonl | wc -l
 # > 1 means the race fires. Client code must dedup within 200ms.
 ```
 
-### 3. Prove entity biasing helps Indic names
+### 3. See how keyword biasing improves proper-noun accuracy
 
 ```
 python stream_client.py --wav scenarios/rahul_choudhary.wav
@@ -113,7 +124,7 @@ python stream_client.py \
     --keywords "Rahul:3,Choudhary:3,Chaudhary:3,Choudhari:3"
 ```
 
-### 4. Regression matrix
+### 4. Sweep every preset × augmentation across your scenarios
 
 ```
 python run_matrix.py --scenarios scenarios --profile voice_agent_short_reply
