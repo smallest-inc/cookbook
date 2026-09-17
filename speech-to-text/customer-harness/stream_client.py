@@ -27,11 +27,14 @@ from urllib.parse import urlencode
 import numpy as np
 import websockets
 
-# websockets>=13 renamed extra_headers -> additional_headers.
+# websockets renamed extra_headers -> additional_headers in the new asyncio
+# implementation, but `websockets.connect` still resolves to the legacy client
+# in v13/v14 unless the user explicitly imports the asyncio one. Pick the
+# kwarg name from the actual module `websockets.connect` binds to.
 _HEADERS_KW = (
-    "additional_headers"
-    if int(websockets.__version__.split(".")[0]) >= 13
-    else "extra_headers"
+    "extra_headers"
+    if websockets.connect.__module__.startswith("websockets.legacy")
+    else "additional_headers"
 )
 
 from augmentations import (
