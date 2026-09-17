@@ -31,12 +31,25 @@ export SMALLEST_API_KEY=sk_...
 # offline_client            → https://api.smallest.ai/waves/v1/stt/?model=pulse
 ```
 
-Pass the STT model via `--model` (default `pulse`). For East Asian languages
-(`zh`, `yue`, `ja`, `ko`, `multi-asian`), point `--url` at the US region:
-`wss://api.us.smallest.ai/waves/v1/stt/live`.
+Pass the STT model via `--model` (default `pulse`). `--api-key` beats the env
+var when both are set.
 
-Override with `--url ws://localhost:8001/transcribe` (or similar) to hit a
-local server. `--api-key` beats the env var when both are set.
+### Pinning to a region (optional)
+
+`api.smallest.ai` routes to the nearest healthy region automatically — you do
+**not** need to pick one. If you'd rather pin traffic to a specific region
+(for data residency, or to minimize latency to a known location), pass a
+regional hostname via `--url`:
+
+```
+# Streaming (stream_client.py, run_matrix.py, live_server.py --upstream)
+--url wss://api.us.smallest.ai/waves/v1/stt/live      # US
+# Offline (offline_client.py)
+--url https://api.us.smallest.ai/waves/v1/stt/        # US
+```
+
+You can also override `--url` to hit a local server, e.g.
+`--url ws://localhost:8001/transcribe`.
 
 ## Files
 
@@ -80,8 +93,8 @@ finalize-button → next-final, running partial count, and avg gap between
 partials. Use **Finalize turn** to simulate a per-turn boundary (WS stays
 open); **Close stream** to end the session.
 
-For East Asian languages (`zh`, `yue`, `ja`, `ko`, `multi-asian`), start the
-server with `--upstream wss://api.us.smallest.ai/waves/v1/stt/live`.
+To pin the browser proxy to a specific region, start it with
+`--upstream wss://api.<region>.smallest.ai/waves/v1/stt/live`.
 
 ## Try it: what each setting actually does
 

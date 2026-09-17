@@ -42,7 +42,8 @@ def main() -> int:
     p.add_argument(
         "--url",
         default="https://api.smallest.ai/waves/v1/stt/",
-        help="HTTP URL (default: Smallest STT).",
+        help="HTTP URL. Defaults to api.smallest.ai (auto region routing). "
+             "Pass https://api.<region>.smallest.ai/waves/v1/stt/ to pin.",
     )
     p.add_argument(
         "--model",

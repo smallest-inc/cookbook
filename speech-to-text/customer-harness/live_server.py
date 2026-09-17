@@ -132,8 +132,9 @@ def main() -> None:
     p.add_argument("--host", default="localhost")
     p.add_argument("--port", type=int, default=8765)
     p.add_argument("--upstream", default=DEFAULT_UPSTREAM,
-                   help="Upstream WSS URL. US region: "
-                        "wss://api.us.smallest.ai/waves/v1/stt/live")
+                   help="Upstream WSS URL. Defaults to api.smallest.ai. "
+                        "Pass wss://api.<region>.smallest.ai/waves/v1/stt/live "
+                        "to pin to a specific region.")
     p.add_argument("--api-key", default="",
                    help="Falls back to SMALLEST_API_KEY env var.")
     args = p.parse_args()

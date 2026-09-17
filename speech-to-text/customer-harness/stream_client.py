@@ -292,7 +292,8 @@ def parse_args() -> argparse.Namespace:
         "--url",
         default="wss://api.smallest.ai/waves/v1/stt/live",
         help="Streaming WebSocket URL. "
-             "Use wss://api.us.smallest.ai/waves/v1/stt/live for zh/yue/ja/ko/multi-asian.",
+             "Defaults to api.smallest.ai (auto region routing). "
+             "Pass wss://api.<region>.smallest.ai/waves/v1/stt/live to pin.",
     )
     p.add_argument(
         "--model",
