@@ -56,12 +56,14 @@ PRESETS: dict[str, dict] = {
         "endpointing": True,
         "finalize_on_words": False,
         "itn_normalize": True,
+        "word_timestamps": True,
     },
     "voice_agent_short_reply": {
         "eou_timeout_ms": 550,
         "endpointing": True,
         "finalize_on_words": False,
         "itn_normalize": False,
+        "word_timestamps": True,
     },
     "ivr": {
         # Also implies sample_rate=8000, encoding=mulaw — see README. The harness
@@ -71,6 +73,7 @@ PRESETS: dict[str, dict] = {
         "endpointing": True,
         "finalize_on_words": False,
         "itn_normalize": False,
+        "word_timestamps": True,
     },
     "dictation": {
         "eou_timeout_ms": 1400,

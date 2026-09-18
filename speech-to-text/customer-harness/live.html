@@ -53,6 +53,34 @@
   #timeline .final { color: #060; font-weight: 600; }
   #timeline .speech-end { color: #b60; font-weight: 600; }
   #audio-playback { width: 100%; margin-top: 4px; }
+  .tracks { margin-top: 8px; }
+  .track {
+    position: relative; height: 24px; margin: 6px 0;
+    border: 1px solid #ddd; border-radius: 3px; background: #fafafa;
+  }
+  .track-label {
+    position: absolute; left: 4px; top: 4px;
+    font: 500 10px sans-serif; color: #555; pointer-events: none; z-index: 2;
+  }
+  .track .word {
+    position: absolute; top: 4px; height: 16px;
+    padding: 0 3px; font: 10px/16px ui-monospace, monospace;
+    background: rgba(0, 120, 200, 0.18); color: #113;
+    border-radius: 2px; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .track-received .word { background: rgba(180, 90, 0, 0.22); color: #421; }
+  .audio-fill {
+    position: absolute; left: 0; top: 0; height: 100%;
+    background: linear-gradient(90deg, #d4edda, #b8e5c8);
+    z-index: 1;
+  }
+  .tick {
+    position: absolute; top: 0; bottom: 0; width: 0;
+    border-left: 1px dashed #ccc; font: 9px sans-serif; color: #999;
+  }
+  .tick span { position: absolute; top: -12px; left: 2px; }
+  #track-legend { font: 10px sans-serif; color: #666; margin-top: 4px; }
   .status { font-size: 12px; padding: 2px 8px; border-radius: 4px; display: inline-block; }
   .status.on { background: #d4edda; color: #155724; }
   .status.off { background: #f8d7da; color: #721c24; }
@@ -104,11 +132,24 @@
     </fieldset>
 
     <fieldset>
-      <legend>Playback (what the server received)</legend>
+      <legend>Playback + word timing</legend>
       <audio id="audio-playback" controls></audio>
       <div style="font-size:11px;color:#666;margin-top:4px;">
-        Recording buffers while the mic is on, freezes on Stop mic.
+        Recording buffers while the mic is on, freezes on Stop mic. The three
+        tracks below share one time axis (t=0 is first audio byte sent).
       </div>
+      <div class="tracks">
+        <div class="track" id="track-audio">
+          <span class="track-label">1. audio</span>
+        </div>
+        <div class="track" id="track-spoken">
+          <span class="track-label">2. words (spoken time — server word_timestamps)</span>
+        </div>
+        <div class="track track-received" id="track-received">
+          <span class="track-label">3. words (received time — when the client got each final)</span>
+        </div>
+      </div>
+      <div id="track-legend">time axis: —</div>
     </fieldset>
 
     <fieldset>
@@ -144,7 +185,7 @@ const PARAM_SPEC = [
   { name: "endpointing",        type: "bool",   default: "true"  },
   { name: "eou_timeout_ms",     type: "number", default: 800 },
   { name: "vad_events",         type: "bool",   default: "false" },
-  { name: "word_timestamps",    type: "bool",   default: "false" },
+  { name: "word_timestamps",    type: "bool",   default: "true"  },
   { name: "sentence_timestamps",type: "bool",   default: "false" },
   { name: "diarize",            type: "bool",   default: "false" },
   { name: "finalize_on_words",  type: "bool",   default: "true"  },
@@ -433,6 +474,99 @@ function loadPlaybackFromBuffer() {
   el.dataset.prevUrl = url;
 }
 
+function currentAudioMs() {
+  // Total buffered audio (samples/rate). During recording this grows; after
+  // Stop mic it's the final duration.
+  let samples = 0;
+  for (const c of pcmChunks) samples += c.length;
+  return Math.round((samples / pcmSampleRate) * 1000);
+}
+
+// --------------------------------------------------------------------------
+// Word timing tracks (audio | spoken time | received time)
+// --------------------------------------------------------------------------
+// Populated from each final's word_timestamps. `received_ms` is set by the
+// client the moment the final arrives (perf.now() − first_audio_ms).
+const words = [];  // {text, spoken_start_ms, spoken_end_ms, received_ms}
+
+function extractWords(payload) {
+  const raw = payload.words || payload.word_timestamps || payload.tokens || [];
+  return raw.map(w => {
+    const text = w.word ?? w.text ?? w.token ?? "";
+    // Support both ms and seconds keys — heuristic: values < 1000 without an
+    // explicit _ms suffix are assumed to be seconds.
+    let s = w.start_ms ?? w.startMs ?? null;
+    let e = w.end_ms ?? w.endMs ?? null;
+    if (s == null && (w.start ?? w.startTime) != null) s = (w.start ?? w.startTime) * 1000;
+    if (e == null && (w.end ?? w.endTime) != null) e = (w.end ?? w.endTime) * 1000;
+    return {
+      text,
+      spoken_start_ms: s != null ? Math.round(s) : null,
+      spoken_end_ms: e != null ? Math.round(e) : null,
+    };
+  }).filter(w => w.text);
+}
+
+function renderWordTracks() {
+  const audioMs = currentAudioMs();
+  const spokenMax = words.reduce((m, w) => Math.max(m, w.spoken_end_ms || w.spoken_start_ms || 0), 0);
+  const receivedMax = words.reduce((m, w) => Math.max(m, w.received_ms || 0), 0);
+  const total = Math.max(audioMs, spokenMax, receivedMax, 500);
+
+  const trackAudio = $("track-audio");
+  const trackSpoken = $("track-spoken");
+  const trackReceived = $("track-received");
+
+  // Wipe everything except the label spans.
+  for (const t of [trackAudio, trackSpoken, trackReceived]) {
+    [...t.children].forEach(ch => { if (!ch.classList.contains("track-label")) ch.remove(); });
+  }
+
+  // 1) Audio track: fill from 0 to audioMs.
+  if (audioMs > 0) {
+    const fill = document.createElement("div");
+    fill.className = "audio-fill";
+    fill.style.width = ((audioMs / total) * 100).toFixed(2) + "%";
+    trackAudio.appendChild(fill);
+  }
+
+  // 2) & 3) Words at spoken / received time.
+  for (const w of words) {
+    if (w.spoken_start_ms != null) {
+      const el = document.createElement("span");
+      el.className = "word";
+      el.textContent = w.text;
+      const durMs = Math.max(60, (w.spoken_end_ms ?? (w.spoken_start_ms + 200)) - w.spoken_start_ms);
+      el.style.left = ((w.spoken_start_ms / total) * 100).toFixed(2) + "%";
+      el.style.width = Math.max(2, (durMs / total) * 100).toFixed(2) + "%";
+      el.title = `"${w.text}"\nspoken: ${w.spoken_start_ms}–${w.spoken_end_ms} ms`;
+      trackSpoken.appendChild(el);
+    }
+    if (w.received_ms != null) {
+      const el = document.createElement("span");
+      el.className = "word";
+      el.textContent = w.text;
+      el.style.left = ((w.received_ms / total) * 100).toFixed(2) + "%";
+      el.title = `"${w.text}"\nreceived at t=+${w.received_ms} ms`;
+      trackReceived.appendChild(el);
+    }
+  }
+
+  // 4) Time-axis ticks + legend.
+  const legend = [
+    `audio: ${(audioMs/1000).toFixed(2)}s`,
+    words.length ? `words: ${words.length}` : null,
+    receivedMax ? `last final received: ${(receivedMax/1000).toFixed(2)}s` : null,
+    `axis: 0 → ${(total/1000).toFixed(2)}s`,
+  ].filter(Boolean).join("  ·  ");
+  $("track-legend").textContent = legend;
+}
+
+function resetWordTracks() {
+  words.length = 0;
+  renderWordTracks();
+}
+
 // --------------------------------------------------------------------------
 // WebSocket + mic
 // --------------------------------------------------------------------------
@@ -443,7 +577,7 @@ let mediaStream = null;
 let micActive = false;
 
 async function connect() {
-  clearTranscript(); clearLog(); clearTimeline();
+  clearTranscript(); clearLog(); clearTimeline(); resetWordTracks();
   Object.assign(L, {
     ws_connect_ms: null, upstream_connect_ms: null,
     first_audio_ms: null, last_audio_ms: null,
@@ -530,6 +664,17 @@ async function connect() {
         (L.primary_latency_ms != null
           ? `   (speech end → final: ${L.primary_latency_ms} ms)` : "")
       );
+
+      // Attach words to the timing tracks. `received_ms` is set to "now"
+      // relative to first audio sent — all words in this final share it.
+      const finalWords = extractWords(payload);
+      const receivedMs = L.first_audio_ms != null
+        ? Math.round(now - L.first_audio_ms) : null;
+      for (const w of finalWords) {
+        w.received_ms = receivedMs;
+        words.push(w);
+      }
+      renderWordTracks();
     } else if (text) {
       L.partial_count++;
       // Show latest partial as the last line (replace previous partial).
@@ -573,9 +718,14 @@ class PCM16Processor extends AudioWorkletProcessor {
 registerProcessor('pcm16', PCM16Processor);
 `;
 
+let trackRefreshTimer = null;
+
 async function startMic() {
   const targetSr = Number(document.getElementById("p_sample_rate").value) || 16000;
   resetPcmBuffer(targetSr);
+  // Refresh the audio track live so users see the bar grow.
+  if (trackRefreshTimer) clearInterval(trackRefreshTimer);
+  trackRefreshTimer = setInterval(renderWordTracks, 250);
   audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: targetSr });
   mediaStream = await navigator.mediaDevices.getUserMedia({ audio: {
     channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true,
@@ -643,6 +793,7 @@ async function startMic() {
 function stopMic() {
   const wasActive = micActive;
   micActive = false;
+  if (trackRefreshTimer) { clearInterval(trackRefreshTimer); trackRefreshTimer = null; }
   if (workletNode) { try { workletNode.disconnect(); } catch {} workletNode = null; }
   if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
   if (audioCtx) { try { audioCtx.close(); } catch {} audioCtx = null; }
@@ -651,6 +802,7 @@ function stopMic() {
   if (wasActive) {
     timelineAppend("send", "■ mic stopped, encoding playback…");
     loadPlaybackFromBuffer();
+    renderWordTracks();  // finalize audio-bar width now that recording is done
   }
 }
 
