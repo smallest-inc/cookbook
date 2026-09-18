@@ -46,6 +46,20 @@ _HEADERS_KW = (
 )
 
 
+def _log_session_summary(peer: str, s: dict) -> None:
+    def _ms(a, b):
+        return int((b - a) * 1000) if (a is not None and b is not None) else None
+
+    print(
+        f"[{peer}] session end · "
+        f"first_partial_ms={_ms(s['first_audio_at'], s['first_partial_at'])} "
+        f"first_final_ms={_ms(s['first_audio_at'], s['first_final_at'])} "
+        f"last_final_ms={_ms(s['first_audio_at'], s['last_final_at'])} "
+        f"partials={s['partials']} finals={s['finals']} bytes_up={s['bytes_up']}",
+        flush=True,
+    )
+
+
 async def index(_request: web.Request) -> web.Response:
     return web.Response(
         body=(HERE / "live.html").read_bytes(),
@@ -96,9 +110,23 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
         "connect_ms": connect_ms,
     })
 
+    # Per-session latency tracking (server-side view).
+    stats = {
+        "first_audio_at": None,   # monotonic sec of first byte from client
+        "first_partial_at": None,
+        "first_final_at": None,
+        "last_final_at": None,
+        "partials": 0,
+        "finals": 0,
+        "bytes_up": 0,
+    }
+
     async def pump_client_to_upstream() -> None:
         async for msg in client_ws:
             if msg.type == WSMsgType.BINARY:
+                if stats["first_audio_at"] is None:
+                    stats["first_audio_at"] = time.monotonic()
+                stats["bytes_up"] += len(msg.data)
                 await upstream.send(msg.data)
             elif msg.type == WSMsgType.TEXT:
                 await upstream.send(msg.data)
@@ -112,7 +140,8 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
     async def pump_upstream_to_client() -> None:
         try:
             async for msg in upstream:
-                srv_ms = int(time.monotonic() * 1000)
+                now = time.monotonic()
+                srv_ms = int(now * 1000)
                 if isinstance(msg, bytes):
                     continue
                 try:
@@ -121,6 +150,29 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
                     payload = {"_raw": msg}
                 payload["_srv_recv_ms"] = srv_ms
                 await client_ws.send_json(payload)
+
+                # Log the first partial and each final with latency vs. first
+                # client audio byte — the numbers customers actually care about.
+                is_final = bool(payload.get("is_final"))
+                is_partial = (not is_final) and (
+                    "transcript" in payload or "text" in payload
+                )
+                if is_partial and stats["first_partial_at"] is None:
+                    stats["first_partial_at"] = now
+                    if stats["first_audio_at"] is not None:
+                        ms = int((now - stats["first_audio_at"]) * 1000)
+                        print(f"[{peer}] first partial: {ms}ms since first audio", flush=True)
+                if is_partial:
+                    stats["partials"] += 1
+                if is_final:
+                    stats["finals"] += 1
+                    if stats["first_final_at"] is None:
+                        stats["first_final_at"] = now
+                        if stats["first_audio_at"] is not None:
+                            ms = int((now - stats["first_audio_at"]) * 1000)
+                            text = (payload.get("transcript") or payload.get("text") or "")[:60]
+                            print(f"[{peer}] first final: {ms}ms since first audio — {text!r}", flush=True)
+                    stats["last_final_at"] = now
         except websockets.ConnectionClosed as e:
             print(
                 f"[{peer}] upstream closed: code={e.code} reason={e.reason!r}",
@@ -132,6 +184,7 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
                 "reason": e.reason,
             })
         finally:
+            _log_session_summary(peer, stats)
             if not client_ws.closed:
                 await client_ws.close()
 
