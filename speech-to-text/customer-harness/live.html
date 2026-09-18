@@ -70,6 +70,14 @@
     text-overflow: ellipsis;
   }
   .track-received .word { background: rgba(180, 90, 0, 0.22); color: #421; }
+  .sentence-marker {
+    position: absolute; top: 3px; height: 18px;
+    padding: 0 5px; font: 600 10px/18px ui-monospace, monospace;
+    background: rgba(180, 90, 0, 0.28); color: #421;
+    border-left: 2px solid #b44; border-radius: 0 3px 3px 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 40%;
+  }
   .audio-fill {
     position: absolute; left: 0; top: 0; height: 100%;
     background: linear-gradient(90deg, #d4edda, #b8e5c8);
@@ -146,7 +154,7 @@
           <span class="track-label">2. words (spoken time — server word_timestamps)</span>
         </div>
         <div class="track track-received" id="track-received">
-          <span class="track-label">3. words (received time — when the client got each final)</span>
+          <span class="track-label">3. sentence end (received time — one marker per final)</span>
         </div>
       </div>
       <div id="track-legend">time axis: —</div>
@@ -483,11 +491,27 @@ function currentAudioMs() {
 }
 
 // --------------------------------------------------------------------------
-// Word timing tracks (audio | spoken time | received time)
+// Sentence timing tracks (audio | words in each sentence at spoken time |
+//                         one marker per sentence at received time)
 // --------------------------------------------------------------------------
-// Populated from each final's word_timestamps. `received_ms` is set by the
-// client the moment the final arrives (perf.now() − first_audio_ms).
-const words = [];  // {text, spoken_start_ms, spoken_end_ms, received_ms}
+// Each final becomes one sentence. Row 2 shows its constituent words at
+// their server-reported spoken timestamps. Row 3 shows a single "sentence
+// end" marker at the moment the client received that final — which is the
+// end of the sentence from the caller's perspective.
+const sentences = [];
+// {index, text, words: [{text, spoken_start_ms, spoken_end_ms}],
+//  spoken_start_ms, spoken_end_ms, received_ms}
+
+// Palette cycled per sentence so row 2 words and row 3 markers line up
+// visually.
+const SENTENCE_COLORS = [
+  { fg: "#0a4", bg: "rgba(0, 140, 60, 0.22)",  border: "#0a4" },
+  { fg: "#a40", bg: "rgba(180, 90, 0, 0.22)",  border: "#a40" },
+  { fg: "#048", bg: "rgba(0, 90, 170, 0.22)",  border: "#048" },
+  { fg: "#909", bg: "rgba(150, 30, 150, 0.20)", border: "#909" },
+  { fg: "#a04", bg: "rgba(180, 30, 90, 0.20)", border: "#a04" },
+];
+function colorFor(i) { return SENTENCE_COLORS[(i - 1) % SENTENCE_COLORS.length]; }
 
 function extractWords(payload) {
   const raw = payload.words || payload.word_timestamps || payload.tokens || [];
@@ -507,10 +531,28 @@ function extractWords(payload) {
   }).filter(w => w.text);
 }
 
+function addSentenceFromFinal(text, payload, receivedMs) {
+  const wordList = extractWords(payload);
+  const starts = wordList.map(w => w.spoken_start_ms).filter(v => v != null);
+  const ends = wordList.map(w => w.spoken_end_ms ?? w.spoken_start_ms).filter(v => v != null);
+  const spokenStart = starts.length ? Math.min(...starts) : null;
+  const spokenEnd = ends.length ? Math.max(...ends) : null;
+  sentences.push({
+    index: sentences.length + 1,
+    text: (text || "").trim(),
+    words: wordList,
+    spoken_start_ms: spokenStart,
+    spoken_end_ms: spokenEnd,
+    received_ms: receivedMs,
+  });
+}
+
 function renderWordTracks() {
   const audioMs = currentAudioMs();
-  const spokenMax = words.reduce((m, w) => Math.max(m, w.spoken_end_ms || w.spoken_start_ms || 0), 0);
-  const receivedMax = words.reduce((m, w) => Math.max(m, w.received_ms || 0), 0);
+  const spokenMax = sentences.reduce(
+    (m, s) => Math.max(m, s.spoken_end_ms || s.spoken_start_ms || 0), 0);
+  const receivedMax = sentences.reduce(
+    (m, s) => Math.max(m, s.received_ms || 0), 0);
   const total = Math.max(audioMs, spokenMax, receivedMax, 500);
 
   const trackAudio = $("track-audio");
@@ -530,32 +572,47 @@ function renderWordTracks() {
     trackAudio.appendChild(fill);
   }
 
-  // 2) & 3) Words at spoken / received time.
-  for (const w of words) {
-    if (w.spoken_start_ms != null) {
+  // 2) Row 2: individual words for each sentence, colored per sentence.
+  // 3) Row 3: one "S{n}" marker per sentence at its received time.
+  for (const s of sentences) {
+    const c = colorFor(s.index);
+
+    for (const w of s.words) {
+      if (w.spoken_start_ms == null) continue;
       const el = document.createElement("span");
       el.className = "word";
       el.textContent = w.text;
       const durMs = Math.max(60, (w.spoken_end_ms ?? (w.spoken_start_ms + 200)) - w.spoken_start_ms);
       el.style.left = ((w.spoken_start_ms / total) * 100).toFixed(2) + "%";
       el.style.width = Math.max(2, (durMs / total) * 100).toFixed(2) + "%";
-      el.title = `"${w.text}"\nspoken: ${w.spoken_start_ms}–${w.spoken_end_ms} ms`;
+      el.style.background = c.bg;
+      el.style.color = c.fg;
+      el.title = `S${s.index} · "${w.text}"\nspoken: ${w.spoken_start_ms}–${w.spoken_end_ms} ms`;
       trackSpoken.appendChild(el);
     }
-    if (w.received_ms != null) {
-      const el = document.createElement("span");
-      el.className = "word";
-      el.textContent = w.text;
-      el.style.left = ((w.received_ms / total) * 100).toFixed(2) + "%";
-      el.title = `"${w.text}"\nreceived at t=+${w.received_ms} ms`;
-      trackReceived.appendChild(el);
+
+    if (s.received_ms != null) {
+      const marker = document.createElement("span");
+      marker.className = "sentence-marker";
+      marker.textContent = `S${s.index}: ${s.text}`;
+      marker.style.left = ((s.received_ms / total) * 100).toFixed(2) + "%";
+      marker.style.background = c.bg;
+      marker.style.color = c.fg;
+      marker.style.borderLeftColor = c.border;
+      const lagMs = s.spoken_end_ms != null
+        ? Math.round(s.received_ms - s.spoken_end_ms) : null;
+      marker.title = `S${s.index}: "${s.text}"\n` +
+        `sentence spoken: ${s.spoken_start_ms}–${s.spoken_end_ms} ms\n` +
+        `final received: t=+${s.received_ms} ms` +
+        (lagMs != null ? `\nlag (last-word-end → final-received): ${lagMs} ms` : "");
+      trackReceived.appendChild(marker);
     }
   }
 
-  // 4) Time-axis ticks + legend.
+  // Legend.
   const legend = [
     `audio: ${(audioMs/1000).toFixed(2)}s`,
-    words.length ? `words: ${words.length}` : null,
+    sentences.length ? `sentences: ${sentences.length}` : null,
     receivedMax ? `last final received: ${(receivedMax/1000).toFixed(2)}s` : null,
     `axis: 0 → ${(total/1000).toFixed(2)}s`,
   ].filter(Boolean).join("  ·  ");
@@ -563,7 +620,7 @@ function renderWordTracks() {
 }
 
 function resetWordTracks() {
-  words.length = 0;
+  sentences.length = 0;
   renderWordTracks();
 }
 
@@ -665,15 +722,11 @@ async function connect() {
           ? `   (speech end → final: ${L.primary_latency_ms} ms)` : "")
       );
 
-      // Attach words to the timing tracks. `received_ms` is set to "now"
-      // relative to first audio sent — all words in this final share it.
-      const finalWords = extractWords(payload);
+      // One sentence per final. Row 2 gets its words, row 3 gets a single
+      // "sentence end" marker at the moment the client received this final.
       const receivedMs = L.first_audio_ms != null
         ? Math.round(now - L.first_audio_ms) : null;
-      for (const w of finalWords) {
-        w.received_ms = receivedMs;
-        words.push(w);
-      }
+      addSentenceFromFinal(text, payload, receivedMs);
       renderWordTracks();
     } else if (text) {
       L.partial_count++;
