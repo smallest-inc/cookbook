@@ -47,14 +47,13 @@ _HEADERS_KW = (
 
 
 def _log_session_summary(peer: str, s: dict) -> None:
+    # All latencies are in milliseconds (ms).
     def _ms(a, b):
         return int((b - a) * 1000) if (a is not None and b is not None) else None
 
     print(
         f"[{peer}] session end · "
-        f"first_partial_ms={_ms(s['first_audio_at'], s['first_partial_at'])} "
-        f"first_final_ms={_ms(s['first_audio_at'], s['first_final_at'])} "
-        f"last_final_ms={_ms(s['first_audio_at'], s['last_final_at'])} "
+        f"last_audio_to_last_final_ms={_ms(s['last_audio_at'], s['last_final_at'])} "
         f"partials={s['partials']} finals={s['finals']} bytes_up={s['bytes_up']}",
         flush=True,
     )
@@ -103,19 +102,17 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
         return client_ws
 
     connect_ms = int((time.monotonic() - t_connect_start) * 1000)
-    print(f"[{peer}] ✓ upstream connected in {connect_ms}ms", flush=True)
+    print(f"[{peer}] ✓ upstream connected in {connect_ms} ms", flush=True)
     await client_ws.send_json({
         "_srv_event": "upstream_connected",
         "upstream_url": upstream_url,
         "connect_ms": connect_ms,
     })
 
-    # Per-session latency tracking (server-side view).
+    # Per-session latency tracking (all values in milliseconds).
     stats = {
-        "first_audio_at": None,   # monotonic sec of first byte from client
-        "first_partial_at": None,
-        "first_final_at": None,
-        "last_final_at": None,
+        "last_audio_at": None,   # monotonic sec of most recent audio byte from client
+        "last_final_at": None,   # monotonic sec of most recent final from upstream
         "partials": 0,
         "finals": 0,
         "bytes_up": 0,
@@ -124,8 +121,7 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
     async def pump_client_to_upstream() -> None:
         async for msg in client_ws:
             if msg.type == WSMsgType.BINARY:
-                if stats["first_audio_at"] is None:
-                    stats["first_audio_at"] = time.monotonic()
+                stats["last_audio_at"] = time.monotonic()
                 stats["bytes_up"] += len(msg.data)
                 await upstream.send(msg.data)
             elif msg.type == WSMsgType.TEXT:
@@ -151,28 +147,24 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
                 payload["_srv_recv_ms"] = srv_ms
                 await client_ws.send_json(payload)
 
-                # Log the first partial and each final with latency vs. first
-                # client audio byte — the numbers customers actually care about.
+                # Only measurement kept: last audio byte from the client → this
+                # final from the server, in milliseconds.
                 is_final = bool(payload.get("is_final"))
                 is_partial = (not is_final) and (
                     "transcript" in payload or "text" in payload
                 )
-                if is_partial and stats["first_partial_at"] is None:
-                    stats["first_partial_at"] = now
-                    if stats["first_audio_at"] is not None:
-                        ms = int((now - stats["first_audio_at"]) * 1000)
-                        print(f"[{peer}] first partial: {ms}ms since first audio", flush=True)
                 if is_partial:
                     stats["partials"] += 1
                 if is_final:
                     stats["finals"] += 1
-                    if stats["first_final_at"] is None:
-                        stats["first_final_at"] = now
-                        if stats["first_audio_at"] is not None:
-                            ms = int((now - stats["first_audio_at"]) * 1000)
-                            text = (payload.get("transcript") or payload.get("text") or "")[:60]
-                            print(f"[{peer}] first final: {ms}ms since first audio — {text!r}", flush=True)
                     stats["last_final_at"] = now
+                    if stats["last_audio_at"] is not None:
+                        latency_ms = int((now - stats["last_audio_at"]) * 1000)
+                        text = (payload.get("transcript") or payload.get("text") or "")[:60]
+                        print(
+                            f"[{peer}] last audio → final latency: {latency_ms} ms — {text!r}",
+                            flush=True,
+                        )
         except websockets.ConnectionClosed as e:
             print(
                 f"[{peer}] upstream closed: code={e.code} reason={e.reason!r}",
