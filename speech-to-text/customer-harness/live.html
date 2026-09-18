@@ -36,6 +36,23 @@
   #latency table { border-collapse: collapse; width: 100%; }
   #latency td { padding: 2px 6px; border-bottom: 1px dashed #eee; }
   #latency td:last-child { text-align: right; font-weight: 600; }
+  #primary-latency {
+    font: 600 20px/1.3 ui-monospace, monospace; color: #0a5;
+    padding: 6px 8px; background: #f0fbf5; border-radius: 4px; margin-bottom: 8px;
+    text-align: center;
+  }
+  #primary-latency.pending { color: #888; background: #f8f8f8; }
+  #primary-latency .lbl { display: block; font: 500 11px sans-serif; color: #555; margin-bottom: 2px; }
+  #timeline {
+    height: 180px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px;
+    padding: 6px; font-family: ui-monospace, monospace; font-size: 11px;
+    background: #fafafa; white-space: pre;
+  }
+  #timeline .send { color: #669; }
+  #timeline .partial { color: #888; }
+  #timeline .final { color: #060; font-weight: 600; }
+  #timeline .speech-end { color: #b60; font-weight: 600; }
+  #audio-playback { width: 100%; margin-top: 4px; }
   .status { font-size: 12px; padding: 2px 8px; border-radius: 4px; display: inline-block; }
   .status.on { background: #d4edda; color: #155724; }
   .status.off { background: #f8d7da; color: #721c24; }
@@ -71,6 +88,10 @@
 
     <fieldset>
       <legend>Latency</legend>
+      <div id="primary-latency" class="pending">
+        <span class="lbl">speech end → final</span>
+        <span id="primary-value">—</span>
+      </div>
       <div id="latency"></div>
     </fieldset>
 
@@ -80,6 +101,19 @@
     <fieldset>
       <legend>Transcript</legend>
       <div id="transcript"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Playback (what the server received)</legend>
+      <audio id="audio-playback" controls></audio>
+      <div style="font-size:11px;color:#666;margin-top:4px;">
+        Recording buffers while the mic is on, freezes on Stop mic.
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Timeline (send / receive)</legend>
+      <div id="timeline"></div>
     </fieldset>
 
     <fieldset>
@@ -266,38 +300,48 @@ function clearTranscript() { $("transcript").innerHTML = ""; }
 function clearLog() { $("log").textContent = ""; }
 
 // --------------------------------------------------------------------------
-// Latency tracking
+// Latency tracking (all values in milliseconds)
 // --------------------------------------------------------------------------
+//
+// Primary metric — the one that matters for voice-agent turn latency:
+//     speech_end_ms → final_ms
+// "Speech end" is taken from the server's VAD end event when it arrives.
+// If no VAD event fires before the final, we fall back to "last audio byte
+// sent → final" (labelled as such so the source is unambiguous).
+//
 const L = {
   ws_connect_ms: null,
   upstream_connect_ms: null,
   first_audio_ms: null,
-  first_partial_ms: null,
-  first_final_ms: null,
   last_audio_ms: null,
-  last_finalize_ms: null,
-  last_final_ms: null,
+  last_speech_end_ms: null,       // most recent server VAD end
+  last_speech_end_source: null,   // "vad" | "last_audio" | null
+  primary_latency_ms: null,       // speech end (or last audio) → last final
+  audio_end_to_final_ms: null,    // last audio → last final (always tracked)
   partial_count: 0,
   final_count: 0,
-  partial_gaps: [],
-  last_partial_recv_ms: null,
-  audio_end_to_final_ms: null,   // last audio → most recent final
-  finalize_to_final_ms: null,    // finalize button → next final
 };
 function renderLatency() {
+  // Big number on top.
+  const primEl = $("primary-latency");
+  const primValEl = $("primary-value");
+  if (L.primary_latency_ms != null) {
+    const src = L.last_speech_end_source === "vad" ? "VAD event" : "last audio byte";
+    primEl.classList.remove("pending");
+    primEl.querySelector(".lbl").textContent = `speech end → final  (source: ${src})`;
+    primValEl.textContent = `${L.primary_latency_ms} ms`;
+  } else {
+    primEl.classList.add("pending");
+    primEl.querySelector(".lbl").textContent = "speech end → final";
+    primValEl.textContent = "— ms (waiting for a final)";
+  }
+  // Supporting numbers underneath.
   const rows = [
-    ["ws connect", L.ws_connect_ms],
-    ["upstream connect", L.upstream_connect_ms],
-    ["mic → first audio sent", L.first_audio_ms != null ? 0 : null],
-    ["first audio → first partial", L.first_partial_ms],
-    ["first audio → first final", L.first_final_ms],
-    ["last audio → last final", L.audio_end_to_final_ms],
-    ["finalize → next final", L.finalize_to_final_ms],
+    ["ws connect (ms)", L.ws_connect_ms],
+    ["upstream connect (ms)", L.upstream_connect_ms],
+    ["last audio → last final (ms)", L.audio_end_to_final_ms],
     ["partial count", L.partial_count],
     ["final count", L.final_count],
-    ["avg partial gap (ms)", L.partial_gaps.length
-      ? Math.round(L.partial_gaps.reduce((a,b)=>a+b,0) / L.partial_gaps.length)
-      : null],
   ];
   const tbl = ["<table>"];
   for (const [k, v] of rows) {
@@ -309,6 +353,87 @@ function renderLatency() {
 renderLatency();
 
 // --------------------------------------------------------------------------
+// Timeline (send / receive events, t-relative to first audio sent)
+// --------------------------------------------------------------------------
+function timelineAppend(cls, text) {
+  const el = $("timeline");
+  const t = L.first_audio_ms != null
+    ? Math.round(performance.now() - L.first_audio_ms)
+    : 0;
+  const line = document.createElement("div");
+  line.className = cls;
+  line.textContent = `[t=+${String(t).padStart(5)}ms] ${text}`;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+function clearTimeline() { $("timeline").textContent = ""; }
+
+// Detect "user stopped speaking" from a variety of server VAD event shapes.
+// (Naming isn't standardized across STT providers.)
+function isSpeechEndEvent(payload) {
+  const s = (v) => String(v || "").toLowerCase();
+  const cand = s(payload.event) + "|" + s(payload.type);
+  if (cand.includes("speech_end") || cand.includes("vad_end")
+      || cand.includes("vad_speech_end") || cand.includes("endpoint")) {
+    return true;
+  }
+  if (payload.speech_end === true || payload.is_endpoint === true) return true;
+  return false;
+}
+
+// --------------------------------------------------------------------------
+// PCM buffer -> WAV blob for playback
+// --------------------------------------------------------------------------
+let pcmChunks = [];       // Array<Int16Array> of what we sent to the server
+let pcmSampleRate = 16000;
+
+function resetPcmBuffer(sampleRate) {
+  pcmChunks = [];
+  pcmSampleRate = sampleRate;
+}
+
+function encodeWavBlob(chunks, sampleRate) {
+  let total = 0;
+  for (const c of chunks) total += c.length;
+  const buf = new ArrayBuffer(44 + total * 2);
+  const view = new DataView(buf);
+  const writeStr = (off, s) => {
+    for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i));
+  };
+  writeStr(0, "RIFF");
+  view.setUint32(4, 36 + total * 2, true);
+  writeStr(8, "WAVE");
+  writeStr(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);          // PCM
+  view.setUint16(22, 1, true);          // mono
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, "data");
+  view.setUint32(40, total * 2, true);
+  let off = 44;
+  for (const c of chunks) {
+    for (let i = 0; i < c.length; i++) {
+      view.setInt16(off, c[i], true);
+      off += 2;
+    }
+  }
+  return new Blob([buf], { type: "audio/wav" });
+}
+
+function loadPlaybackFromBuffer() {
+  if (!pcmChunks.length) return;
+  const blob = encodeWavBlob(pcmChunks, pcmSampleRate);
+  const url = URL.createObjectURL(blob);
+  const el = $("audio-playback");
+  if (el.dataset.prevUrl) URL.revokeObjectURL(el.dataset.prevUrl);
+  el.src = url;
+  el.dataset.prevUrl = url;
+}
+
+// --------------------------------------------------------------------------
 // WebSocket + mic
 // --------------------------------------------------------------------------
 let ws = null;
@@ -318,14 +443,13 @@ let mediaStream = null;
 let micActive = false;
 
 async function connect() {
-  clearTranscript(); clearLog();
+  clearTranscript(); clearLog(); clearTimeline();
   Object.assign(L, {
     ws_connect_ms: null, upstream_connect_ms: null,
-    first_audio_ms: null, first_partial_ms: null, first_final_ms: null,
-    last_audio_ms: null, last_finalize_ms: null, last_final_ms: null,
+    first_audio_ms: null, last_audio_ms: null,
+    last_speech_end_ms: null, last_speech_end_source: null,
+    primary_latency_ms: null, audio_end_to_final_ms: null,
     partial_count: 0, final_count: 0,
-    partial_gaps: [], last_partial_recv_ms: null,
-    audio_end_to_final_ms: null, finalize_to_final_ms: null,
   });
   renderLatency();
 
@@ -374,34 +498,45 @@ async function connect() {
     const now = performance.now();
     const text = payload.transcript ?? payload.text ?? "";
 
+    // Speech-end (VAD) event: record it as the anchor for the next final.
+    if (isSpeechEndEvent(payload)) {
+      L.last_speech_end_ms = now;
+      L.last_speech_end_source = "vad";
+      timelineAppend("speech-end", "▲ speech end (VAD)");
+    }
+
     if (payload.is_final) {
       L.final_count++;
-      L.last_final_ms = now;
-      if (L.first_final_ms == null && L.first_audio_ms != null) {
-        L.first_final_ms = Math.round(now - L.first_audio_ms);
+      // Primary metric: speech end → final. Prefer the server VAD event; fall
+      // back to last audio byte sent when the server doesn't emit one.
+      let anchor = L.last_speech_end_ms;
+      let source = L.last_speech_end_source;
+      if (anchor == null && L.last_audio_ms != null) {
+        anchor = L.last_audio_ms;
+        source = "last_audio";
+      }
+      if (anchor != null) {
+        L.primary_latency_ms = Math.round(now - anchor);
+        L.last_speech_end_source = source;
       }
       if (L.last_audio_ms != null) {
         L.audio_end_to_final_ms = Math.round(now - L.last_audio_ms);
       }
-      if (L.last_finalize_ms != null) {
-        L.finalize_to_final_ms = Math.round(now - L.last_finalize_ms);
-        L.last_finalize_ms = null;
-      }
+      // Consume the anchor so the next final doesn't reuse it.
+      L.last_speech_end_ms = null;
       transcriptLine(text, "final");
+      timelineAppend("final",
+        `● FINAL: ${JSON.stringify(text)}` +
+        (L.primary_latency_ms != null
+          ? `   (speech end → final: ${L.primary_latency_ms} ms)` : "")
+      );
     } else if (text) {
       L.partial_count++;
-      if (L.first_partial_ms == null && L.first_audio_ms != null) {
-        L.first_partial_ms = Math.round(now - L.first_audio_ms);
-      }
-      if (L.last_partial_recv_ms != null) {
-        L.partial_gaps.push(Math.round(now - L.last_partial_recv_ms));
-        if (L.partial_gaps.length > 200) L.partial_gaps.shift();
-      }
-      L.last_partial_recv_ms = now;
       // Show latest partial as the last line (replace previous partial).
       const el = $("transcript");
       if (el.lastChild && el.lastChild.className === "partial") el.removeChild(el.lastChild);
       transcriptLine(text, "partial");
+      timelineAppend("partial", `· partial: ${JSON.stringify(text)}`);
     }
     renderLatency();
   });
@@ -440,6 +575,7 @@ registerProcessor('pcm16', PCM16Processor);
 
 async function startMic() {
   const targetSr = Number(document.getElementById("p_sample_rate").value) || 16000;
+  resetPcmBuffer(targetSr);
   audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: targetSr });
   mediaStream = await navigator.mediaDevices.getUserMedia({ audio: {
     channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true,
@@ -486,7 +622,11 @@ async function startMic() {
       i16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
     }
     ws.send(i16.buffer);
-    if (L.first_audio_ms == null) L.first_audio_ms = performance.now();
+    pcmChunks.push(i16);  // buffer for playback
+    if (L.first_audio_ms == null) {
+      L.first_audio_ms = performance.now();
+      timelineAppend("send", "▶ first audio sent");
+    }
     L.last_audio_ms = performance.now();
   };
 
@@ -501,12 +641,17 @@ async function startMic() {
 }
 
 function stopMic() {
+  const wasActive = micActive;
   micActive = false;
   if (workletNode) { try { workletNode.disconnect(); } catch {} workletNode = null; }
   if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
   if (audioCtx) { try { audioCtx.close(); } catch {} audioCtx = null; }
   $("btn-mic").textContent = "Start mic";
   if (ws && ws.readyState === WebSocket.OPEN) setStatus("connected", true);
+  if (wasActive) {
+    timelineAppend("send", "■ mic stopped, encoding playback…");
+    loadPlaybackFromBuffer();
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -524,15 +669,16 @@ $("btn-mic").addEventListener("click", async () => {
 });
 $("btn-finalize").addEventListener("click", () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
-    L.last_finalize_ms = performance.now();
     ws.send(JSON.stringify({type: "finalize"}));
     logLine({event: "sent_finalize"});
+    timelineAppend("send", "▶ sent finalize (client-forced turn end)");
   }
 });
 $("btn-close").addEventListener("click", () => {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({type: "close_stream"}));
     logLine({event: "sent_close_stream"});
+    timelineAppend("send", "■ sent close_stream");
   }
 });
 </script>
