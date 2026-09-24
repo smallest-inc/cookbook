@@ -33,8 +33,8 @@ _CUSTOMERS = {
 SUBAGENTS = {
     "intake": {
         "prompt": (
-            "You are the intake step. Greet the caller and ask for their customer id. "
-            "Call start_intake with the id. Keep it to one short sentence."
+            "You are the intake step. The caller was already greeted. Ask for their "
+            "customer id, then call start_intake with it. Keep it to one short sentence."
         ),
         "tools": ["start_intake"],
     },

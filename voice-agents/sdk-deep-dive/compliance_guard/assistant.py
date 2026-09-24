@@ -30,9 +30,10 @@ CODE WALKTHROUGH (for presenting)
   6. Transfer. `transfer_to_human` emits `SDKAgentTransferConversationEvent`. On a real
      call the platform bridges the caller to a human. The node stops generating after.
 
-  7. The turn loop. `generate_response` streams the model, yields text to TTS as it
-     arrives, collects any tool calls, runs them, feeds results back, and loops until
-     the model produces a final spoken reply with no more tool calls.
+  7. The turn loop. `generate_response` runs the tool loop, collecting tool calls,
+     running them, and feeding results back, then speaks only the final reply (the
+     one with no tool calls). Buffering the reply this way keeps a pre-tool preamble
+     from running into the post-tool answer.
 
 PREREQUISITE. `agent-crew init` links this project to an agent that already exists.
 Create the agent first, on the dashboard or with `SmallestAI().atoms.agents.create_agent`,
@@ -48,6 +49,8 @@ from smallestai.atoms.crew.events import (
     SDKAgentTransferConversationEvent,
     TransferOption,
     TransferOptionType,
+    WarmTransferHandoffOptionType,
+    WarmTransferPrivateHandoffOption,
 )
 from smallestai.atoms.crew.nodes import OutputCrewNode
 from smallestai.atoms.crew.tools import ToolRegistry, function_tool
@@ -80,14 +83,14 @@ class Assistant(OutputCrewNode):
                 "content": (
                     "You are Riley, a collections voice agent for Northwind Recovery, "
                     "calling account 4821 about an overdue balance. One or two short spoken "
-                    "sentences per turn. Follow this exactly:\n"
-                    "1) Greet, say you're on a recorded line.\n"
-                    "2) BEFORE any debt detail you MUST call give_required_disclosure "
+                    "sentences per turn. The caller was already greeted, do not greet "
+                    "again. Follow this exactly:\n"
+                    "1) BEFORE any debt detail you MUST call give_required_disclosure "
                     "(FDCPA mini-Miranda). Never state a balance before that.\n"
-                    "3) Verify identity with verify_identity (date-of-birth last 4).\n"
-                    "4) Only then use get_account_balance and tell them.\n"
-                    "5) Offer offer_payment_plan if they can't pay in full.\n"
-                    "6) If they dispute or ask for a human, call transfer_to_human immediately."
+                    "2) Verify identity with verify_identity (date-of-birth last 4).\n"
+                    "3) Only then use get_account_balance and tell them.\n"
+                    "4) Offer offer_payment_plan if they can't pay in full.\n"
+                    "5) If they dispute or ask for a human, call transfer_to_human immediately."
                 ),
             }
         )
@@ -127,29 +130,34 @@ class Assistant(OutputCrewNode):
 
     @function_tool(name="transfer_to_human")
     async def transfer_to_human(self, reason: str) -> None:
-        """Warm-transfer to a human collector, carrying context."""
+        """Warm-transfer to a human collector. The reason is whispered to the human
+        before they are connected, so they get the context."""
         await self.send_event(
             SDKAgentTransferConversationEvent(
                 transfer_call_number=HUMAN_COLLECTOR,
-                transfer_options=TransferOption(type=TransferOptionType.WARM_TRANSFER),
+                transfer_options=TransferOption(
+                    type=TransferOptionType.WARM_TRANSFER,
+                    private_handoff_option=WarmTransferPrivateHandoffOption(
+                        type=WarmTransferHandoffOptionType.PROMPT,
+                        prompt=f"Incoming collections call. Context: {reason}",
+                    ),
+                ),
                 on_hold_music="relaxing_sound",
             )
         )
 
     async def generate_response(self):
-        """Streaming caller-driven tool loop. Streams the spoken reply so the
-        first word reaches TTS as soon as the model produces it (lower latency),
-        while still running the tool loop for tool-calling turns."""
+        """Caller-driven tool loop. Buffers each hop and speaks only the final reply,
+        the one with no tool calls, so a pre-tool preamble never runs into the
+        post-tool answer."""
         for _ in range(6):
             content_parts: list[str] = []
             tool_calls: list = []
-            stream = await self.llm.chat(
+            async for chunk in await self.llm.chat(
                 messages=self.context.messages, stream=True, tools=self.tool_schemas
-            )
-            async for chunk in stream:
+            ):
                 if chunk.content:
                     content_parts.append(chunk.content)
-                    yield chunk.content  # -> TTS immediately, no wait for the full turn
                 if chunk.tool_calls:
                     tool_calls.extend(chunk.tool_calls)
             text = "".join(content_parts)
@@ -168,4 +176,5 @@ class Assistant(OutputCrewNode):
                 continue
             if text:
                 self.context.add_message({"role": "assistant", "content": text})
+                yield text
             return
