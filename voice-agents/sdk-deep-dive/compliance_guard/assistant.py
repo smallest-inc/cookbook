@@ -30,9 +30,10 @@ CODE WALKTHROUGH (for presenting)
   6. Transfer. `transfer_to_human` emits `SDKAgentTransferConversationEvent`. On a real
      call the platform bridges the caller to a human. The node stops generating after.
 
-  7. The turn loop. `generate_response` streams the model, yields text to TTS as it
-     arrives, collects any tool calls, runs them, feeds results back, and loops until
-     the model produces a final spoken reply with no more tool calls.
+  7. The turn loop. `generate_response` runs the tool loop, collecting tool calls,
+     running them, and feeding results back, then speaks only the final reply (the
+     one with no tool calls). Buffering the reply this way keeps a pre-tool preamble
+     from running into the post-tool answer.
 
 PREREQUISITE. `agent-crew init` links this project to an agent that already exists.
 Create the agent first, on the dashboard or with `SmallestAI().atoms.agents.create_agent`,
