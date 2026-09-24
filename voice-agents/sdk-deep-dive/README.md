@@ -29,7 +29,7 @@ create the agent.
 pip install smallestai
 smallestai auth login
 
-# create the agent (or make one on the dashboard)
+# create the agent (or make one on the dashboard). prints the agent id to use below
 python -c "from smallestai import SmallestAI; print(SmallestAI().atoms.agents.create_agent(name='my-agent').data)"
 
 smallestai agent-crew init --agent-id <agent-id>
@@ -102,8 +102,8 @@ smallestai calls events <call-id>         # transcript, tool calls, latency, nod
 ```
 
 Or in the browser with no phone number, open the agent on the dashboard and use the
-Webcall tab. Read finished calls with `client.atoms.calls.get(call_id)` and
-`search_calls(...)`, see [analytics](../analytics/) and
+Webcall tab. Read finished calls with `client.atoms.calls.get(id=call_id)` and
+`client.atoms.calls.list(...)`, see [analytics](../analytics/) and
 [call metrics docs](https://docs.smallest.ai/voice-agents/developer-guide/operate/analytics/call-metrics).
 
 ## Multi-agent, the two ways
