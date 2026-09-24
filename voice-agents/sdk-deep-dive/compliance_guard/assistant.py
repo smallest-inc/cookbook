@@ -61,7 +61,7 @@ _ACCT = {
     "balance_usd": 428.55,
     "days_overdue": 34,
 }
-HUMAN_COLLECTOR = os.getenv("TRANSFER_CALL_NUMBER", "+917066487364")
+HUMAN_COLLECTOR = os.getenv("TRANSFER_CALL_NUMBER", "+15551234567")
 
 
 class Assistant(OutputCrewNode):
