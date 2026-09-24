@@ -1,0 +1,4 @@
+smallestai
+openai
+python-dotenv
+loguru
