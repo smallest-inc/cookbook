@@ -204,4 +204,4 @@ chore: add .env.sample files
 ## Questions?
 
 - [Discord Community](https://discord.gg/ywShEyXHBW)
-- [Open an Issue](https://github.com/smallest-ai/cookbook/issues)
+- [Open an Issue](https://github.com/smallest-inc/cookbook/issues)
