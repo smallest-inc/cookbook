@@ -1,6 +1,6 @@
 # Hearthside — a voice-told story on Smallest AI Voice Agents
 
-A minimal React Native (Expo) sample that opens a real-time voice session with a Smallest AI voice agent and lets the listener steer a short branching Victorian mystery with their voice. Built on the plain WebSocket protocol documented at [docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/react-native](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/react-native).
+A minimal React Native (Expo) sample that opens a real-time voice session with a Smallest AI voice agent and lets the listener steer a short branching Victorian mystery with their voice. Built on the plain WebSocket protocol documented at [docs.smallest.ai/voice-agents/integrate/mobile/react-native](https://docs.smallest.ai/voice-agents/integrate/mobile/react-native).
 
 <p align="center"><img src="./assets/hearthside-home.png" alt="Hearthside home screen on Android" width="260"></p>
 
@@ -130,6 +130,6 @@ For a storytelling app with long-running playback, `default` is the right pick. 
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/voice-agents/api-reference/realtime-agent/realtime-agent) — full event protocol.
-- [React Native integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/react-native) — the validated stack this app uses.
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent) — full event protocol.
+- [React Native integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/react-native) — the validated stack this app uses.
 - [`react-native-audio-api`](https://github.com/software-mansion/react-native-audio-api) — the underlying audio library.

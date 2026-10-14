@@ -93,6 +93,6 @@ The `sending · N` counter under the *you* waveform increments per outbound chun
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/voice-agents/api-reference/realtime-agent/realtime-agent) — full event protocol.
-- [Flutter integration guide](https://docs.smallest.ai/voice-agents/platform/agent-sdk/mobile-integrations/flutter) — the docs pattern this cookbook implements end-to-end.
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent) — full event protocol.
+- [Flutter integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/flutter) — the docs pattern this cookbook implements end-to-end.
 - [`mic_stream`](https://pub.dev/packages/mic_stream), [`flutter_pcm_sound`](https://pub.dev/packages/flutter_pcm_sound), [`web_socket_channel`](https://pub.dev/packages/web_socket_channel) — the three libraries doing the heavy lifting.

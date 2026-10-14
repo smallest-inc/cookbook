@@ -22,7 +22,7 @@ Usage:
     python scripts/setup_agent.py --model gpt-4o  # override LLM
     python scripts/setup_agent.py --name "My Narrator"   # override agent name
 
-Reference: https://docs.smallest.ai/atoms/api-reference
+Reference: https://docs.smallest.ai/api-reference/voice-agents
 """
 from __future__ import annotations
 

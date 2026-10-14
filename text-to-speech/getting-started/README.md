@@ -49,9 +49,9 @@ Output is saved to `output.wav` in the current directory.
 
 ## API Reference
 
-- [Synthesize speech (unified `/waves/v1/tts`)](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/synthesize-speech)
-- [Lightning v3.1 model card](https://docs.smallest.ai/waves/model-cards/text-to-speech/lightning-v-3-1)
-- [Lightning v3.1 Pro model card](https://docs.smallest.ai/waves/model-cards/text-to-speech/lightning-v-3-1-pro)
+- [Synthesize speech (unified `/waves/v1/tts`)](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Lightning v3.1 model card](https://docs.smallest.ai/model-cards/text-to-speech/lightning-v-3-1)
+- [Lightning v3.1 Pro model card](https://docs.smallest.ai/model-cards/text-to-speech/lightning-v-3-1-pro)
 
 ## Next Steps
 

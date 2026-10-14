@@ -20,4 +20,4 @@ All cookbook examples use the Lightning v3.1 REST and WebSocket APIs directly, w
 ## API Reference
 
 - [Python SDK on GitHub](https://github.com/smallest-inc/smallest-python-sdk)
-- [Lightning v3.1 API](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1)
+- [Lightning v3.1 API](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)

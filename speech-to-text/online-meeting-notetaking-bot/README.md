@@ -163,7 +163,7 @@ Alex presented the Q1 roadmap. Sarah raised concerns about timeline...
 ## API Reference
 
 - [Recall.ai API Docs](https://docs.recall.ai)
-- [Pulse STT API](https://waves-docs.smallest.ai/v4.0.0/content/api-references/pulse-asr)
+- [Pulse STT API](https://waves-docs.smallest.ai/api-reference/models/speech-to-text/transcribe)
 - [OpenAI Chat API](https://platform.openai.com/docs/api-reference/chat)
 
 ## Next Steps

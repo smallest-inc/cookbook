@@ -83,8 +83,8 @@ Video: MP4, MKV, AVI, MOV, WebM, FLV, WMV, M4V
 
 ## API Reference
 
-- [Pre-recorded Quickstart](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/pre-recorded/quickstart)
-- [Pulse STT API Reference](https://waves-docs.smallest.ai/v4.0.0/content/api-references/pulse-asr)
+- [Pre-recorded Quickstart](https://waves-docs.smallest.ai/models/speech-to-text/pre-recorded/quickstart)
+- [Pulse STT API Reference](https://waves-docs.smallest.ai/api-reference/models/speech-to-text/transcribe)
 
 ## Next Steps
 

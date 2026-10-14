@@ -48,7 +48,7 @@ Output files are saved to a `translations/` folder.
 
 ## API Reference
 
-- [Lightning v3.1 API](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1)
+- [Lightning v3.1 API](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
 
 ## Next Steps
 

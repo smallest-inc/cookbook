@@ -83,7 +83,7 @@ async with websockets.connect(ws_url) as ws:
 
 ### Response Format
 
-Based on [Response Format documentation](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/realtime/response-format):
+Based on [Response Format documentation](https://waves-docs.smallest.ai/models/speech-to-text/realtime-web-socket/response-format):
 
 - `is_final=false`: Interim transcript (quick, lower accuracy)
 - `is_final=true`: Final transcript for segment (accurate)
@@ -91,9 +91,9 @@ Based on [Response Format documentation](https://waves-docs.smallest.ai/v4.0.0/c
 
 ## API Reference
 
-- [Streaming Quickstart](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/streaming/quickstart)
-- [Response Format](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/realtime/response-format)
-- [Pulse STT WebSocket API](https://waves-docs.smallest.ai/content/api-references/pulse-stt-ws)
+- [Streaming Quickstart](https://waves-docs.smallest.ai/models/speech-to-text/realtime-web-socket/quickstart)
+- [Response Format](https://waves-docs.smallest.ai/models/speech-to-text/realtime-web-socket/response-format)
+- [Pulse STT WebSocket API](https://waves-docs.smallest.ai/api-reference/models/speech-to-text/speech-to-text)
 
 ## Next Steps
 

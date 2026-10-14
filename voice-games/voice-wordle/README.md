@@ -1,6 +1,6 @@
 # Voice Wordle
 
-Play Wordle entirely by voice. [Pulse STT](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/overview) hears your spoken guess, scores it Wordle-style, and [Lightning v3.1 TTS](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1) speaks back the letter-by-letter feedback.
+Play Wordle entirely by voice. [Pulse STT](https://waves-docs.smallest.ai/models/speech-to-text/overview) hears your spoken guess, scores it Wordle-style, and [Lightning v3.1 TTS](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech) speaks back the letter-by-letter feedback.
 
 ## Features
 
@@ -113,8 +113,8 @@ voice-wordle/
 
 ## Documentation
 
-- [Pulse STT overview](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/overview)
-- [Lightning v3.1 TTS API reference](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1)
+- [Pulse STT overview](https://waves-docs.smallest.ai/models/speech-to-text/overview)
+- [Lightning v3.1 TTS API reference](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
 
 ## Next Steps
 

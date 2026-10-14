@@ -1,6 +1,6 @@
 # Text-to-Speech
 
-> **Powered by [Lightning TTS v3.1](https://docs.smallest.ai/waves/model-cards/text-to-speech/lightning-v-3-1) and the new [Lightning v3.1 Pro](https://docs.smallest.ai/waves/model-cards/text-to-speech/lightning-v-3-1-pro) pool.**
+> **Powered by [Lightning TTS v3.1](https://docs.smallest.ai/model-cards/text-to-speech/lightning-v-3-1) and the new [Lightning v3.1 Pro](https://docs.smallest.ai/model-cards/text-to-speech/lightning-v-3-1-pro) pool.**
 
 Generate natural-sounding speech from text using Smallest AI's Lightning TTS API. 80+ voices on standard Lightning v3.1, plus a curated Pro voice catalog across American, British, and Indian accents. 44.1 kHz native sample rate, ~200ms latency.
 
@@ -138,10 +138,10 @@ Lightning v3.1 Pro: depends on the voice — Indian Pro voices speak `en` + `hi`
 
 ## Documentation
 
-- [Lightning v3.1 REST](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/synthesize-speech)
-- [Lightning v3.1 WebSocket](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/synthesize-speech-ws)
-- [Voices API](https://waves-docs.smallest.ai/v4.0.0/content/api-references/get-voices-api)
-- [Voice Cloning](https://waves-docs.smallest.ai/v4.0.0/content/api-references/voice-cloning-api)
-- [Pronunciation Dicts](https://waves-docs.smallest.ai/v4.0.0/content/api-references/pronunciation-dicts-api)
+- [Lightning v3.1 REST](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Lightning v3.1 WebSocket](https://docs.smallest.ai/api-reference/models/text-to-speech/tts)
+- [Voices API](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/get-waves-voices)
+- [Voice Cloning](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/create-voice-clone)
+- [Pronunciation Dicts](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/get-pronunciation-dicts)
 - [Python SDK](https://github.com/smallest-inc/smallest-python-sdk)
 

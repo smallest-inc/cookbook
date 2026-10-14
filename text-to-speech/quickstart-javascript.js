@@ -9,7 +9,7 @@
  *     export SMALLEST_API_KEY="your-api-key"
  *     node quickstart-javascript.js
  *
- * Docs: https://docs.smallest.ai/waves/documentation/text-to-speech-lightning/quickstart
+ * Docs: https://docs.smallest.ai/models/text-to-speech/quickstart
  */
 
 const fs = require("fs");
