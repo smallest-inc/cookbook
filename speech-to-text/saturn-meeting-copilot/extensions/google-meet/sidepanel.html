@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saturn</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <iframe id="frame" src="http://localhost:3000" allow="microphone; autoplay"></iframe>
+    <div id="offline">
+      <div class="icon">⬡</div>
+      <p>Saturn is not running.<br/><strong>Start it with <code>npm run dev</code></strong><br/>then click Retry.</p>
+      <button id="retry-btn">Retry</button>
+    </div>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>
