@@ -1,0 +1,16 @@
+{
+  "name": "agent-ws-client-tools",
+  "version": "1.0.0",
+  "description": "Minimal Node.js sample of the Atoms Agent WebSocket client-tools protocol (session.update, function_call, function_call.result).",
+  "type": "module",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
