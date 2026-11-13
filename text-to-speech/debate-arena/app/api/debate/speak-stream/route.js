@@ -5,68 +5,7 @@ import WebSocket from "ws";
 
 // Same live TTS endpoint as the other cookbook streaming examples; the model is picked in the message body.
 const TTS_MODEL = "lightning_v3.1_pro";
-const WS_URLS = ["wss://api.smallest.ai/waves/v1/tts/live"];
-
-// ─── Startup probe: find the first working endpoint ────────────────
-// Runs once on cold start, caches result, re-probes every 5 min.
-const PROBE_INTERVAL = 5 * 60 * 1000;
-
-function getState() {
-  if (!globalThis.__ttsState) {
-    globalThis.__ttsState = { wsUrl: null, lastProbe: 0, probing: null };
-  }
-  return globalThis.__ttsState;
-}
-
-async function probeEndpoint(url, apiKey) {
-  return new Promise((resolve) => {
-    const ws = new WebSocket(url, {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    });
-    const t = setTimeout(() => { ws.terminate(); resolve(false); }, 4000);
-    ws.on("open", () => { clearTimeout(t); ws.close(); resolve(true); });
-    ws.on("error", () => { clearTimeout(t); resolve(false); });
-    ws.on("unexpected-response", () => { clearTimeout(t); ws.terminate(); resolve(false); });
-  });
-}
-
-async function resolveWsUrl(apiKey) {
-  const state = getState();
-  const now = Date.now();
-
-  // Return cached URL if fresh
-  if (state.wsUrl && now - state.lastProbe < PROBE_INTERVAL) {
-    return state.wsUrl;
-  }
-
-  // Reuse in-flight probe
-  if (state.probing) return state.probing;
-
-  state.probing = (async () => {
-    for (const url of WS_URLS) {
-      const ok = await probeEndpoint(url, apiKey);
-      if (ok) {
-        console.log(`[TTS] Using ${TTS_MODEL}`);
-        state.wsUrl = url;
-        state.lastProbe = Date.now();
-        state.probing = null;
-        return url;
-      }
-    }
-    // Nothing worked — default to v3.1 and let the real request fail with a clear error
-    console.log("[TTS] All endpoints failed during probe");
-    state.wsUrl = WS_URLS[0];
-    state.lastProbe = Date.now();
-    state.probing = null;
-    return WS_URLS[0];
-  })();
-
-  return state.probing;
-}
-
-// ─── Eagerly probe on module load so first request is instant ──────
-const apiKeyForProbe = process.env.SMALLEST_API_KEY;
-if (apiKeyForProbe) resolveWsUrl(apiKeyForProbe);
+const WS_URL = "wss://api.smallest.ai/waves/v1/tts/live";
 
 // ─── POST handler ──────────────────────────────────────────────────
 export async function POST(request) {
@@ -107,8 +46,6 @@ export async function POST(request) {
   // if (prosody) ttsMsg.prosody = prosody;
   if (accent) ttsMsg.accent = accent;
 
-  const wsUrl = await resolveWsUrl(apiKey);
-
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
@@ -131,7 +68,7 @@ export async function POST(request) {
       let ws;
       try {
         ws = await new Promise((resolve, reject) => {
-          const conn = new WebSocket(wsUrl, {
+          const conn = new WebSocket(WS_URL, {
             headers: { Authorization: `Bearer ${apiKey}` },
           });
           const t = setTimeout(() => { conn.terminate(); reject(new Error("WS connect timeout")); }, 8000);
@@ -140,12 +77,17 @@ export async function POST(request) {
           conn.on("unexpected-response", (req, res) => {
             clearTimeout(t);
             conn.terminate();
-            // Usually a bad key on this one request, so leave the shared endpoint cache alone.
-            reject(new Error(`Unexpected server response: ${res.statusCode}`));
+            const err = new Error(`Unexpected server response: ${res.statusCode}`);
+            if (res.statusCode === 401 || res.statusCode === 403) {
+              err.userMessage = userKey
+                ? "Your Smallest API key was rejected. Check it under 'Enter your API keys'."
+                : "The server's Smallest API key was rejected. Add your own key under 'Enter your API keys'.";
+            }
+            reject(err);
           });
         });
       } catch (err) {
-        sendSSE({ error: `Connection failed: ${err.message}` });
+        sendSSE({ error: err.userMessage || `Connection failed: ${err.message}` });
         closed = true;
         try { controller.close(); } catch {}
         return;
