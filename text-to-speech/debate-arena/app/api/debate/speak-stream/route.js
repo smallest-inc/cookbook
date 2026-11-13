@@ -3,11 +3,9 @@ export const runtime = "nodejs";
 
 import WebSocket from "ws";
 
-// Lightning v3.1 Pro is selected in the message body; the URL path stays v3.1.
+// Same live TTS endpoint as the other cookbook streaming examples; the model is picked in the message body.
 const TTS_MODEL = "lightning_v3.1_pro";
-const WS_URLS = [
-  "wss://waves-api.smallest.ai/api/v1/lightning-v3.1/get_speech/stream?timeout=180",
-];
+const WS_URLS = ["wss://api.smallest.ai/waves/v1/tts/live"];
 
 // ─── Startup probe: find the first working endpoint ────────────────
 // Runs once on cold start, caches result, re-probes every 5 min.
