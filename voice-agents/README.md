@@ -42,6 +42,7 @@ Build AI voice agents with the [Voice Agents SDK](https://docs.smallest.ai/voice
 | [calendar_receptionist](./calendar_receptionist/) | Google Calendar integration, webhook workflow, agent duplication, React client |
 | [form_filler](./form_filler/) | State machine data collection, Jotform integration, typed validation, backtracking |
 | [atoms_sdk_web_agent](./atoms_sdk_web_agent/) | Multi-agent collaboration, tool calling, Next.js integration |
+| [phone_draw](./phone_draw/) | Image generation as a tool, live board updates during a call, Atoms deploy with a local board over a tunnel |
 
 ## Platform Features
 
