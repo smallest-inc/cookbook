@@ -83,8 +83,8 @@ class Studio:
 
     async def generate(self, prompt: str) -> dict:
         async with self.lock:
-            await self._status(f"drawing: {prompt}")
             try:
+                await self._status(f"drawing: {prompt}")
                 r = await self.oa.images.generate(
                     model=IMAGE_MODEL, prompt=prompt,
                     quality=IMAGE_QUALITY, size="1024x1024")
@@ -103,8 +103,8 @@ class Studio:
         async with self.lock:
             if self.current_png is None:
                 return {"status": "error", "reason": "no picture yet, ask what to draw first"}
-            await self._status(f"editing: {change}")
             try:
+                await self._status(f"editing: {change}")
                 r = await self.oa.images.edit(
                     model=IMAGE_MODEL, prompt=change,
                     image=("current.png", self.current_png, "image/png"),

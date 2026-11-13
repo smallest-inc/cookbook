@@ -1,4 +1,4 @@
-import { get, list, put } from "@vercel/blob";
+import { get, put } from "@vercel/blob";
 
 export type BoardState = {
   version: number;
@@ -7,7 +7,9 @@ export type BoardState = {
   status: string;
 };
 
-const PREFIX = "phone-draw/state-";
+// One blob, overwritten on every write. Reads skip the CDN cache (useCache: false)
+// so the board sees each write right away, and old states never pile up.
+const PATHNAME = "phone-draw/state.json";
 
 const EMPTY: BoardState = {
   version: 0,
@@ -18,13 +20,7 @@ const EMPTY: BoardState = {
 
 export async function readState(): Promise<BoardState> {
   try {
-    const { blobs } = await list({ prefix: PREFIX, limit: 1000 });
-    if (!blobs.length) return { ...EMPTY };
-    blobs.sort(
-      (a, b) =>
-        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
-    );
-    const res = await get(blobs[0].pathname, { access: "private" });
+    const res = await get(PATHNAME, { access: "private", useCache: false });
     if (!res || res.statusCode !== 200) return { ...EMPTY };
     const text = await new Response(res.stream).text();
     return { ...EMPTY, ...JSON.parse(text) };
@@ -34,14 +30,11 @@ export async function readState(): Promise<BoardState> {
 }
 
 export async function writeState(state: BoardState): Promise<void> {
-  // Unique pathname each write so we never depend on overwrite cache
-  // (Blob cacheControlMaxAge cannot go below 60s on overwrite).
-  const pathname = `${PREFIX}${Date.now()}-${Math.random().toString(36).slice(2, 8)}.json`;
-  await put(pathname, JSON.stringify(state), {
+  await put(PATHNAME, JSON.stringify(state), {
     access: "private",
     addRandomSuffix: false,
+    allowOverwrite: true,
     contentType: "application/json",
-    cacheControlMaxAge: 60,
   });
 }
 
