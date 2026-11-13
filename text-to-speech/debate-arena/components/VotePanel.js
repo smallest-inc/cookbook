@@ -24,11 +24,13 @@ function ScoreBar({ label, score, color }) {
   );
 }
 
-export default function VotePanel({ verdict, onVote }) {
+export default function VotePanel({ verdict, onVote, names = {} }) {
   const [userVote, setUserVote] = useState(null);
 
   if (!verdict) return null;
 
+  const nA = names.socrates || "Socrates";
+  const nB = names.aristotle || "Aristotle";
   const socratesTot =
     verdict.socrates.wisdom +
     verdict.socrates.rhetoric +
@@ -44,7 +46,7 @@ export default function VotePanel({ verdict, onVote }) {
   };
 
   const winnerName =
-    verdict.winner === "socrates" ? "Socrates" : "Aristotle";
+    verdict.winner === "socrates" ? nA : nB;
 
   return (
     <motion.div
@@ -82,7 +84,7 @@ export default function VotePanel({ verdict, onVote }) {
         <div className="glass-gold rounded-2xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <span className="font-display text-sm font-semibold text-gold">
-              Socrates
+              {nA}
             </span>
             <span className="text-xl font-bold text-gold tabular-nums font-body">
               {socratesTot}
@@ -97,7 +99,7 @@ export default function VotePanel({ verdict, onVote }) {
         <div className="glass-gold rounded-2xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <span className="font-display text-sm font-semibold text-olive">
-              Aristotle
+              {nB}
             </span>
             <span className="text-xl font-bold text-olive tabular-nums font-body">
               {aristotleTot}
@@ -139,7 +141,7 @@ export default function VotePanel({ verdict, onVote }) {
                 : "glass-gold text-gold/70 border border-gold/15 hover:bg-gold/10 hover:border-gold/30"
             }`}
           >
-            Socrates
+            {nA}
           </button>
           <button
             onClick={() => handleVote("aristotle")}
@@ -152,7 +154,7 @@ export default function VotePanel({ verdict, onVote }) {
                 : "glass-gold text-olive/70 border border-olive/15 hover:bg-olive/10 hover:border-olive/30"
             }`}
           >
-            Aristotle
+            {nB}
           </button>
         </div>
         {userVote && (

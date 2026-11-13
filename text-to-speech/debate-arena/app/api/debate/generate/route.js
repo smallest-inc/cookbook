@@ -46,8 +46,24 @@ Return ONLY a JSON object (no markdown) with this exact structure:
   }
 }`;
 
+// Custom fighters: real people (e.g. you and your manager) instead of the philosophers.
+function fighterInstructions(fighters, mode) {
+  const a = fighters?.a?.name?.trim();
+  const b = fighters?.b?.name?.trim();
+  if (!a && !b) return "";
+  const nameA = a || "Socrates";
+  const nameB = b || "Aristotle";
+  let t = `\n\nCAST CHANGE: the "socrates" side is ${nameA} and the "aristotle" side is ${nameB}. They are real people, not ancient philosophers. Drop the Greek philosopher style. They talk like two coworkers arguing out loud, in plain modern English, and call each other by name (${nameA}, ${nameB}). Keep the same JSON keys.`;
+  const na = fighters?.a?.note?.trim();
+  const nb = fighters?.b?.note?.trim();
+  if (na) t += `\nWhat to know about ${nameA}: ${na.slice(0, 200)}`;
+  if (nb) t += `\nWhat to know about ${nameB}: ${nb.slice(0, 200)}`;
+  if (mode === "roast") t += `\nRoast each other using those details. Keep it workplace-friendly: tease habits, opinions and work, never looks, family, health, money, religion or anything mean-spirited. No profanity and no crude or toilet jokes. It should feel like friends roasting, and both should come off likeable.`;
+  return t;
+}
+
 export async function POST(request) {
-  const { topic, round, totalRounds, history, mode } = await request.json();
+  const { topic, round, totalRounds, history, mode, fighters, interrupt } = await request.json();
 
   if (!topic) {
     return NextResponse.json({ error: "topic is required" }, { status: 400 });
@@ -64,6 +80,11 @@ This is a comedic roast battle! The philosophers should:
 - Be genuinely funny — aim for crowd laughter, not academic points
 - Still argue FOR/AGAINST the topic, but in the most entertaining way possible
 - Use emotions like "sarcastic", "amused", "excited" more often`;
+  }
+
+  modeInstructions += fighterInstructions(fighters, mode);
+  if (interrupt) {
+    modeInstructions += `\n\nINTERRUPTIONS: the second speaker cuts the first one off before they finish. So the "aristotle" text must open with a short barge-in of 2 to 5 words (for example "Okay, stop. Stop." or "No no no, hold on,") and then respond. Keep both arguments short: 2 to 3 sentences.`;
   }
 
   let userPrompt = `Topic for debate: "${topic}"\nRound ${round} of ${totalRounds}.${modeInstructions}\n`;
@@ -117,6 +138,10 @@ This is a comedic roast battle! The philosophers should:
 
   try {
     const parsed = JSON.parse(content);
+    // Dashes read badly in captions and TTS pauses on them oddly; use commas.
+    for (const k of ["socrates", "aristotle"]) {
+      if (parsed[k]?.text) parsed[k].text = parsed[k].text.replace(/\s*[\u2014\u2013]\s*/g, ", ");
+    }
     return NextResponse.json(parsed);
   } catch {
     return NextResponse.json(

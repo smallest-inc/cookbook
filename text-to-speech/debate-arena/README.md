@@ -1,17 +1,20 @@
-# The Agora — AI Philosophical Debate Arena
+# The Agora: AI Debate Arena
 
-Socrates and Aristotle debate any modern topic with AI-generated voices, powered by [Smallest AI](https://smallest.ai) Lightning TTS v3.2 WebSocket streaming.
+Two AI voices debate any topic, out loud, powered by [Smallest AI](https://smallest.ai) Lightning v3.1 Pro streaming TTS. Use the built-in voices, or paste your own cloned voice IDs and make your clones argue.
 
-**Socrates** argues FOR — using the Socratic method, rhetorical questions, and passionate conviction.
-**Aristotle** argues AGAINST — using logic, systematic analysis, and appeals to reason.
+**Side A** argues FOR. **Side B** argues AGAINST. An ancient Athenian judge scores both, then you cast your own vote.
 
-Each philosopher has a distinct voice with expressive parameters (emotion, pitch, volume, prosody) predicted by the LLM each round.
+Live demo: [showcase.smallest.ai/projects/debate-arena](https://showcase.smallest.ai/projects/debate-arena)
 
-## Try It Live
+## Features
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/smallest-inc/cookbook/tree/main/text-to-speech/debate-arena&env=SMALLEST_API_KEY,OPENAI_API_KEY&envDescription=Get%20your%20Smallest%20AI%20key%20at%20smallest.ai%20and%20OpenAI%20key%20at%20platform.openai.com&envLink=https://smallest.ai)
+- **Two modes.** Philosophical (Socrates vs Aristotle, classical rhetoric) and Roast Battle (absurd analogies, playful insults).
+- **Your own cast.** Name each side and, in roast mode, add roast notes ("ships demos at 3 AM", "replies 'ok' to everything"). The arguments use them.
+- **Cloned voices.** Paste a Smallest AI cloned voice ID for either side. Clone a voice from about 15 seconds of clean audio in the [Smallest AI console](https://app.smallest.ai).
+- **Real interruptions.** Turn on "Let them interrupt each other" and the next speaker cuts in while the current one is still talking.
+- **Live captions.** Karaoke-style captions follow the audio. The full transcript appears after the verdict.
 
-Or run locally:
+## Run locally
 
 ```bash
 git clone https://github.com/smallest-inc/cookbook.git
@@ -20,52 +23,38 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and enter your API keys in the browser.
+Open [http://localhost:3000](http://localhost:3000) and enter your API keys in the browser, or put them in `.env.local` (see `.env.example`).
 
-## Get Your API Keys (Free)
+## API keys
 
-| Key | Where to Get | What It's For |
-|-----|-------------|---------------|
-| **Smallest AI API Key** | [smallest.ai](https://smallest.ai) | Voice synthesis (TTS v3.2) |
-| **OpenAI API Key** | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) | Argument generation (GPT-4o-mini) |
+| Key | Where to get it | Used for |
+|-----|-----------------|----------|
+| **Smallest AI API key** | [smallest.ai](https://smallest.ai) | Voices (Lightning v3.1 Pro) and voice cloning |
+| **OpenAI API key** | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) | Arguments and judging (GPT-4o-mini) |
 
-Keys are entered directly in the browser UI — they stay in your browser and are never stored on any server.
+Keys entered in the browser are kept in your browser and sent with each request. They are not stored on the server.
 
-## How It Works
+### Server keys and cloned voices
 
-1. Enter any debate topic, pick voices for each philosopher, choose 1-3 rounds
-2. GPT-4o-mini generates arguments in the style of each philosopher + predicts voice parameters
-3. v3.2 WebSocket streaming TTS renders both voices in parallel with expressive emotion
-4. Arguments escalate: measured early, passionate/angry by the final round
-5. An ancient Athenian judge scores both on Wisdom, Rhetoric, and Logic
-6. Cast your own vote as a citizen of Athens
+If you set `SMALLEST_API_KEY` on the server, visitors can debate without their own key using the built-in voices. Cloned voice IDs need the visitor's own Smallest key, so nobody can use your key with voices you did not approve. To let specific clones run on the server key, list them in `ALLOWED_CLONE_VOICES` (comma-separated).
 
-### Two Modes
+## How it works
 
-- **Philosophical** — Classical rhetoric, wisdom, escalating arguments
-- **Roast Battle** — Satirical wit, absurd analogies, playful insults
-
-### Architecture
-
-- **v3.2 WebSocket streaming** for low-latency expressive TTS (~0.3s TTFB)
-- **Parallel TTS**: both voices generate simultaneously
-- **Pre-fetch pipeline**: next round's LLM call starts during current audio playback
-- **Web Audio API**: chunk-by-chunk playback with real-time waveform visualization + lip-sync
-- **BYOK mode**: users enter their own API keys in the browser (no server env vars needed)
+1. Pick a topic, a mode, 1 to 3 rounds, a voice (or cloned voice ID) for each side, and optionally names, roast notes and interruptions.
+2. GPT-4o-mini writes both sides of the round.
+3. `/api/debate/speak-stream` streams each turn from the Lightning v3.1 Pro WebSocket API to the browser as server-sent events.
+4. The browser plays the audio chunk by chunk with the Web Audio API, driving the waveform, the avatar's mouth and the live captions.
+5. With interruptions on, side B's audio is buffered and starts while side A is still speaking, then side A fades out mid-sentence.
+6. The next round is generated while the current one plays, so rounds follow each other without a long wait.
+7. The judge scores Wisdom, Rhetoric and Logic and picks a winner.
 
 ## Deploy
 
-### Vercel (Recommended)
-
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/smallest-inc/cookbook/tree/main/text-to-speech/debate-arena&env=SMALLEST_API_KEY,OPENAI_API_KEY&envDescription=Get%20your%20Smallest%20AI%20key%20at%20smallest.ai%20and%20OpenAI%20key%20at%20platform.openai.com&envLink=https://smallest.ai)
 
-Server env vars are optional — if not set, users must enter their own keys in the UI.
+Server env vars are optional. Without them, visitors enter their own keys in the UI.
 
-### Railway
-
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/smallest-debate-arena?referralCode=smallest)
-
-### Manual
+Or run it anywhere Node runs:
 
 ```bash
 npm install
@@ -73,14 +62,12 @@ npm run build
 npm start
 ```
 
-## Tech Stack
+## Tech stack
 
-- **Next.js 14** — App Router
-- **Tailwind CSS** — Greek philosophical theme
-- **Framer Motion** — Animations
-- **Web Audio API** — Streaming playback + waveform + lip-sync
-- **Lightning TTS v3.2** — WebSocket streaming with expressive voice params
-- **GPT-4o-mini** — Argument generation & judging
+- Next.js 14 (App Router), Tailwind CSS, Framer Motion
+- Web Audio API for streaming playback, waveform and lip-sync
+- Smallest AI Lightning v3.1 Pro (WebSocket streaming TTS, voice cloning)
+- OpenAI GPT-4o-mini for arguments and judging
 
 ## License
 
