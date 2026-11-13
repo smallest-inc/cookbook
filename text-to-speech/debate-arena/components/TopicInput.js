@@ -13,15 +13,16 @@ const EXAMPLE_TOPICS = [
   "Should we colonize the stars?",
 ];
 
+// Lightning v3.1 Pro voices
 const VOICE_OPTIONS = [
-  { id: "cody", label: "Cody" },
-  { id: "kieran", label: "Kieran" },
-  { id: "scott", label: "Scott" },
-  { id: "knox", label: "Knox" },
-  { id: "lindsey", label: "Lindsey" },
-  { id: "sloane", label: "Sloane" },
-  { id: "jade", label: "Jade" },
-  { id: "wren", label: "Wren" },
+  { id: "winston", label: "Winston" },
+  { id: "rupert", label: "Rupert" },
+  { id: "henry", label: "Henry" },
+  { id: "everett", label: "Everett" },
+  { id: "benedict", label: "Benedict" },
+  { id: "joanna", label: "Joanna" },
+  { id: "cressida", label: "Cressida" },
+  { id: "seraphina", label: "Seraphina" },
 ];
 
 const QUOTES = [
@@ -53,11 +54,35 @@ const ROAST_TOPICS = [
 export default function TopicInput({ onStart, disabled }) {
   const [topic, setTopic] = useState("");
   const [rounds, setRounds] = useState(2);
-  const [socratesVoice, setSocratesVoice] = useState("cody");
-  const [aristotleVoice, setAristotleVoice] = useState("kieran");
+  const [socratesVoice, setSocratesVoice] = useState("winston");
+  const [aristotleVoice, setAristotleVoice] = useState("everett");
+  // Optional cloned voice IDs; when set they override the dropdown
+  const [socratesCustom, setSocratesCustom] = useState("");
+  const [aristotleCustom, setAristotleCustom] = useState("");
   const [quoteIdx, setQuoteIdx] = useState(0);
   const [breathe, setBreathe] = useState(false);
   const [mode, setMode] = useState("philosophical"); // philosophical | roast
+  // Optional cast: real names and roast notes instead of the philosophers
+  const [nameA, setNameA] = useState("");
+  const [nameB, setNameB] = useState("");
+  const [noteA, setNoteA] = useState("");
+  const [noteB, setNoteB] = useState("");
+  const [interrupt, setInterrupt] = useState(false);
+
+  // Prefill from the URL so a matchup can be shared as a link
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    if (q.get("topic")) setTopic(q.get("topic"));
+    if (q.get("mode") === "roast") setMode("roast");
+    if (q.get("rounds")) setRounds(Math.min(3, Math.max(1, +q.get("rounds") || 2)));
+    if (q.get("a")) setNameA(q.get("a"));
+    if (q.get("b")) setNameB(q.get("b"));
+    if (q.get("an")) setNoteA(q.get("an"));
+    if (q.get("bn")) setNoteB(q.get("bn"));
+    if (q.get("av")) (q.get("av").startsWith("voice_") ? setSocratesCustom : setSocratesVoice)(q.get("av"));
+    if (q.get("bv")) (q.get("bv").startsWith("voice_") ? setAristotleCustom : setAristotleVoice)(q.get("bv"));
+    if (q.get("interrupt") === "1") setInterrupt(true);
+  }, []);
 
   // Rotate quotes every 5 seconds
   useEffect(() => {
@@ -76,7 +101,21 @@ export default function TopicInput({ onStart, disabled }) {
   }, []);
 
   const handleStart = () => {
-    if (topic.trim()) onStart(topic.trim(), rounds, socratesVoice, aristotleVoice, mode);
+    if (topic.trim())
+      onStart(
+        topic.trim(),
+        rounds,
+        socratesCustom.trim() || socratesVoice,
+        aristotleCustom.trim() || aristotleVoice,
+        mode,
+        {
+          fighters: {
+            a: { name: nameA.trim(), note: mode === "roast" ? noteA.trim() : "" },
+            b: { name: nameB.trim(), note: mode === "roast" ? noteB.trim() : "" },
+          },
+          interrupt,
+        }
+      );
   };
 
   const activeTopics = mode === "roast" ? ROAST_TOPICS : EXAMPLE_TOPICS;
@@ -196,8 +235,28 @@ export default function TopicInput({ onStart, disabled }) {
       <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
         <div className="space-y-2">
           <label className="text-[10px] uppercase tracking-[0.2em] text-gold/50 font-medium">
-            Voice of Socrates
+            Side A, argues for
           </label>
+          <input
+            type="text"
+            value={nameA}
+            onChange={(e) => setNameA(e.target.value)}
+            placeholder="Name (default Socrates)"
+            maxLength={30}
+            disabled={disabled}
+            className="w-full px-3 py-2 glass-gold rounded-lg text-xs text-cream/70 placeholder-cream/20 bg-transparent focus:outline-none"
+          />
+          {mode === "roast" && (
+            <input
+              type="text"
+              value={noteA}
+              onChange={(e) => setNoteA(e.target.value)}
+              placeholder="Roast notes, e.g. loves long meetings"
+              maxLength={200}
+              disabled={disabled}
+              className="w-full px-3 py-2 glass-gold rounded-lg text-xs text-cream/70 placeholder-cream/20 bg-transparent focus:outline-none"
+            />
+          )}
           <select
             value={socratesVoice}
             onChange={(e) => setSocratesVoice(e.target.value)}
@@ -210,11 +269,39 @@ export default function TopicInput({ onStart, disabled }) {
               </option>
             ))}
           </select>
+          <input
+            type="text"
+            value={socratesCustom}
+            onChange={(e) => setSocratesCustom(e.target.value)}
+            placeholder="or paste a cloned voice ID (your API key)"
+            disabled={disabled}
+            className="w-full px-3 py-2 glass-gold rounded-lg text-xs text-cream/60 placeholder-cream/20 bg-transparent focus:outline-none"
+          />
         </div>
         <div className="space-y-2">
           <label className="text-[10px] uppercase tracking-[0.2em] text-olive/60 font-medium">
-            Voice of Aristotle
+            Side B, argues against
           </label>
+          <input
+            type="text"
+            value={nameB}
+            onChange={(e) => setNameB(e.target.value)}
+            placeholder="Name (default Aristotle)"
+            maxLength={30}
+            disabled={disabled}
+            className="w-full px-3 py-2 glass-gold rounded-lg text-xs text-cream/70 placeholder-cream/20 bg-transparent focus:outline-none"
+          />
+          {mode === "roast" && (
+            <input
+              type="text"
+              value={noteB}
+              onChange={(e) => setNoteB(e.target.value)}
+              placeholder="Roast notes, e.g. loves long meetings"
+              maxLength={200}
+              disabled={disabled}
+              className="w-full px-3 py-2 glass-gold rounded-lg text-xs text-cream/70 placeholder-cream/20 bg-transparent focus:outline-none"
+            />
+          )}
           <select
             value={aristotleVoice}
             onChange={(e) => setAristotleVoice(e.target.value)}
@@ -227,6 +314,14 @@ export default function TopicInput({ onStart, disabled }) {
               </option>
             ))}
           </select>
+          <input
+            type="text"
+            value={aristotleCustom}
+            onChange={(e) => setAristotleCustom(e.target.value)}
+            placeholder="or paste a cloned voice ID (your API key)"
+            disabled={disabled}
+            className="w-full px-3 py-2 glass-gold rounded-lg text-xs text-cream/60 placeholder-cream/20 bg-transparent focus:outline-none"
+          />
         </div>
       </div>
 
@@ -251,6 +346,17 @@ export default function TopicInput({ onStart, disabled }) {
             </button>
           ))}
         </div>
+
+        <label className="flex items-center justify-center gap-3 text-xs text-cream/50 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={interrupt}
+            onChange={(e) => setInterrupt(e.target.checked)}
+            disabled={disabled}
+            className="h-4 w-4 accent-[#c9a84c]"
+          />
+          Let them interrupt each other
+        </label>
 
         <button
           onClick={handleStart}

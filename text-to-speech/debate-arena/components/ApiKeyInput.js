@@ -40,7 +40,7 @@ export default function ApiKeyInput({ onKeysSet, freeDebatesLeft: freeGeneration
               </p>
               <p className="text-[10px] text-gold/40 mt-1">
                 Join our{" "}
-                <a href="https://discord.gg/2VcvUyB2DD" target="_blank" rel="noopener noreferrer" className="text-gold/60 hover:text-gold underline">
+                <a href="https://discord.gg/2VcvUyB2DD?utm_source=debate-arena&utm_medium=app&utm_campaign=discord-credits" target="_blank" rel="noopener noreferrer" className="text-gold/60 hover:text-gold underline">
                   Discord
                 </a>{" "}
                 and get $20 in free credits!
@@ -111,7 +111,7 @@ export default function ApiKeyInput({ onKeysSet, freeDebatesLeft: freeGeneration
                       Smallest AI API Key
                     </label>
                     <a
-                      href="https://smallest.ai"
+                      href="https://smallest.ai?utm_source=debate-arena&utm_medium=app&utm_campaign=get-api-key"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[10px] text-gold/50 hover:text-gold tracking-wider font-display transition-colors"
@@ -134,7 +134,7 @@ export default function ApiKeyInput({ onKeysSet, freeDebatesLeft: freeGeneration
                       OpenAI API Key
                     </label>
                     <a
-                      href="https://platform.openai.com/api-keys"
+                      href="https://platform.openai.com/api-keys?utm_source=debate-arena&utm_medium=app&utm_campaign=get-openai-key"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[10px] text-gold/50 hover:text-gold tracking-wider font-display transition-colors"
@@ -166,7 +166,7 @@ export default function ApiKeyInput({ onKeysSet, freeDebatesLeft: freeGeneration
                 </p>
                 <p className="text-[10px] text-gold/40">
                   Join our{" "}
-                  <a href="https://discord.gg/2VcvUyB2DD" target="_blank" rel="noopener noreferrer" className="text-gold/60 hover:text-gold underline">
+                  <a href="https://discord.gg/2VcvUyB2DD?utm_source=debate-arena&utm_medium=app&utm_campaign=discord-credits" target="_blank" rel="noopener noreferrer" className="text-gold/60 hover:text-gold underline">
                     Discord
                   </a>{" "}
                   and get $20 in free credits!

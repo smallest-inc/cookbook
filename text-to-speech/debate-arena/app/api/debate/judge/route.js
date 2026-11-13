@@ -16,7 +16,9 @@ Return ONLY a JSON object (no markdown) with this structure:
 }`;
 
 export async function POST(request) {
-  const { topic, rounds } = await request.json();
+  const { topic, rounds, fighters } = await request.json();
+  const nameA = fighters?.a?.name?.trim() || "Socrates";
+  const nameB = fighters?.b?.name?.trim() || "Aristotle";
 
   if (!topic || !rounds) {
     return NextResponse.json(
@@ -28,10 +30,12 @@ export async function POST(request) {
   let prompt = `The topic debated: "${topic}"\n\nFull debate transcript:\n`;
   rounds.forEach((r, i) => {
     prompt += `\nRound ${i + 1}:\n`;
-    prompt += `  Socrates (FOR): "${r.socrates}"\n`;
-    prompt += `  Aristotle (AGAINST): "${r.aristotle}"\n`;
+    prompt += `  ${nameA} (FOR, key "socrates"): "${r.socrates}"\n`;
+    prompt += `  ${nameB} (AGAINST, key "aristotle"): "${r.aristotle}"\n`;
   });
-  prompt += "\nDeliver your verdict, O wise judge of Athens.";
+  prompt += nameA !== "Socrates" || nameB !== "Aristotle"
+    ? `\nThe speakers are ${nameA} and ${nameB}. Use their names in the reasoning. Keep the "socrates"/"aristotle" keys in the JSON.\nDeliver your verdict, O wise judge of Athens.`
+    : "\nDeliver your verdict, O wise judge of Athens.";
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
