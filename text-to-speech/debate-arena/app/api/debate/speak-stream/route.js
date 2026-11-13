@@ -140,10 +140,7 @@ export async function POST(request) {
           conn.on("unexpected-response", (req, res) => {
             clearTimeout(t);
             conn.terminate();
-            // Invalidate cache so next request re-probes
-            const state = getState();
-            state.wsUrl = null;
-            state.lastProbe = 0;
+            // Usually a bad key on this one request, so leave the shared endpoint cache alone.
             reject(new Error(`Unexpected server response: ${res.statusCode}`));
           });
         });
