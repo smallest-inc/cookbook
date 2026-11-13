@@ -50,7 +50,15 @@ export default function PhilosopherAvatar({
         else brow = Math.sin(Math.PI * p);
       }
       const bob = isSpeaking ? Math.sin(now / 160) * s.mouth * 2.2 : 0;
-      setFace({ mouth: s.mouth, blink, look, brow, bob });
+      // Only re-render when the face visibly changes, so idle avatars stay quiet between blinks.
+      const next = { mouth: s.mouth, blink, look, brow, bob };
+      const prev = s.last;
+      const moved = (x, y) => Math.abs(x - y) > 0.01;
+      if (!prev || blink !== prev.blink || moved(next.mouth, prev.mouth) || moved(brow, prev.brow) ||
+          moved(bob, prev.bob) || moved(look[0], prev.look[0]) || moved(look[1], prev.look[1])) {
+        s.last = next;
+        setFace(next);
+      }
       raf.current = requestAnimationFrame(loop);
     };
     raf.current = requestAnimationFrame(loop);
