@@ -34,7 +34,7 @@ export const AGENT_PRESETS: AgentPreset[] = [
     tagline: "A friendly, curious voice assistant.",
     emoji: "✦",
     category: "Featured",
-    voice: "wren",
+    voice: "aria",
     instructions:
       `You are Hydra, a friendly real-time voice companion built on Smallest.ai. ` +
       `Be warm, concise, and conversational. Speak naturally — you are a voice, ` +
@@ -48,7 +48,7 @@ export const AGENT_PRESETS: AgentPreset[] = [
     tagline: "A burger-joint phone agent that takes orders.",
     emoji: "🍔",
     category: "Demos",
-    voice: "sloane",
+    voice: "maya",
     instructions:
       `You are the phone agent for Smallest Kitchen, a popular burger restaurant. ` +
       `Take the customer's order conversationally — never recite the whole menu unless they ask. ` +
@@ -64,7 +64,7 @@ export const AGENT_PRESETS: AgentPreset[] = [
     tagline: "A banking concierge that handles balances, transfers, and cards.",
     emoji: "🏦",
     category: "Demos",
-    voice: "reed",
+    voice: "sterling",
     instructions:
       `You are a NovaBank phone concierge. Help the customer with balances, ` +
       `recent transactions, transfers between checking and savings, blocking ` +

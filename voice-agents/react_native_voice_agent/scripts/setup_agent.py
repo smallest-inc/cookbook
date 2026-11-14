@@ -10,10 +10,11 @@ Two modes, chosen automatically from .env:
 
   2. Create-or-update — If AGENT_ID is missing, requires SMALLEST_API_KEY.
      Looks up an existing agent by name; if found, updates its config in
-     place. Otherwise creates a fresh agent. In both cases: opens a draft,
-     writes the full single-prompt config (prompt, voice, language,
-     model), and publishes the draft as a new version. Writes AGENT_ID
-     (and EXPO_PUBLIC_* mirrors for Metro bundle inlining) into .env.
+     place. Otherwise creates a fresh agent. In both cases: writes the
+     full single-prompt config (prompt, voice, language, model) into the
+     live branch's draft and publishes it, which makes the new revision
+     live. Writes AGENT_ID (and EXPO_PUBLIC_* mirrors for Metro bundle
+     inlining) into .env.
 
 Usage:
     cd voice-agents/atoms_hearthside_rn
@@ -215,45 +216,33 @@ def create_agent(api_key: str, name: str, slm: str, language: str,
     return agent_id
 
 
-def fetch_published_version_id(api_key: str, agent_id: str) -> Optional[str]:
-    resp = api_request("GET", f"/agent/{agent_id}/versions?limit=1", api_key)
+def fetch_branch_id(api_key: str, agent_id: str) -> str:
+    # v2 versioning: every agent carries a set of branches. The live branch
+    # holds the deployed config; fall back to the default branch when
+    # nothing is live yet (fresh agents).
+    resp = api_request("GET", f"/agent/{agent_id}/branches", api_key)
     data = unwrap_data(resp)
-    items = data.get("versions") if isinstance(data, dict) else data
-    if isinstance(items, list) and items:
-        v = items[0]
-        return v.get("_id") or v.get("id") or v.get("versionId")
-    return None
+    branches = data.get("branches") if isinstance(data, dict) else None
+    if not isinstance(branches, list) or not branches:
+        raise SystemExit(f"No branches on agent {agent_id}: {json.dumps(resp)[:400]}")
+    entry = next((b for b in branches if isinstance(b, dict) and (b.get("isLive") or b.get("is_live"))), None)
+    if entry is None:
+        entry = next((b for b in branches
+                      if isinstance(b, dict) and ((b.get("branch") or {}).get("isDefault") or (b.get("branch") or {}).get("is_default"))), None)
+    if entry is None:
+        entry = branches[0]
+    branch_obj = (entry.get("branch") or {}) if isinstance(entry, dict) else {}
+    branch_id = branch_obj.get("_id") or branch_obj.get("id")
+    if not branch_id:
+        raise SystemExit(f"Branch entry has no id: {json.dumps(entry)[:400]}")
+    return branch_id
 
 
-def fetch_or_create_draft(api_key: str, agent_id: str, source_version_id: Optional[str]) -> str:
-    # AgentVersion has two id fields: _id (mongo record id) and draftId
-    # (the routing identifier used on PATCH/PUBLISH paths). We must use
-    # draftId for API routes, not _id.
-    try:
-        resp = api_request("GET", f"/agent/{agent_id}/drafts", api_key)
-        drafts = unwrap_data(resp)
-        if isinstance(drafts, list) and drafts:
-            d = drafts[0]
-            draft_id = d.get("draftId")
-            if draft_id:
-                return draft_id
-    except ApiError:
-        pass
-
-    body: dict[str, Any] = {"draftName": "hearthside-setup"}
-    if source_version_id:
-        body["sourceVersionId"] = source_version_id
-    resp = api_request("POST", f"/agent/{agent_id}/drafts", api_key, body)
-    data = unwrap_data(resp)
-    draft_id = data.get("draftId") if isinstance(data, dict) else None
-    if not draft_id:
-        raise SystemExit(f"Unexpected /drafts response (no draftId): {json.dumps(resp)[:400]}")
-    return draft_id
-
-
-def patch_draft_config(api_key: str, agent_id: str, draft_id: str, *,
-                       slm: str, language: str, prompt: str,
-                       voice_id: Optional[str], voice_model: Optional[str]) -> None:
+def edit_branch_draft(api_key: str, agent_id: str, branch_id: str, *,
+                      slm: str, language: str, prompt: str,
+                      voice_id: Optional[str], voice_model: Optional[str]) -> None:
+    # PUT creates the branch's open draft when there is none, otherwise
+    # updates it in place. Field names match the old draft-config payload.
     body: dict[str, Any] = {
         "language": {
             "default": language,
@@ -274,22 +263,28 @@ def patch_draft_config(api_key: str, agent_id: str, draft_id: str, *,
             },
             "speed": 1.0,
         }
-    api_request("PATCH", f"/agent/{agent_id}/drafts/{draft_id}/config", api_key, body)
+    api_request("PUT", f"/agent/{agent_id}/branches/{branch_id}/draft", api_key, body)
 
 
-def publish_draft(api_key: str, agent_id: str, draft_id: str) -> str:
-    """Publish a draft; returns the new version id (needed for activation)."""
-    resp = api_request("POST", f"/agent/{agent_id}/drafts/{draft_id}/publish", api_key,
+def publish_branch_draft(api_key: str, agent_id: str, branch_id: str) -> str:
+    """Publish the branch's open draft; the published revision goes live
+    on its own (no separate activate step in v2)."""
+    resp = api_request("POST", f"/agent/{agent_id}/branches/{branch_id}/draft/publish", api_key,
                        {"label": f"hearthside-{int(time.time())}"})
     data = unwrap_data(resp)
-    version_id = data.get("_id") if isinstance(data, dict) else None
-    if not version_id:
-        raise SystemExit(f"Publish did not return a version id: {json.dumps(resp)[:400]}")
-    return version_id
-
-
-def activate_version(api_key: str, agent_id: str, version_id: str) -> None:
-    api_request("PATCH", f"/agent/{agent_id}/versions/{version_id}/activate", api_key)
+    revision_id = (data.get("_id") or data.get("id")) if isinstance(data, dict) else None
+    if revision_id:
+        return revision_id
+    # Publishing runs an async security scan; poll until the draft closes.
+    if isinstance(data, dict) and data.get("state"):
+        for _ in range(60):
+            time.sleep(2)
+            b = unwrap_data(api_request("GET", f"/agent/{agent_id}/branches/{branch_id}", api_key))
+            branch = b.get("branch", b) if isinstance(b, dict) else {}
+            if not branch.get("openDraftId"):
+                return branch.get("headRevisionId") or "published"
+        raise SystemExit("Publish did not finish scanning within 120s")
+    raise SystemExit(f"Publish did not return a revision id: {json.dumps(resp)[:400]}")
 
 
 def verify_agent_exists(api_key: str, agent_id: str) -> bool:
@@ -354,24 +349,19 @@ def main() -> int:
                                 args.voice, args.voice_model)
         print(f"  created agent: {agent_id}")
 
-    print("Opening draft for config edit...")
-    version_id = fetch_published_version_id(api_key, agent_id)
-    draft_id = fetch_or_create_draft(api_key, agent_id, version_id)
-    print(f"  draft: {draft_id}")
+    print("Resolving live branch...")
+    branch_id = fetch_branch_id(api_key, agent_id)
+    print(f"  branch: {branch_id}")
 
     print("Writing prompt, LLM, and language into draft...")
-    patch_draft_config(api_key, agent_id, draft_id,
-                       slm=args.model, language=args.language,
-                       prompt=NARRATOR_PROMPT,
-                       voice_id=args.voice, voice_model=args.voice_model)
+    edit_branch_draft(api_key, agent_id, branch_id,
+                      slm=args.model, language=args.language,
+                      prompt=NARRATOR_PROMPT,
+                      voice_id=args.voice, voice_model=args.voice_model)
 
     print("Publishing draft...")
-    new_version_id = publish_draft(api_key, agent_id, draft_id)
-    print(f"  published as version {new_version_id}.")
-
-    print("Activating new version...")
-    activate_version(api_key, agent_id, new_version_id)
-    print("  activated (new config is live).")
+    revision_id = publish_branch_draft(api_key, agent_id, branch_id)
+    print(f"  published as revision {revision_id} (new config is live).")
 
     _mirror_env_for_expo(api_key, agent_id)
     print(f"\nDone. Agent ID -> {agent_id}")

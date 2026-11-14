@@ -1,11 +1,9 @@
 // Thin wrapper around the Atoms REST surface the app needs for updating a
-// live agent's voice/speed/language. Full dance:
-//   1. GET /agent/{id}                       (read current config)
-//   2. GET /agent/{id}/versions?limit=1      (find version to branch from)
-//   3. POST /agent/{id}/drafts                (open a draft)
-//   4. PATCH /agent/{id}/drafts/{d}/config    (write new values)
-//   5. POST /agent/{id}/drafts/{d}/publish    (publish as new version)
-//   6. PATCH /agent/{id}/versions/{v}/activate (make it live)
+// live agent's voice/speed/language. Full dance (v2 branches flow):
+//   1. GET /agent/{id}                              (read current config)
+//   2. GET /agent/{id}/branches                     (find the live branch)
+//   3. PUT /agent/{id}/branches/{b}/draft           (write new values into the open draft)
+//   4. POST /agent/{id}/branches/{b}/draft/publish  (publish; the revision goes live)
 // Anything that doesn't change is carried forward from the current config.
 
 const API_BASE = 'https://api.smallest.ai/atoms/v1';
@@ -70,27 +68,23 @@ export interface UpdateInput {
   language?: string;
 }
 
-// Runs the 5-step draft-publish-activate flow. Returns the new version id.
+// Runs the branch edit-and-publish flow. Returns the published revision id.
 export async function updateAgentConfig(
   apiKey: string,
   agentId: string,
   current: AgentSnapshot,
   patch: UpdateInput,
 ): Promise<string> {
-  const versionsResp = unwrap<any>(
-    await call(apiKey, 'GET', `/agent/${agentId}/versions?limit=1`),
+  const branchesResp = unwrap<any>(
+    await call(apiKey, 'GET', `/agent/${agentId}/branches`),
   );
-  const sourceVersion = (versionsResp?.versions ?? [])[0]?._id;
-  if (!sourceVersion) throw new Error('No source version found on agent');
-
-  const draftResp = unwrap<any>(
-    await call(apiKey, 'POST', `/agent/${agentId}/drafts`, {
-      draftName: `live-config-${Date.now()}`,
-      sourceVersionId: sourceVersion,
-    }),
-  );
-  const draftId: string = draftResp.draftId;
-  if (!draftId) throw new Error('Draft creation did not return draftId');
+  const branches: any[] = branchesResp?.branches ?? [];
+  const entry =
+    branches.find((b) => b?.isLive ?? b?.is_live) ??
+    branches.find((b) => b?.branch?.isDefault ?? b?.branch?.is_default) ??
+    branches[0];
+  const branchId: string = entry?.branch?._id ?? entry?.branch?.id;
+  if (!branchId) throw new Error('No branch found on agent');
 
   const nextVoiceId = patch.voiceId ?? current.voiceId;
   const nextVoiceModel = patch.voiceModel ?? current.voiceModel;
@@ -111,17 +105,27 @@ export async function updateAgentConfig(
     },
   };
 
-  await call(apiKey, 'PATCH', `/agent/${agentId}/drafts/${draftId}/config`, configBody);
+  // PUT creates the branch's open draft when there is none, otherwise
+  // updates it in place.
+  await call(apiKey, 'PUT', `/agent/${agentId}/branches/${branchId}/draft`, configBody);
 
+  // Publishing the draft makes the new revision live; no activate step in v2.
   const publishResp = unwrap<any>(
-    await call(apiKey, 'POST', `/agent/${agentId}/drafts/${draftId}/publish`, {
+    await call(apiKey, 'POST', `/agent/${agentId}/branches/${branchId}/draft/publish`, {
       label: `hearthside-${Date.now()}`,
     }),
   );
-  const newVersion: string = publishResp._id;
-  if (!newVersion) throw new Error('Publish did not return version id');
+  let newRevision: string | undefined = publishResp?._id ?? publishResp?.id;
+  if (!newRevision && publishResp?.state) {
+    // Publishing runs an async security scan; poll until the draft closes.
+    for (let i = 0; i < 60 && !newRevision; i++) {
+      await new Promise((r) => setTimeout(r, 2000));
+      const b = unwrap<any>(await call(apiKey, 'GET', `/agent/${agentId}/branches/${branchId}`));
+      const branch = b?.branch ?? b;
+      if (!branch?.openDraftId) newRevision = branch?.headRevisionId ?? 'published';
+    }
+  }
+  if (!newRevision) throw new Error('Publish did not return revision id');
 
-  await call(apiKey, 'PATCH', `/agent/${agentId}/versions/${newVersion}/activate`);
-
-  return newVersion;
+  return newRevision;
 }
