@@ -245,8 +245,9 @@ async def speak(text, path):
         await ws.send(json.dumps({"flush": True}))
         pcm = bytearray()
         while True:
+            # Allow up to 10 s for the first chunk, then stop after 1.5 s of quiet.
             try:
-                d = json.loads(await asyncio.wait_for(ws.recv(), timeout=1.5))
+                d = json.loads(await asyncio.wait_for(ws.recv(), timeout=1.5 if pcm else 10))
             except asyncio.TimeoutError:
                 break
             if d.get("status") == "chunk":
@@ -254,6 +255,8 @@ async def speak(text, path):
                 pcm.extend(b[44:] if b[:4] == b"RIFF" else b)
             elif d.get("status") == "error":
                 raise RuntimeError(f"TTS error: {d}")
+    if not pcm:
+        raise RuntimeError("Lightning returned no audio for --say; try again or pass --wav")
     sf.write(path, np.frombuffer(bytes(pcm), "<i2"), 16000)
     return str(path)
 
