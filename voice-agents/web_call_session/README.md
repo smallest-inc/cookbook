@@ -63,7 +63,8 @@ The intended split:
 
 ## API Reference
 
-- [Atoms API Reference](https://docs.smallest.ai/atoms/api-reference)
+- [Start web call conversation API](https://docs.smallest.ai/api-reference/voice-agents/web-call/start-web-call-conversation)
+- [Start web chat conversation API](https://docs.smallest.ai/api-reference/voice-agents/web-call/start-web-chat-conversation)
 
 ## Next Steps
 
