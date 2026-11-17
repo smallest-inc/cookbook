@@ -74,15 +74,21 @@ async def one_turn(pcm, speech_start, speech_end, llm_model, oai, eou_ms=None, s
 
     # Connections are opened before the caller speaks, as a live agent keeps them warm.
     url = STT_URL + (f"&eou_timeout_ms={eou_ms}" if eou_ms else "")
-    stt = await websockets.connect(url, additional_headers=hdr, max_size=None)
-    tts = await websockets.connect(TTS_URL, additional_headers=hdr, max_size=None)
-    await oai.chat.completions.create(model=llm_model, max_tokens=1, messages=[{"role": "user", "content": "hi"}])  # warm the HTTPS connection
-
+    stt = tts = None
     rtts = []
-    for _ in range(5):  # network round trip to the API edge, for context on every bar
-        p0 = time.perf_counter()
-        await (await tts.ping())
-        rtts.append((time.perf_counter() - p0) * 1000)
+    try:
+        stt = await websockets.connect(url, additional_headers=hdr, max_size=None)
+        tts = await websockets.connect(TTS_URL, additional_headers=hdr, max_size=None)
+        await oai.chat.completions.create(model=llm_model, max_tokens=1, messages=[{"role": "user", "content": "hi"}])  # warm the HTTPS connection
+        for _ in range(5):  # network round trip to the API edge, for context on every bar
+            p0 = time.perf_counter()
+            await (await tts.ping())
+            rtts.append((time.perf_counter() - p0) * 1000)
+    except BaseException:
+        for ws in (stt, tts):
+            if ws is not None:
+                await ws.close()
+        raise
 
     t0 = time.perf_counter()
     now = lambda: time.perf_counter() - t0
@@ -273,8 +279,10 @@ async def main():
         try:
             r, audio = await one_turn(pcm, s0, s1, a.llm, oai, a.eou, a.system)
         except Exception as e:  # keep going, report the failure honestly
-            print(f"run {i}: failed: {e!r}")
-            runs.append({"run": i, "error": repr(e)})
+            status = getattr(getattr(e, "response", None), "status_code", None)
+            why = f"HTTP {status}" + (" (check SMALLEST_API_KEY)" if status in (401, 403) else "") if status else repr(e)
+            print(f"run {i}: failed: {why}")
+            runs.append({"run": i, "error": why})
             continue
         r.update(run=i, llm=a.llm, tts_model=TTS_MODEL, tts_voice=TTS_VOICE, caller=Path(caller).name)
         sf.write(out / f"reply_{i:02d}.wav", np.frombuffer(audio, "<i2"), TTS_RATE)
@@ -286,6 +294,8 @@ async def main():
     median_run = min(ok, key=lambda r: abs(r["stages_ms"]["total"] - summary["total"]))["run"] if ok else None
     (out / "runs.json").write_text(json.dumps({"runs": runs, "median_ms": summary, "median_run": median_run, "ok": len(ok), "of": len(runs)}, indent=1))
     print("median", summary, "closest run", median_run, f"{len(ok)}/{len(runs)} ok")
+    if not ok:
+        raise SystemExit("every run failed, see the errors above")
 
 
 if __name__ == "__main__":
