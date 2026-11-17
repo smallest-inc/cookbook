@@ -21,8 +21,9 @@ import os
 import time
 import wave
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 
 import numpy as np
 import websockets
@@ -48,41 +49,24 @@ from augmentations import (
 
 
 # ---- Preset profiles --------------------------------------------------------
-# Bundles of client-visible knobs, one per turn distribution. Only the knobs
-# the streaming WebSocket accepts as query params are represented here.
-PRESETS: dict[str, dict] = {
-    "voice_agent_open": {
-        "eou_timeout_ms": 900,
-        "endpointing": True,
-        "finalize_on_words": False,
-        "itn_normalize": True,
-        "word_timestamps": True,
-    },
-    "voice_agent_short_reply": {
-        "eou_timeout_ms": 550,
-        "endpointing": True,
-        "finalize_on_words": False,
-        "itn_normalize": False,
-        "word_timestamps": True,
-    },
-    "ivr": {
-        # Also implies sample_rate=8000, encoding=mulaw — see README. The harness
-        # takes sample_rate from the input WAV, so IVR-format audio must be
-        # supplied as such.
-        "eou_timeout_ms": 500,
-        "endpointing": True,
-        "finalize_on_words": False,
-        "itn_normalize": False,
-        "word_timestamps": True,
-    },
-    "dictation": {
-        "eou_timeout_ms": 1400,
-        "endpointing": False,
-        "finalize_on_words": False,
-        "itn_normalize": True,
-        "word_timestamps": True,
-    },
-}
+# Presets live in presets.json next to this file. run_matrix.py and live.html
+# read the same file, so a preset means the same thing everywhere. Only presets
+# marked "cli": true are offered here, because they use only the query params
+# this client can send.
+PRESETS_PATH = Path(__file__).with_name("presets.json")
+
+
+def load_presets(cli_only: bool = True) -> dict[str, dict]:
+    with open(PRESETS_PATH) as f:
+        raw = json.load(f)
+    return {
+        name: spec["params"]
+        for name, spec in raw.items()
+        if not name.startswith("_") and (spec.get("cli") or not cli_only)
+    }
+
+
+PRESETS: dict[str, dict] = load_presets()
 
 
 @dataclass
@@ -126,6 +110,14 @@ class StreamConfig:
         if self.keywords:
             params["keywords"] = self.keywords
         return urlencode(params)
+
+
+def _is_safe_for_key(url: str) -> bool:
+    """Only send the bearer key over TLS, or in plain text to this machine."""
+    parsed = urlparse(url)
+    if parsed.scheme == "wss":
+        return True
+    return parsed.hostname in {"localhost", "127.0.0.1", "::1"}
 
 
 def load_wav_int16(path: str) -> tuple[np.ndarray, int]:
@@ -190,6 +182,11 @@ async def recv_loop(ws, log, start_mono: float) -> None:
             continue
         payload["t_ms"] = int((time.monotonic() - start_mono) * 1000)
         log(payload)
+        # The server sets is_last on the final message it sends after a
+        # close_stream. A plain `finalize` ends a turn but not the session, so
+        # its final does not carry is_last and we keep reading. If is_last never
+        # arrives (for example after --force-finalize-after without a close),
+        # the caller's --recv-timeout ends the loop.
         if payload.get("is_last"):
             return
 
@@ -227,7 +224,7 @@ def _build_config(args, sr: int, preset: dict) -> StreamConfig:
         max_words=_resolve(args.max_words, preset, "max_words", 0),
         finalize_on_words=_resolve(args.finalize_on_words, preset, "finalize_on_words", True),
         word_timestamps=_resolve(args.word_timestamps, preset, "word_timestamps", False),
-        keywords=args.keywords,
+        keywords=args.keywords or preset.get("keywords", ""),
     )
 
 
@@ -289,7 +286,13 @@ async def run(args) -> None:
         if args.verbose:
             print(json.dumps(ev), flush=True)
 
-    api_key = args.api_key or os.getenv("SMALLEST_API_KEY", "")
+    # The key is read from the environment only. Passing it as a CLI flag would
+    # expose it in `ps` output and shell history.
+    api_key = os.getenv("SMALLEST_API_KEY", "")
+    if not api_key:
+        print("note: SMALLEST_API_KEY is not set, connecting without auth", flush=True)
+    elif not _is_safe_for_key(cfg.url):
+        raise SystemExit("Refusing to send SMALLEST_API_KEY over plain ws:// to a non-local host. Use wss://.")
     await _stream(ws_url, api_key, pcm, sr, args, log)
 
     if args.out_jsonl:
@@ -312,17 +315,11 @@ def parse_args() -> argparse.Namespace:
         default="pulse",
         help="ASR model. Only 'pulse' is supported on the streaming endpoint.",
     )
-    p.add_argument(
-        "--api-key",
-        default="",
-        help="Smallest API key. Falls back to SMALLEST_API_KEY env var. "
-             "Sent as Authorization: Bearer <key>.",
-    )
     p.add_argument("--language", default="en")
     p.add_argument("--out-jsonl", default="")
     p.add_argument("--verbose", action="store_true")
 
-    # Preset profile — bundles the config knobs below. Explicit CLI flags override.
+    # Preset profile: bundles the config knobs below. Explicit CLI flags override.
     p.add_argument(
         "--preset",
         default=None,
@@ -337,7 +334,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--max-words", type=int, default=None, help="0 = unset (server default)")
     p.add_argument("--finalize-on-words", action=argparse.BooleanOptionalAction, default=None)
     p.add_argument("--word-timestamps", action=argparse.BooleanOptionalAction, default=None)
-    p.add_argument("--keywords", default="")
+    p.add_argument("--keywords", default="", help="Overrides the preset's keywords.")
 
     # Send-side augmentations.
     p.add_argument("--chunk-ms", type=int, default=40)

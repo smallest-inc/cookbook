@@ -204,52 +204,10 @@ const PARAM_SPEC = [
 ];
 
 // --------------------------------------------------------------------------
-// Presets — each patches the defaults above. Keep the tuned voice-agent /
-// dictation ones aligned with run_matrix.py so results are comparable.
+// Presets come from presets.json (served by live_server.py), the same file
+// stream_client.py and run_matrix.py read, so all three stay in sync.
 // --------------------------------------------------------------------------
-const PRESETS = {
-  default: {
-    note: "Server defaults. Good baseline.",
-    overrides: {}
-  },
-  voice_agent_open: {
-    note: "Open-ended user turns (support / sales agent). Longer EOU tolerance.",
-    overrides: { eou_timeout_ms: 800, endpointing: "true", itn_normalize: "true" }
-  },
-  voice_agent_short_reply: {
-    note: "yes/no/digit confirmations. Tight EOU. ITN off. Boosted keywords.",
-    overrides: {
-      eou_timeout_ms: 550, endpointing: "true", itn_normalize: "false",
-      keywords: "yes:3,no:3,one:2,two:2,three:2,four:2,five:2"
-    }
-  },
-  dictation: {
-    note: "Long-form monologue. Loose EOU, ITN on.",
-    overrides: { eou_timeout_ms: 1400, endpointing: "true", itn_normalize: "true" }
-  },
-  meeting_diarize: {
-    note: "Word + sentence timestamps and speaker diarization for meetings.",
-    overrides: {
-      diarize: "true", word_timestamps: "true", sentence_timestamps: "true",
-      full_transcript: "true", eou_timeout_ms: 1000
-    }
-  },
-  pci_redacted_agent: {
-    note: "Voice-agent flow with PII + PCI redaction (en/hi only).",
-    overrides: {
-      eou_timeout_ms: 700, endpointing: "true", itn_normalize: "true",
-      redact_pii: "true", redact_pci: "true"
-    }
-  },
-  keywords_demo: {
-    note: "Force entity biasing so proper nouns land. Edit keywords freely.",
-    overrides: { keywords: "Rahul:3,Choudhary:3,Chaudhary:3,Choudhari:3" }
-  },
-  raw_no_formatting: {
-    note: "format=false forces lowercase, no punctuation, no ITN.",
-    overrides: { format: "false" }
-  },
-};
+let PRESETS = { default: { note: "Server defaults. Good baseline.", params: {} } };
 
 // --------------------------------------------------------------------------
 // Build the param form
@@ -283,13 +241,18 @@ for (const spec of PARAM_SPEC) {
 // Preset dropdown
 const presetEl = document.getElementById("preset");
 const presetNote = document.getElementById("preset-note");
-for (const name of Object.keys(PRESETS)) {
-  const opt = document.createElement("option");
-  opt.value = name; opt.textContent = name;
-  presetEl.appendChild(opt);
+function renderPresetOptions() {
+  presetEl.replaceChildren();
+  for (const name of Object.keys(PRESETS)) {
+    if (name.startsWith("_")) continue;
+    const opt = document.createElement("option");
+    opt.value = name; opt.textContent = name;
+    presetEl.appendChild(opt);
+  }
 }
 function applyPreset(name) {
   const p = PRESETS[name];
+  if (!p) return;
   presetNote.textContent = p.note || "";
   // reset to spec defaults
   for (const spec of PARAM_SPEC) {
@@ -297,14 +260,24 @@ function applyPreset(name) {
     if (!el) continue;
     el.value = String(spec.default);
   }
-  // apply overrides
-  for (const [k, v] of Object.entries(p.overrides)) {
+  // apply the preset's params
+  for (const [k, v] of Object.entries(p.params || {})) {
     const el = document.getElementById("p_" + k);
     if (el) el.value = String(v);
   }
 }
 presetEl.addEventListener("change", () => applyPreset(presetEl.value));
+renderPresetOptions();
 applyPreset("default");
+fetch("/presets.json", { cache: "no-store" })
+  .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+  .then((data) => {
+    PRESETS = data;
+    renderPresetOptions();
+    presetEl.value = "default";
+    applyPreset("default");
+  })
+  .catch((err) => { presetNote.textContent = `Could not load presets.json: ${err.message}`; });
 
 // --------------------------------------------------------------------------
 // Collect params → query string

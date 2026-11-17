@@ -11,6 +11,13 @@ key. This server:
      Each forwarded JSON event is tagged with `_srv_recv_ms` so the browser can
      compute end-to-end latency.
 
+Only pages served from this proxy may open `/ws`. The handler checks the
+`Origin` header against an allowlist (by default http://localhost:<port>,
+http://127.0.0.1:<port> and http://[::1]:<port>) so a random website you visit
+while the proxy runs cannot open a socket to it and spend your key
+(cross-site WebSocket hijacking). Add more origins with `--allowed-origin` or
+the comma-separated `HARNESS_ALLOWED_ORIGINS` env var.
+
 Requires: `aiohttp websockets`.
 
   export SMALLEST_API_KEY=sk_...
@@ -66,9 +73,40 @@ async def index(_request: web.Request) -> web.Response:
     )
 
 
-async def ws_handler(request: web.Request) -> web.WebSocketResponse:
+async def presets(_request: web.Request) -> web.Response:
+    return web.Response(
+        body=(HERE / "presets.json").read_bytes(),
+        content_type="application/json",
+    )
+
+
+def default_allowed_origins(port: int) -> set[str]:
+    return {
+        f"http://localhost:{port}",
+        f"http://127.0.0.1:{port}",
+        f"http://[::1]:{port}",
+    }
+
+
+def _normalize_origin(origin: str) -> str:
+    return origin.strip().rstrip("/").lower()
+
+
+async def ws_handler(request: web.Request) -> web.StreamResponse:
     upstream_base: str = request.app["upstream"]
     api_key: str = request.app["api_key"]
+    allowed: set[str] = request.app["allowed_origins"]
+
+    # Browsers always send Origin on a WebSocket handshake and page scripts
+    # cannot forge it. Reject anything that is not on the allowlist, including
+    # a missing Origin, before touching the upstream or the key.
+    origin = _normalize_origin(request.headers.get("Origin", ""))
+    if origin not in allowed:
+        print(
+            f"[{request.remote or '?'}] rejected /ws from origin {origin or '<none>'!r}",
+            flush=True,
+        )
+        raise web.HTTPForbidden(text="origin not allowed\n")
 
     client_ws = web.WebSocketResponse(max_msg_size=10 * 1024 * 1024)
     await client_ws.prepare(request)
@@ -162,7 +200,7 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
                         latency_ms = int((now - stats["last_audio_at"]) * 1000)
                         text = (payload.get("transcript") or payload.get("text") or "")[:60]
                         print(
-                            f"[{peer}] last audio → final latency: {latency_ms} ms — {text!r}",
+                            f"[{peer}] last audio → final latency: {latency_ms} ms: {text!r}",
                             flush=True,
                         )
         except websockets.ConnectionClosed as e:
@@ -188,11 +226,16 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
     return client_ws
 
 
-def build_app(upstream: str, api_key: str) -> web.Application:
+def build_app(upstream: str, api_key: str, allowed_origins: set[str]) -> web.Application:
     app = web.Application()
     app["upstream"] = upstream
     app["api_key"] = api_key
-    app.add_routes([web.get("/", index), web.get("/ws", ws_handler)])
+    app["allowed_origins"] = {_normalize_origin(o) for o in allowed_origins if o.strip()}
+    app.add_routes([
+        web.get("/", index),
+        web.get("/presets.json", presets),
+        web.get("/ws", ws_handler),
+    ])
     return app
 
 
@@ -204,17 +247,27 @@ def main() -> None:
                    help="Upstream WSS URL. Defaults to api.smallest.ai. "
                         "Pass wss://api.<region>.smallest.ai/waves/v1/stt/live "
                         "to pin to a specific region.")
-    p.add_argument("--api-key", default="",
-                   help="Falls back to SMALLEST_API_KEY env var.")
+    p.add_argument("--allowed-origin", action="append", default=[],
+                   help="Extra browser Origin allowed to open /ws, for example "
+                        "http://mybox.local:8765. Repeatable. Also read from "
+                        "HARNESS_ALLOWED_ORIGINS (comma-separated).")
     args = p.parse_args()
 
-    api_key = args.api_key or os.getenv("SMALLEST_API_KEY", "")
+    # The key comes from the environment only. A --api-key flag would expose it
+    # in `ps` output and shell history.
+    api_key = os.getenv("SMALLEST_API_KEY", "")
     if not api_key:
-        raise SystemExit("SMALLEST_API_KEY not set (env or --api-key).")
+        raise SystemExit("SMALLEST_API_KEY is not set.")
+
+    allowed = default_allowed_origins(args.port)
+    allowed.update(args.allowed_origin)
+    allowed.update(os.getenv("HARNESS_ALLOWED_ORIGINS", "").split(","))
+    allowed = {o for o in allowed if o.strip()}
 
     print(f"→ http://{args.host}:{args.port}")
     print(f"→ upstream: {args.upstream}")
-    web.run_app(build_app(args.upstream, api_key), host=args.host, port=args.port)
+    print(f"→ allowed origins: {', '.join(sorted(allowed))}")
+    web.run_app(build_app(args.upstream, api_key, allowed), host=args.host, port=args.port)
 
 
 if __name__ == "__main__":
