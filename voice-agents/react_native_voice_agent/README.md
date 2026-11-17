@@ -12,7 +12,7 @@ The app is deliberately small so it reads as a reference for anyone wiring a voi
 - Microphone capture and gapless PCM playback using [`react-native-audio-api`](https://docs.swmansion.com/react-native-audio-api/).
 - Full protocol: `input_audio_buffer.append` streaming, `output_audio.delta` scheduled playback, `agent_start_talking` / `agent_stop_talking` / `interruption` / `session.closed` handling.
 - Exponential-backoff reconnect for transient drops, hard-stop on auth failures.
-- Programmatic agent creation and in-app reconfiguration via REST — voice, speed, and language pickers that drive the full branch `draft → publish` flow.
+- Programmatic agent creation and in-app reconfiguration via REST: voice, speed, and language pickers that drive the full branch `draft → publish` flow.
 - Transport diagnostics in the UI: a live chunk counter so users can verify their voice is actually reaching the server.
 - Mute toggle to suppress mic uploads during narration (stops spurious server-side VAD interruptions).
 - Correctly configured iOS audio session: `playAndRecord` + `default` mode + `defaultToSpeaker`, so narration plays through the loud bottom speaker at full media volume, cleanly, without distortion or buffer underruns.
@@ -41,7 +41,7 @@ npm install
 npx expo prebuild --clean            # regenerates ios/ and android/ projects
 ```
 
-`scripts/setup_agent.py` walks the full REST flow behind the scenes: `POST /agent` → `GET /branches` to find the live branch → `PUT /branches/.../draft` with the prompt, voice, and LLM model → `POST /branches/.../draft/publish` (the published revision goes live on its own). It is idempotent — re-running updates the existing agent in place instead of creating duplicates.
+`scripts/setup_agent.py` walks the full REST flow behind the scenes: `POST /agent` → `GET /branches` to find the live branch → `PUT /branches/.../draft` with the prompt, voice, and LLM model → `POST /branches/.../draft/publish` (the published revision goes live on its own). It is idempotent: re-running updates the existing agent in place instead of creating duplicates.
 
 Flags:
 

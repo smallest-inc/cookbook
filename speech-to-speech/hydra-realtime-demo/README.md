@@ -14,7 +14,7 @@ Talk to Hydra in your browser, watch every WebSocket frame as it lands, and swit
 - **Wire-log tab** — every `session.*`, `input_audio_buffer.*`, `response.*`, `conversation.item.*`, and `error` event, in & out, with a JSON inspector.
 - **Multi-agent presets** — a friendly companion, a burger-restaurant phone agent (`Smallest Kitchen`), and a banking concierge (`NovaBank`). All tools execute locally — Hydra is a pure voice engine.
 - **Beautiful, audio-reactive orb** that pulses with the live RMS level of whichever side is currently active.
-- **Persona / voice editing** — change the system prompt, pick from six Hydra voices, toggle whether the agent speaks first.
+- **Persona / voice editing**: change the system prompt, pick from six Hydra voices, toggle whether the agent speaks first.
 - **Zero server** — connects browser → Hydra directly. Your API key never leaves your browser.
 
 ---

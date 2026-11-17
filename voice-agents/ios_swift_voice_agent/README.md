@@ -2,7 +2,7 @@
 
 A minimal native iOS sample that opens a real-time voice session with a Smallest AI voice agent over the plain WebSocket endpoint. SwiftUI, `URLSessionWebSocketTask`, `AVAudioEngine`. iOS 16+.
 
-The app has the same UX as the [React Native cookbook](../react_native_voice_agent/) — status chip, two labelled waveforms (narrator + you), mute toggle, sending counter, in-app settings sheet wired to the full branch `draft → publish` REST flow.
+The app has the same UX as the [React Native cookbook](../react_native_voice_agent/): status chip, two labelled waveforms (narrator + you), mute toggle, sending counter, in-app settings sheet wired to the full branch `draft → publish` REST flow.
 
 ## What it shows
 
