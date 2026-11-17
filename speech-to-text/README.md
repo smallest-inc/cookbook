@@ -1,6 +1,6 @@
 # Speech-to-Text
 
-> **Powered by [Pulse STT](https://waves-docs.smallest.ai/models/speech-to-text/overview)**
+> **Powered by [Pulse STT](https://docs.smallest.ai/models/speech-to-text/overview)**
 
 Convert audio to text using Smallest AI's Pulse Speech-to-Text API. Supports 30+ languages with industry-leading accuracy and speed.
 
@@ -43,8 +43,8 @@ Use `multi` for automatic language detection.
 
 ## Documentation
 
-- [Pulse STT Overview](https://waves-docs.smallest.ai/models/speech-to-text/overview)
-- [Pre-recorded Audio](https://waves-docs.smallest.ai/models/speech-to-text/pre-recorded/quickstart)
-- [Streaming Audio](https://waves-docs.smallest.ai/models/speech-to-text/realtime-web-socket/quickstart)
-- [Response Format](https://waves-docs.smallest.ai/models/speech-to-text/realtime-web-socket/response-format)
-- [API Reference](https://waves-docs.smallest.ai/api-reference/models/speech-to-text/transcribe)
+- [Pulse STT Overview](https://docs.smallest.ai/models/speech-to-text/overview)
+- [Pre-recorded Audio](https://docs.smallest.ai/models/speech-to-text/pre-recorded/quickstart)
+- [Streaming Audio](https://docs.smallest.ai/models/speech-to-text/realtime-web-socket/quickstart)
+- [Response Format](https://docs.smallest.ai/models/speech-to-text/realtime-web-socket/response-format)
+- [API Reference](https://docs.smallest.ai/api-reference/models/speech-to-text/transcribe)

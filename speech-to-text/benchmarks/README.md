@@ -117,7 +117,7 @@ jq '.aggregate' /path/to/data/results_batch_pulse-pro_en.json
 
 ## What this measures vs. what it doesn't
 
-These scripts measure **wall-clock client-observed latency**, which includes network transit + server processing + client overhead. They do **not** attribute latency by component. For component attribution (network vs model vs client), see the [docs page](https://docs.smallest.ai/models/speech-to-text/benchmarks/measuring-latency#component-breakdown).
+These scripts measure **wall-clock client-observed latency**, which includes network transit + server processing + client overhead. They do **not** attribute latency by component. For component attribution (network vs model vs client), see the [docs page](https://docs.smallest.ai/models/speech-to-text/benchmarks/measuring-latency#latency-components).
 
 For streaming, the script reports **tail latency** — the time from the last audio chunk being sent to the final transcript landing. It does **not** report transcript latency (the running gap during the session) or end-of-utterance latency (silence → final). Both of those require client-side instrumentation; see the docs page for measurement patterns.
 

@@ -72,9 +72,9 @@ Audio: WAV, MP3, FLAC, OGG, M4A, AAC, WMA
 
 ## API Reference
 
-- [Pulse STT Overview](https://waves-docs.smallest.ai/models/speech-to-text/overview)
-- [Emotion Detection](https://waves-docs.smallest.ai/models/speech-to-text/features/emotion-detection)
-- [Pre-recorded API](https://waves-docs.smallest.ai/models/speech-to-text/pre-recorded/quickstart)
+- [Pulse STT Overview](https://docs.smallest.ai/models/speech-to-text/overview)
+- [Emotion Detection](https://docs.smallest.ai/models/speech-to-text/features/emotion-detection)
+- [Pre-recorded API](https://docs.smallest.ai/models/speech-to-text/pre-recorded/quickstart)
 
 ## Next Steps
 

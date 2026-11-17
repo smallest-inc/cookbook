@@ -54,7 +54,7 @@ node javascript/voices.js --preview sophia
 
 ## API Reference
 
-- [Get Voices API](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/get-waves-voices)
+- [Get Voices API](https://docs.smallest.ai/api-reference/models/text-to-speech/get-waves-voices)
 
 ## Next Steps
 

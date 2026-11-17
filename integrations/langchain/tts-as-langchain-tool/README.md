@@ -75,8 +75,8 @@ tts-as-langchain-tool/
 
 ## API Reference
 
-- [Lightning TTS Overview](https://waves-docs.smallest.ai/models/text-to-speech/overview)
-- [TTS API Reference](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Lightning TTS Overview](https://docs.smallest.ai/models/text-to-speech/overview)
+- [TTS API Reference](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
 
 ## Next Steps
 

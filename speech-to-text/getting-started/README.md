@@ -41,8 +41,8 @@ node javascript/transcribe.js recording.wav
 
 ## API Reference
 
-- [Pre-recorded Quickstart](https://waves-docs.smallest.ai/models/speech-to-text/pre-recorded/quickstart)
-- [Pulse STT API Reference](https://waves-docs.smallest.ai/api-reference/models/speech-to-text/transcribe)
+- [Pre-recorded Quickstart](https://docs.smallest.ai/models/speech-to-text/pre-recorded/quickstart)
+- [Pulse STT API Reference](https://docs.smallest.ai/api-reference/models/speech-to-text/transcribe)
 
 ## Next Steps
 

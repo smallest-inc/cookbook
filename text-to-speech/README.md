@@ -140,8 +140,8 @@ Lightning v3.1 Pro: depends on the voice — Indian Pro voices speak `en` + `hi`
 
 - [Lightning v3.1 REST](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
 - [Lightning v3.1 WebSocket](https://docs.smallest.ai/api-reference/models/text-to-speech/tts)
-- [Voices API](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/get-waves-voices)
-- [Voice Cloning](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/create-voice-clone)
-- [Pronunciation Dicts](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/get-pronunciation-dicts)
+- [Voices API](https://docs.smallest.ai/api-reference/models/text-to-speech/get-waves-voices)
+- [Voice Cloning](https://docs.smallest.ai/api-reference/models/text-to-speech/create-voice-clone)
+- [Pronunciation Dicts](https://docs.smallest.ai/api-reference/models/text-to-speech/get-pronunciation-dicts)
 - [Python SDK](https://github.com/smallest-inc/smallest-python-sdk)
 

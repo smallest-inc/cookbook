@@ -58,7 +58,7 @@ podcast_output/
 
 ## API Reference
 
-- [Lightning v3.1 API](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Lightning v3.1 API](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
 - [OpenAI Chat API](https://platform.openai.com/docs/api-reference/chat)
 
 ## Next Steps

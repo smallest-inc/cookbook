@@ -49,6 +49,6 @@ When you type a search query, it's embedded with the same model and ranked by co
 
 ## API Reference
 
-- [Get Voices](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/get-waves-voices)
-- [Get Cloned Voices](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/list-voice-clones)
-- [Text-to-Speech](https://waves-docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Get Voices](https://docs.smallest.ai/api-reference/models/text-to-speech/get-waves-voices)
+- [Get Cloned Voices](https://docs.smallest.ai/api-reference/models/text-to-speech/list-voice-clones)
+- [Text-to-Speech](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)

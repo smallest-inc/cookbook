@@ -48,8 +48,8 @@ The Gradio app captures microphone audio, streams it via WebSocket to Pulse STT,
 
 ## API Reference
 
-- [Streaming Quickstart](https://waves-docs.smallest.ai/models/speech-to-text/realtime-web-socket/quickstart)
-- [Pulse STT WebSocket API](https://waves-docs.smallest.ai/api-reference/models/speech-to-text/speech-to-text)
+- [Streaming Quickstart](https://docs.smallest.ai/models/speech-to-text/realtime-web-socket/quickstart)
+- [Pulse STT WebSocket API](https://docs.smallest.ai/api-reference/models/speech-to-text/speech-to-text)
 
 ## Next Steps
 

@@ -79,8 +79,8 @@ stt-as-langchain-tool/
 
 ## API Reference
 
-- [Pulse STT Overview](https://waves-docs.smallest.ai/models/speech-to-text/overview)
-- [Pre-recorded API](https://waves-docs.smallest.ai/models/speech-to-text/pre-recorded/quickstart)
+- [Pulse STT Overview](https://docs.smallest.ai/models/speech-to-text/overview)
+- [Pre-recorded API](https://docs.smallest.ai/models/speech-to-text/pre-recorded/quickstart)
 
 ## Next Steps
 

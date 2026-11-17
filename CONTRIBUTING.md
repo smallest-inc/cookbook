@@ -135,7 +135,7 @@ uv run your_script.py
 
 ## Documentation
 
-- [Relevant docs link](https://waves-docs.smallest.ai/...)
+- [Relevant docs link](https://docs.smallest.ai/...)
 
 ## Next Steps
 
