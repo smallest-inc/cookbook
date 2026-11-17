@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, Platform } from 'react-native';
 import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import { AtomsClient } from '@/agent/AtomsClient';
+import { fetchSessionToken } from '@/agent/sessionServer';
 import { startMicCapture, CaptureHandle } from '@/agent/audioCapture';
 import { ScheduledPlayback } from '@/agent/audioPlayback';
 import { ServerEvent, SessionError, SessionStatus } from '@/agent/types';
@@ -29,8 +30,8 @@ export interface UseAtomsSessionResult {
 }
 
 export interface UseAtomsSessionConfig {
-  apiKey: string | undefined;
-  agentId: string | undefined;
+  // Session server URL (EXPO_PUBLIC_TOKEN_SERVER_URL). See ../mobile_token_server.
+  serverUrl: string | undefined;
 }
 
 async function ensureMicPermission(): Promise<boolean> {
@@ -41,7 +42,7 @@ async function ensureMicPermission(): Promise<boolean> {
   return result === RESULTS.GRANTED;
 }
 
-export function useAtomsSession({ apiKey, agentId }: UseAtomsSessionConfig): UseAtomsSessionResult {
+export function useAtomsSession({ serverUrl }: UseAtomsSessionConfig): UseAtomsSessionResult {
   const [status, setStatus] = useState<SessionStatus>('idle');
   const [error, setError] = useState<SessionError | null>(null);
   const [micLevel, setMicLevel] = useState(0);
@@ -136,10 +137,10 @@ export function useAtomsSession({ apiKey, agentId }: UseAtomsSessionConfig): Use
   }, [stop, fail]);
 
   const start = useCallback(async () => {
-    if (!apiKey || !agentId) {
+    if (!serverUrl) {
       fail({
         kind: 'missing-config',
-        message: 'SMALLEST_API_KEY and AGENT_ID must be set in .env',
+        message: 'EXPO_PUBLIC_TOKEN_SERVER_URL must be set in .env (see mobile_token_server)',
         retryable: false,
       });
       return;
@@ -176,8 +177,7 @@ export function useAtomsSession({ apiKey, agentId }: UseAtomsSessionConfig): Use
     playbackRef.current = playback;
 
     const client = new AtomsClient({
-      apiKey,
-      agentId,
+      getToken: async () => (await fetchSessionToken(serverUrl)).token,
       sampleRate: SAMPLE_RATE,
       onOpen: () => {
         captureRef.current = startMicCapture({
@@ -206,7 +206,7 @@ export function useAtomsSession({ apiKey, agentId }: UseAtomsSessionConfig): Use
     });
     clientRef.current = client;
     client.start();
-  }, [apiKey, agentId, handleEvent, fail]);
+  }, [serverUrl, handleEvent, fail]);
 
   // Tear down only on *real* backgrounding, not on the transient
   // `inactive` state. iOS fires `inactive` when the user pulls the

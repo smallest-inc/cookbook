@@ -11,11 +11,10 @@ import { SettingsSheet } from '@/ui/SettingsSheet';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 
-// Credentials come from .env via Expo's public env var path (EXPO_PUBLIC_*
-// is inlined at build time). The script at scripts/setup_agent.py writes
-// AGENT_ID for you; SMALLEST_API_KEY is whatever the user sets.
-const API_KEY = process.env.EXPO_PUBLIC_SMALLEST_API_KEY;
-const AGENT_ID = process.env.EXPO_PUBLIC_AGENT_ID;
+// EXPO_PUBLIC_* values are inlined into the JS bundle at build time, so only
+// a non-secret URL goes here. The session server (../mobile_token_server)
+// holds SMALLEST_API_KEY and AGENT_ID and mints short-lived tokens.
+const TOKEN_SERVER_URL = process.env.EXPO_PUBLIC_TOKEN_SERVER_URL;
 
 export default function Index() {
   const {
@@ -23,7 +22,7 @@ export default function Index() {
     micLevel, agentLevel, micChunksSent,
     muted, toggleMute,
     start, stop,
-  } = useAtomsSession({ apiKey: API_KEY, agentId: AGENT_ID });
+  } = useAtomsSession({ serverUrl: TOKEN_SERVER_URL });
 
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -148,8 +147,7 @@ export default function Index() {
       <SettingsSheet
         visible={settingsOpen}
         onClose={() => setSettingsOpen(false)}
-        apiKey={API_KEY}
-        agentId={AGENT_ID}
+        serverUrl={TOKEN_SERVER_URL}
       />
     </SafeAreaView>
   );

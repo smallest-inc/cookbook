@@ -12,7 +12,8 @@ The app is deliberately small so it reads as a reference for anyone wiring a voi
 - Microphone capture and gapless PCM playback using [`react-native-audio-api`](https://docs.swmansion.com/react-native-audio-api/).
 - Full protocol: `input_audio_buffer.append` streaming, `output_audio.delta` scheduled playback, `agent_start_talking` / `agent_stop_talking` / `interruption` / `session.closed` handling.
 - Exponential-backoff reconnect for transient drops, hard-stop on auth failures.
-- Programmatic agent creation and in-app reconfiguration via REST: voice, speed, and language pickers that drive the full branch `draft → publish` flow.
+- No API key in the app. A small session server ([`../mobile_token_server`](../mobile_token_server/)) holds the key and mints a short-lived, single-use token for each connection.
+- Programmatic agent creation, plus voice, speed, and language pickers that the session server applies to the agent (off by default).
 - Transport diagnostics in the UI: a live chunk counter so users can verify their voice is actually reaching the server.
 - Mute toggle to suppress mic uploads during narration (stops spurious server-side VAD interruptions).
 - Correctly configured iOS audio session: `playAndRecord` + `default` mode + `defaultToSpeaker`, so narration plays through the loud bottom speaker at full media volume, cleanly, without distortion or buffer underruns.
@@ -40,6 +41,8 @@ python3 scripts/setup_agent.py       # creates (or updates) the narrator, writes
 npm install
 npx expo prebuild --clean            # regenerates ios/ and android/ projects
 ```
+
+`.env` ends up with `SMALLEST_API_KEY`, `AGENT_ID` and `EXPO_PUBLIC_TOKEN_SERVER_URL`. Only the `EXPO_PUBLIC_` value is bundled into the app, and it is just a URL. If your `.env` still has `EXPO_PUBLIC_SMALLEST_API_KEY` from an older version, the script removes it; rotate that key if you ever shipped a build with it.
 
 `scripts/setup_agent.py` walks the full REST flow behind the scenes: `POST /agent` → `GET /branches` to find the live branch → `PUT /branches/.../draft` with the prompt, voice, and LLM model → `POST /branches/.../draft/publish` (the published revision goes live on its own). It is idempotent: re-running updates the existing agent in place instead of creating duplicates.
 
@@ -69,6 +72,26 @@ The script detects that `AGENT_ID` is already set and exits without calling any 
 
 ## Run
 
+### 1. Start the session server
+
+The app never holds your API key. Run the session server next to it; it reads `SMALLEST_API_KEY` and `AGENT_ID` from the same `.env`:
+
+```bash
+node --env-file=.env ../mobile_token_server/server.mjs     # http://127.0.0.1:8787
+```
+
+Point the app at it with `EXPO_PUBLIC_TOKEN_SERVER_URL` in `.env`:
+
+| Where the app runs | `EXPO_PUBLIC_TOKEN_SERVER_URL` | Server start |
+|---|---|---|
+| iOS simulator | `http://localhost:8787` | as above |
+| Android emulator | `http://10.0.2.2:8787` | as above |
+| Physical device on your Wi-Fi | `http://<your-computer-LAN-IP>:8787` | `HOST=0.0.0.0 node --env-file=.env ../mobile_token_server/server.mjs` |
+
+Plain `http://` is for local development only. For a real deployment, host the server behind HTTPS and add your own user authentication in front of `/session`. See [`../mobile_token_server`](../mobile_token_server/) for details.
+
+### 2. Run the app
+
 **iOS** (simulator or device):
 
 ```bash
@@ -92,7 +115,7 @@ Tap **settings** (top-right, idle screen only) to open the agent configuration s
 - **Speed** — 0.85× / 1.00× / 1.15× / 1.30×.
 - **Language** — English, Hindi, or Multi (auto-detect).
 
-**Apply & publish** runs the branch REST flow (find the live branch → PUT the draft config → publish the draft, which makes the new revision live) against your live agent. End the current story and start a new one to hear the change.
+The sheet reads the current values from the session server (`GET /agent`). **Apply & publish** sends the change to the server (`POST /agent/config`), which publishes it on the agent's live branch. Editing is off by default, because anyone who can reach the server could otherwise change your agent; start the server with `ALLOW_AGENT_EDITS=true` to turn it on for local development. Without it the sheet is read only. End the current story and start a new one to hear the change.
 
 ### During a session
 
@@ -103,8 +126,8 @@ Tap **settings** (top-right, idle screen only) to open the agent configuration s
 
 | Layer | Module | Responsibility |
 |---|---|---|
-| Transport | `src/agent/AtomsClient.ts` | Opens the WebSocket, dispatches server events, handles reconnect with backoff. |
-| REST | `src/agent/atomsRest.ts` | Thin `fetch` wrapper for the agent read + branch draft-publish flow used by the settings sheet. |
+| Session server client | `src/agent/sessionServer.ts` | Calls the session server: `POST /session` for a short-lived token, `GET /agent` and `POST /agent/config` for the settings sheet. |
+| Transport | `src/agent/AtomsClient.ts` | Fetches a fresh token, opens the WebSocket with it, dispatches server events, handles reconnect with backoff (a new token per attempt, since tokens are single-use). |
 | Capture | `src/agent/audioCapture.ts` | Configures the iOS audio session (`playAndRecord` + `default` + `defaultToSpeaker`), starts an `AudioRecorder`, converts Float32 → Int16 LE, emits RMS for the mic waveform. |
 | Playback | `src/agent/audioPlayback.ts` | Web Audio `AudioContext` with a `nextPlayTime` pointer for gapless scheduling; `ctx.resume()` after construction (Android starts suspended); `flush()` resets the pointer on `interruption`. |
 | State machine | `src/hooks/useAtomsSession.ts` | `idle → connecting → joined → listening → narrating → error`. Owns permission check, lifecycle, mute gating, mic-chunk counter, error classification. |

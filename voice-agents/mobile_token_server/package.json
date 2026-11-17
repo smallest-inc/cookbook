@@ -1,0 +1,14 @@
+{
+  "name": "mobile-token-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Keeps the Smallest API key off the device and mints short-lived Agent WebSocket tokens for the React Native voice examples.",
+  "type": "module",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

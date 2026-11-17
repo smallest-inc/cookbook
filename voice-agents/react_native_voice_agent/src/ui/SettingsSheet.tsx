@@ -14,7 +14,7 @@ import {
   AgentSnapshot,
   fetchAgent,
   updateAgentConfig,
-} from '@/agent/atomsRest';
+} from '@/agent/sessionServer';
 
 // Curated v3.1 voices. These are stable catalog IDs that ship on every
 // org. For a full picker fetch GET /waves/v1/voices, but for a cookbook
@@ -39,14 +39,15 @@ const SPEEDS = [0.85, 1.0, 1.15, 1.3];
 export interface SettingsSheetProps {
   visible: boolean;
   onClose: () => void;
-  apiKey: string | undefined;
-  agentId: string | undefined;
+  // Session server URL (EXPO_PUBLIC_TOKEN_SERVER_URL). The server holds the
+  // API key and applies the change; the app never talks to the Atoms REST API.
+  serverUrl: string | undefined;
   // Called after a successful apply. Parent may choose to restart session.
   onApplied?: () => void;
 }
 
 export function SettingsSheet(props: SettingsSheetProps) {
-  const { visible, onClose, apiKey, agentId, onApplied } = props;
+  const { visible, onClose, serverUrl, onApplied } = props;
 
   const [snapshot, setSnapshot] = useState<AgentSnapshot | null>(null);
   const [voiceId, setVoiceId] = useState<string>('');
@@ -58,11 +59,11 @@ export function SettingsSheet(props: SettingsSheetProps) {
   const [applied, setApplied] = useState(false);
 
   useEffect(() => {
-    if (!visible || !apiKey || !agentId) return;
+    if (!visible || !serverUrl) return;
     setErr(null);
     setApplied(false);
     setLoading(true);
-    fetchAgent(apiKey, agentId)
+    fetchAgent(serverUrl)
       .then((s) => {
         setSnapshot(s);
         setVoiceId(s.voiceId);
@@ -71,7 +72,7 @@ export function SettingsSheet(props: SettingsSheetProps) {
       })
       .catch((e) => setErr(e instanceof Error ? e.message : 'failed to load'))
       .finally(() => setLoading(false));
-  }, [visible, apiKey, agentId]);
+  }, [visible, serverUrl]);
 
   const dirty =
     snapshot !== null &&
@@ -80,15 +81,11 @@ export function SettingsSheet(props: SettingsSheetProps) {
       language !== snapshot.language);
 
   const apply = async () => {
-    if (!apiKey || !agentId || !snapshot || !dirty) return;
+    if (!serverUrl || !snapshot || !snapshot.editable || !dirty) return;
     setApplying(true);
     setErr(null);
     try {
-      await updateAgentConfig(apiKey, agentId, snapshot, {
-        voiceId,
-        speed,
-        language,
-      });
+      await updateAgentConfig(serverUrl, { voiceId, speed, language });
       setApplied(true);
       setSnapshot({ ...snapshot, voiceId, speed, language });
       onApplied?.();
@@ -176,6 +173,12 @@ export function SettingsSheet(props: SettingsSheetProps) {
                 </View>
               </Section>
 
+              {!snapshot.editable ? (
+                <Text style={styles.hint}>
+                  Editing is turned off on the session server. Start it with
+                  ALLOW_AGENT_EDITS=true to apply changes from the app.
+                </Text>
+              ) : null}
               {err ? <Text style={styles.error}>{err}</Text> : null}
               {applied ? (
                 <Text style={styles.okText}>
@@ -185,11 +188,11 @@ export function SettingsSheet(props: SettingsSheetProps) {
               ) : null}
 
               <Pressable
-                disabled={!dirty || applying}
+                disabled={!snapshot.editable || !dirty || applying}
                 onPress={apply}
                 style={({ pressed }) => [
                   styles.applyBtn,
-                  (!dirty || applying) && styles.applyBtnDisabled,
+                  (!snapshot.editable || !dirty || applying) && styles.applyBtnDisabled,
                   pressed && { opacity: 0.7 },
                 ]}
               >
@@ -197,7 +200,7 @@ export function SettingsSheet(props: SettingsSheetProps) {
                   <ActivityIndicator color={colors.bg} />
                 ) : (
                   <Text style={styles.applyText}>
-                    {dirty ? 'Apply & publish' : 'No changes'}
+                    {!snapshot.editable ? 'Read only' : dirty ? 'Apply & publish' : 'No changes'}
                   </Text>
                 )}
               </Pressable>
