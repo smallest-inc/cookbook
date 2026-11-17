@@ -47,6 +47,7 @@ The sample connects, declares a `lookup_order` client tool, and prints the sessi
 
 ## Reference
 
-- API reference: [Agent WebSocket](https://docs.smallest.ai/voice-agents/api-reference/realtime-agent/realtime-agent)
+- Guide: [Client tools](https://docs.smallest.ai/voice-agents/build/tools/client-tools)
+- API reference: [Agent WebSocket](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent)
 - Web SDK wrapper (browser): [`@smallest-ai/agent-sdk`](https://www.npmjs.com/package/@smallest-ai/agent-sdk)
-- Browser three-step cookbook: [Browser Voice Cookbook](https://docs.smallest.ai/voice-agents/developer-guide/client-libraries/browser-voice-cookbook)
+- Browser three-step cookbook: [Browser Voice Cookbook](https://docs.smallest.ai/voice-agents/integrate/browser-voice-cookbook)
