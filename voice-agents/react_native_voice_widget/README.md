@@ -24,7 +24,7 @@ export default function YourScreen() {
 }
 ```
 
-The widget renders a floating pill in the bottom-right and manages everything else — session lifecycle, mic permission, audio capture + playback, transcript, error handling. One required prop, `serverUrl`: the URL of your session server ([`../mobile_token_server`](../mobile_token_server/)), which holds the API key and hands the widget a short-lived token per connection. The optional `label` customizes the pill text. Never pass an API key to the widget: anything in the app bundle can be extracted.
+The widget renders a floating pill in the bottom-right and manages everything else: session lifecycle, mic permission, audio capture + playback, transcript, error handling. One required prop, `serverUrl`: the URL of your session server ([`../mobile_token_server`](../mobile_token_server/)), which holds the API key and hands the widget a short-lived token per connection. The optional `label` customizes the pill text. Never pass an API key to the widget: anything in the app bundle can be extracted.
 
 ## What's inside
 
