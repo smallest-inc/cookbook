@@ -9,6 +9,11 @@ arrives, and saves the spoken reply to reply.wav.
 Audio is paced at real time (100 ms chunks). Hydra expects a live stream;
 dumping the whole file at once gets the session closed by the server.
 
+Order matters: wait for `session.created` before sending `session.configure`
+(the server drops a configure sent earlier), and wait for
+`session.configured` before streaming audio. An overall timeout makes sure the
+script exits even if the server never finishes the turn.
+
 Usage: python quickstart.py path/to/audio.wav
 """
 
@@ -25,7 +30,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-WS_URL = "wss://api.smallest.ai/waves/v1/s2s?model=hydra&api_key={api_key}"
+# The key goes in the Authorization header, not the URL, so it does not end up
+# in proxy or server access logs. (Browsers cannot set WebSocket headers; see
+# the README for the browser option.)
+WS_URL = "wss://api.smallest.ai/waves/v1/s2s?model=hydra-v1.0"
 
 VOICE = "aria"
 INSTRUCTIONS = "You are a helpful voice assistant. Keep replies short and conversational."
@@ -36,6 +44,7 @@ CHUNK_BYTES = SAMPLE_RATE * 2 * CHUNK_MS // 1000  # 3200 bytes per 100 ms
 SILENCE_CHUNKS = 12  # ~1.2 s of trailing silence so server VAD closes the turn
 
 OUTPUT_FILE = "reply.wav"
+TURN_TIMEOUT_S = 60  # give up if the turn has not finished by then
 
 
 def load_pcm16_mono_16k(path: str) -> bytes:
@@ -85,29 +94,37 @@ async def send_audio(ws, pcm: bytes) -> None:
 
 
 async def run(audio_path: str, api_key: str) -> bytes:
-    reply_chunks = []
+    pcm = load_pcm16_mono_16k(audio_path)
+    reply_chunks: list[bytes] = []
+    headers = {"Authorization": f"Bearer {api_key}"}
 
-    async with websockets.connect(WS_URL.format(api_key=api_key)) as ws:
-        await ws.send(json.dumps({
-            "type": "session.configure",
-            "session": {
-                "instructions": INSTRUCTIONS,
-                "voice": VOICE,
-                "input_audio_sample_rate": SAMPLE_RATE,
-                "output_audio_sample_rate": SAMPLE_RATE,
-            },
-        }))
+    async with websockets.connect(WS_URL, additional_headers=headers) as ws:
+        sender = None
 
-        pcm = load_pcm16_mono_16k(audio_path)
-        print(f"Streaming {len(pcm) / (SAMPLE_RATE * 2):.1f}s of audio...")
-        sender = asyncio.create_task(send_audio(ws, pcm))
-
-        try:
+        async def receive() -> None:
+            nonlocal sender
             async for message in ws:
                 event = json.loads(message)
                 event_type = event.get("type")
 
-                if event_type == "input_audio_buffer.speech_started":
+                if event_type == "session.created":
+                    # Only now will the server accept a configure.
+                    await ws.send(json.dumps({
+                        "type": "session.configure",
+                        "session": {
+                            "instructions": INSTRUCTIONS,
+                            "voice": VOICE,
+                            "input_audio_sample_rate": SAMPLE_RATE,
+                            "output_audio_sample_rate": SAMPLE_RATE,
+                        },
+                    }))
+
+                elif event_type == "session.configured" and sender is None:
+                    # Configured: start streaming the file at real time.
+                    print(f"Streaming {len(pcm) / (SAMPLE_RATE * 2):.1f}s of audio...")
+                    sender = asyncio.create_task(send_audio(ws, pcm))
+
+                elif event_type == "input_audio_buffer.speech_started":
                     print("[speech started]")
 
                 elif event_type == "input_audio_buffer.speech_stopped":
@@ -122,13 +139,19 @@ async def run(audio_path: str, api_key: str) -> bytes:
 
                 elif event_type == "response.done":
                     print()
-                    break
+                    return
 
                 elif event_type == "error":
                     print(f"\nError: {event}", file=sys.stderr)
                     sys.exit(1)
+
+        try:
+            await asyncio.wait_for(receive(), timeout=TURN_TIMEOUT_S)
+        except asyncio.TimeoutError:
+            print(f"\nTimed out after {TURN_TIMEOUT_S}s waiting for the reply", file=sys.stderr)
         finally:
-            sender.cancel()
+            if sender is not None:
+                sender.cancel()
 
     return b"".join(reply_chunks)
 

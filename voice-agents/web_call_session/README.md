@@ -13,18 +13,18 @@ python start_session.py --agent-id <AGENT_ID>
 python start_session.py --agent-id <AGENT_ID> --chat
 ```
 
-Output:
+Output (the token is masked unless you pass `--show-token`):
 
 ```
 Starting web call session...
-  token:           eyJhbGciOi...
+  token:           eyJhbGciOi... (pass --show-token to print it)
   room_name:       0f6c1c1e-9b1a-4d5e-8f2a-...
   host:            wss://...livekit.cloud
   conversation_id: 68b1f0c2e4a1b2c3d4e5f6a7
-  call_id:         68b1f0c2e4a1b2c3d4e5f6a8
+  call_id:         CALL-1763400000000-a1b2c3
 
 After the call, fetch details with:
-  client.atoms.calls.get(id="68b1f0c2e4a1b2c3d4e5f6a7")
+  client.atoms.calls.get(id="CALL-1763400000000-a1b2c3")
 ```
 
 ## Requirements
@@ -52,14 +52,14 @@ session = response.data
 | `token` | Short-lived room access token. Safe to send to the browser. |
 | `room_name` | Room UUID pre-created for this session. |
 | `host` | WebSocket URL the room client connects to. |
-| `conversation_id` | Correlates the session with transcripts and post-call analytics. |
-| `call_id` | Call ID surfaced in call logs and analytics endpoints. |
+| `conversation_id` | Internal ID of the conversation record. |
+| `call_id` | Call ID used by call logs and analytics. Pass this one to `client.atoms.calls.get`. |
 
 The intended split:
 
 - **Server** (this script): holds `SMALLEST_API_KEY`, creates the session, returns `token` + `host` to the frontend.
-- **Browser**: passes `token` and `host` to the room client (e.g. the Atoms web SDK or a LiveKit client) to join the live session. It never sees the API key.
-- **Afterwards**: `conversation_id` is what `client.atoms.calls.get(id=...)` tracks, so store it if you want transcripts, recordings, or analytics for the session.
+- **Browser**: passes `token` and `host` to the room client (for example the Atoms web SDK or a LiveKit client) to join the live session. It never sees the API key.
+- **Afterwards**: store `call_id` if you want transcripts, recordings, or analytics for the session, and fetch them with `client.atoms.calls.get(id=call_id)`. Passing `conversation_id` there returns 404 "logs not found".
 
 ## API Reference
 

@@ -24,7 +24,13 @@ Saved to out.wav
 
 ## Requirements
 
-> Base dependencies are installed via the root `requirements.txt`. See the [main README](../../README.md#usage) for setup. Add `SMALLEST_API_KEY` to your `.env` (see `.env.sample`).
+> Base dependencies are installed via the root `requirements.txt`. See the [main README](../../README.md#usage) for setup. This example also needs `websockets>=14` (for the `additional_headers` argument), so install the local file too:
+>
+> ```bash
+> uv pip install -r requirements.txt
+> ```
+>
+> Add `SMALLEST_API_KEY` to your `.env` (see `.env.sample`).
 
 ## How It Works
 

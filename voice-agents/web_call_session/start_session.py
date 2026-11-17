@@ -9,6 +9,7 @@ short-lived token, host, and room name it needs to join the session.
 Usage:
     python start_session.py --agent-id <AGENT_ID>
     python start_session.py --agent-id <AGENT_ID> --chat
+    python start_session.py --agent-id <AGENT_ID> --show-token
     AGENT_ID=... python start_session.py
 """
 
@@ -34,6 +35,11 @@ def main():
         action="store_true",
         help="Start a text chat session instead of a voice call",
     )
+    parser.add_argument(
+        "--show-token",
+        action="store_true",
+        help="Print the full room token (masked by default so it does not end up in logs)",
+    )
     args = parser.parse_args()
 
     if not args.agent_id:
@@ -52,14 +58,17 @@ def main():
     session = response.data
 
     # token + host go to the browser room client; the rest stays server-side.
-    print(f"  token:           {session.token}")
+    # The token grants access to the live room until it expires, so mask it
+    # unless explicitly asked for.
+    token = session.token if args.show_token else f"{session.token[:10]}... (pass --show-token to print it)"
+    print(f"  token:           {token}")
     print(f"  room_name:       {session.room_name}")
     print(f"  host:            {session.host}")
     print(f"  conversation_id: {session.conversation_id}")
     print(f"  call_id:         {session.call_id}")
 
     print("\nAfter the call, fetch details with:")
-    print(f'  client.atoms.calls.get(id="{session.conversation_id}")')
+    print(f'  client.atoms.calls.get(id="{session.call_id}")')
 
 
 if __name__ == "__main__":

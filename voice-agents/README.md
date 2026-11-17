@@ -17,6 +17,7 @@ Build AI voice agents with the [Voice Agents SDK](https://docs.smallest.ai/voice
 | [getting_started](./getting_started/) | `OutputCrewNode`, `generate_response()`, `AtomsCrewApp` |
 | [agent_with_tools](./agent_with_tools/) | `@function_tool`, `ToolRegistry`, tool execution |
 | [call_control](./call_control/) | `SDKAgentEndCallEvent`, cold/warm transfers |
+| [web_call_session](./web_call_session/) | Start a browser voice or chat session from your server with `start_web_call_conversation`; the API key stays server-side |
 
 ## Multi-Node Patterns
 

@@ -1,8 +1,10 @@
 """Governed voice agent: TealTiger guardrails around a Smallest AI crew node.
 
 Every user turn is scanned before it reaches the LLM (PII is redacted in the
-conversation context) and every LLM response is scanned before it is spoken.
-A per-call turn cap ends runaway sessions gracefully.
+conversation context), tool results are scanned before they go back to the
+LLM, and every LLM response is scanned before it is spoken. The LLM can call
+three tools (lookup_account, check_balance, transfer_to_human). A per-call
+turn cap and a per-turn tool-round cap end runaway sessions gracefully.
 
 Requirements:
     pip install smallestai tealtiger
@@ -10,16 +12,26 @@ Requirements:
 Run:
     export SMALLEST_API_KEY="your-key"
     export OPENAI_API_KEY="your-openai-key"
+    export TRANSFER_NUMBER="+15550100"   # optional: human line for transfers
     python app.py
 """
 
+import json
 import os
+from typing import List
 
 from dotenv import load_dotenv
 from loguru import logger
 
 from smallestai.atoms.crew.clients.openai import OpenAIClient
-from smallestai.atoms.crew.events import SDKEvent, SDKSystemUserJoinedEvent
+from smallestai.atoms.crew.clients.types import ToolCall, ToolResult
+from smallestai.atoms.crew.events import (
+    SDKAgentTransferConversationEvent,
+    SDKEvent,
+    SDKSystemUserJoinedEvent,
+    TransferOption,
+    TransferOptionType,
+)
 from smallestai.atoms.crew.nodes import OutputCrewNode
 from smallestai.atoms.crew.server import AtomsCrewApp
 from smallestai.atoms.crew.session import CrewSession
@@ -38,6 +50,11 @@ guardrails = GuardrailEngine()
 guardrails.register_guardrail(PIIDetectionGuardrail())
 
 MAX_TURNS_PER_CALL = 20  # runaway-loop cap
+MAX_TOOL_ROUNDS = 3  # tool calls the LLM may chain within one turn
+
+# Optional human line for transfer_to_human. Without it the agent says a person
+# will follow up instead of promising a live transfer.
+TRANSFER_NUMBER = os.getenv("TRANSFER_NUMBER", "").strip()
 
 
 async def redact(text: str) -> tuple[str, list[str]]:
@@ -59,13 +76,18 @@ async def redact(text: str) -> tuple[str, list[str]]:
 # ─────────────────────────────────────────────────────────────────
 
 SYSTEM_PROMPT = """You are a customer support agent for Acme Corp.
-Help callers with account inquiries, balance checks, and transfers.
+Help callers with account lookups and balance checks.
+
+Tools:
+- lookup_account and check_balance take the caller's account ID.
+- transfer_to_human hands the caller to a person. Use it for complex issues
+  or when the caller asks for a human.
 
 IMPORTANT:
 - Never repeat sensitive information back to the caller
 - If the caller provides an SSN or card number, acknowledge receipt
   without repeating it
-- For complex issues, transfer to a human agent
+- Keep replies short; they are spoken aloud
 """
 
 
@@ -105,12 +127,37 @@ class GovernedSupportAgent(OutputCrewNode):
                     message["content"] = cleaned
                 break
 
-        # Buffer the full response so it can be scanned before TTS speaks it.
-        response = await self.llm.chat(messages=self.context.messages, stream=True)
+        # Let the LLM call tools, then buffer the final reply so it can be
+        # scanned before TTS speaks it. Nothing is yielded until the scan.
         full_response = ""
-        async for chunk in response:
-            if chunk.content:
-                full_response += chunk.content
+        for _ in range(MAX_TOOL_ROUNDS + 1):
+            response = await self.llm.chat(
+                messages=self.context.messages,
+                stream=True,
+                tools=self.tool_schemas,
+            )
+            text = ""
+            tool_calls: List[ToolCall] = []
+            async for chunk in response:
+                if chunk.content:
+                    text += chunk.content
+                if chunk.tool_calls:
+                    tool_calls.extend(chunk.tool_calls)
+
+            if not tool_calls:
+                full_response = text
+                break
+
+            logger.info(f"Tool calls: {[tc.name for tc in tool_calls]}")
+            results: List[ToolResult] = await self.tool_registry.execute(
+                tool_calls=tool_calls, parallel=True
+            )
+            await self._add_tool_turn(tool_calls, results)
+        else:
+            full_response = (
+                "Sorry, I couldn't finish that request. "
+                "Let me get a person to help you."
+            )
 
         cleaned, pii = await redact(full_response)
         if pii:
@@ -119,6 +166,37 @@ class GovernedSupportAgent(OutputCrewNode):
         if cleaned:
             self.context.add_message({"role": "assistant", "content": cleaned})
             yield cleaned
+
+    async def _add_tool_turn(self, tool_calls: List[ToolCall], results: List[ToolResult]):
+        """Record the tool calls and their (redacted) results in the context."""
+        tool_messages = []
+        for tc, result in zip(tool_calls, results):
+            content = "" if result.content is None else str(result.content)
+            content, pii = await redact(content)
+            if pii:
+                logger.warning(f"Redacted PII from {tc.name} result: {pii}")
+            tool_messages.append({"role": "tool", "tool_call_id": tc.id, "content": content})
+
+        self.context.add_messages([
+            {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                    {
+                        "id": tc.id,
+                        "type": "function",
+                        "function": {
+                            "name": tc.name,
+                            "arguments": tc.arguments
+                            if isinstance(tc.arguments, str)
+                            else json.dumps(tc.arguments),
+                        },
+                    }
+                    for tc in tool_calls
+                ],
+            },
+            *tool_messages,
+        ])
 
     @function_tool()
     def lookup_account(self, account_id: str) -> str:
@@ -139,13 +217,27 @@ class GovernedSupportAgent(OutputCrewNode):
         return f"Account {account_id} balance: $1,234.56"
 
     @function_tool()
-    def transfer_to_human(self, reason: str) -> str:
+    async def transfer_to_human(self, reason: str) -> str:
         """Transfer the call to a human agent.
 
         Args:
             reason: Why the caller needs a human.
         """
-        return f"Transferring to human agent. Reason: {reason}"
+        logger.info(f"Transfer requested: {reason}")
+        if not TRANSFER_NUMBER:
+            return (
+                "No human line is configured for this demo. Tell the caller a "
+                "person will follow up, and do not promise a live transfer."
+            )
+        await self.speak("Sure, I'll connect you to a person now. Please hold.")
+        await self.send_event(
+            SDKAgentTransferConversationEvent(
+                transfer_call_number=TRANSFER_NUMBER,
+                transfer_options=TransferOption(type=TransferOptionType.COLD_TRANSFER),
+                on_hold_music="relaxing_sound",
+            )
+        )
+        return "Transfer started. Do not say anything else."
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -171,6 +263,9 @@ async def setup_session(session: CrewSession):
 
 if __name__ == "__main__":
     print("Starting governed voice agent...")
-    print(f"Guardrails: PII redaction on input and output, {MAX_TURNS_PER_CALL}-turn cap per call")
+    print(
+        f"Guardrails: PII redaction on caller input, tool results and agent output; "
+        f"{MAX_TURNS_PER_CALL}-turn cap per call; {MAX_TOOL_ROUNDS} tool rounds per turn"
+    )
     app = AtomsCrewApp(setup_handler=setup_session)
     app.run()
