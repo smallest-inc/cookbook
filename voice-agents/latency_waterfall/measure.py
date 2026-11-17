@@ -58,6 +58,8 @@ def load_caller(path):
         x = resample_poly(x, 16000, sr).astype("float32")
     n = int(FRAME * 16000)
     rms = np.array([np.sqrt(np.mean(x[i : i + n] ** 2)) for i in range(0, len(x) - n, n)])
+    if len(rms) == 0 or rms.max() < 1e-4:
+        raise ValueError(f"{path}: no speech found (the file is silent or shorter than {FRAME * 1000:.0f} ms)")
     loud = np.where(rms > rms.max() * 0.05)[0]
     start, end = loud[0] * FRAME, (loud[-1] + 1) * FRAME
     lead, tail = 0.6, 3.0  # room tone before, silence after (the mic keeps streaming)
@@ -86,7 +88,7 @@ async def one_turn(pcm, speech_start, speech_end, llm_model, oai, eou_ms=None, s
     now = lambda: time.perf_counter() - t0
     final_text, heard, triggered = [], [], asyncio.Event()
     reply_audio, first_audio = bytearray(), asyncio.Event()
-    flushes = 0
+    flushes, last_flush = 0, 0.0
     tts_done, llm_finished = asyncio.Event(), asyncio.Event()
 
     audio_done = asyncio.Event()
@@ -125,7 +127,7 @@ async def one_turn(pcm, speech_start, speech_end, llm_model, oai, eou_ms=None, s
                 ev.append((t, "stt_partial", {"text": " ".join(final_text + [text])}))
 
     async def run_llm():
-        nonlocal flushes
+        nonlocal flushes, last_flush
         await triggered.wait()
         user = heard[0]
         ev.append((now(), "llm_request", {"text": user}))
@@ -151,6 +153,7 @@ async def one_turn(pcm, speech_start, speech_end, llm_model, oai, eou_ms=None, s
                 await tts.send(json.dumps({"text": first, "voice_id": TTS_VOICE, "model": TTS_MODEL, "sample_rate": TTS_RATE}))
                 await tts.send(json.dumps({"flush": True}))
                 flushes += 1
+                last_flush = now()
                 ev.append((now(), "tts_request", {"text": first}))
                 sent = m.end()
         rest = buf[sent:].strip()
@@ -161,6 +164,7 @@ async def one_turn(pcm, speech_start, speech_end, llm_model, oai, eou_ms=None, s
             await tts.send(json.dumps({"text": rest, "voice_id": TTS_VOICE, "model": TTS_MODEL, "sample_rate": TTS_RATE}))
             await tts.send(json.dumps({"flush": True}))
             flushes += 1
+            last_flush = now()
             if sent == 0:
                 ev.append((now(), "tts_request", {"text": rest}))
         llm_finished.set()
@@ -169,14 +173,14 @@ async def one_turn(pcm, speech_start, speech_end, llm_model, oai, eou_ms=None, s
 
     async def read_tts():
         # The socket sends one "complete" only after it goes idle (about 4 s), not one per
-        # flush. So the reply is done once every flushed request has sent audio and the
-        # LLM has finished, followed by a short quiet gap.
-        requests, last_chunk = set(), None
+        # flush. So the reply is done once the LLM has finished, audio has arrived after
+        # the last flush was sent, and the socket then stays quiet for a moment.
+        last_chunk = None
         while True:
             try:
                 raw = await asyncio.wait_for(tts.recv(), timeout=0.6)
             except asyncio.TimeoutError:
-                if llm_finished.is_set() and flushes and len(requests) >= flushes:
+                if llm_finished.is_set() and last_chunk is not None and last_chunk > last_flush:
                     ev.append((last_chunk, "tts_done", {}))
                     tts_done.set()
                     return
@@ -189,7 +193,6 @@ async def one_turn(pcm, speech_start, speech_end, llm_model, oai, eou_ms=None, s
                 if not first_audio.is_set():
                     first_audio.set()
                     ev.append((now(), "tts_first_audio", {}))
-                requests.add(d.get("request_id"))
                 last_chunk = now()
                 reply_audio.extend(b)
             elif d.get("status") == "error":
