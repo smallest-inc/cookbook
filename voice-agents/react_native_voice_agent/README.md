@@ -130,6 +130,6 @@ For a storytelling app with long-running playback, `default` is the right pick. 
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent) — full event protocol.
-- [React Native integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/react-native) — the validated stack this app uses.
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent): full event protocol.
+- [React Native integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/react-native): the validated stack this app uses.
 - [`react-native-audio-api`](https://github.com/software-mansion/react-native-audio-api) — the underlying audio library.

@@ -11,7 +11,7 @@ Both scripts are single-file, no imports from this repo. Copy either one anywher
 | [`ping_pulse_offline.py`](./ping_pulse_offline.py) | `POST /waves/v1/stt/` (pre-recorded HTTP) | WER (corpus-level), per-clip latency, RTF (real-time factor) at p50 / p90 / p95 |
 | [`ping_pulse_streaming.py`](./ping_pulse_streaming.py) | `WSS /waves/v1/stt/live` (real-time WebSocket) | WER (corpus-level), tail latency at p50 / p90 / p95 |
 
-For the methodology behind each metric — what tail latency means, how RTF is computed, which transcripts to sample from — see the [Measuring Latency docs page](https://docs.smallest.ai/models/speech-to-text/benchmarks/measuring-latency).
+For the methodology behind each metric (what tail latency means, how RTF is computed, which transcripts to sample from), see the [Measuring Latency docs page](https://docs.smallest.ai/models/speech-to-text/benchmarks/measuring-latency).
 
 ## Quick start — using the bundled samples
 

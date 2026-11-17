@@ -62,7 +62,7 @@ xcodebuild -project AtomsVoiceWidget.xcodeproj -scheme AtomsVoiceWidget \
 
 ## iOS audio session
 
-`.playAndRecord` + `.default` mode + `.defaultToSpeaker`. Full-speaker volume, clean continuous playback. No hardware AEC by default — on hands-free the user should mute between turns (mic button) or wear headphones. See the [iOS Swift integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/i-os-swift) for the three-way audio-session trade-off.
+`.playAndRecord` + `.default` mode + `.defaultToSpeaker`. Full-speaker volume, clean continuous playback. No hardware AEC by default; on hands-free the user should mute between turns (mic button) or wear headphones. See the [iOS Swift integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/i-os-swift) for the three-way audio-session trade-off.
 
 ## iOS simulator caveat
 

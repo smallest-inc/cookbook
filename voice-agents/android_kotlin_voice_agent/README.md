@@ -100,7 +100,7 @@ Same `./gradlew installDebug` with a plugged-in device. Real mic works out of th
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent) — full event protocol.
-- [Android (Kotlin) integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/android-kotlin) — the protocol snippets this cookbook builds on.
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent): full event protocol.
+- [Android (Kotlin) integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/android-kotlin): the protocol snippets this cookbook builds on.
 - [React Native voice agent cookbook](../react_native_voice_agent/) — the same app pattern in React Native.
 - [iOS Swift voice agent cookbook](../ios_swift_voice_agent/) — the same app pattern in SwiftUI.

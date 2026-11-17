@@ -139,7 +139,7 @@ If you have no existing app and are starting fresh, Hearthside (RN) is the recom
 
 ## Reference
 
-- [Realtime Agent WebSocket API](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent) — full event protocol.
+- [Realtime Agent WebSocket API](https://docs.smallest.ai/api-reference/voice-agents/realtime-agent/realtime-agent): full event protocol.
 - [React Native integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/react-native)
 - [iOS (Swift) integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/i-os-swift)
 - [Android (Kotlin) integration guide](https://docs.smallest.ai/voice-agents/integrate/mobile/android-kotlin)
