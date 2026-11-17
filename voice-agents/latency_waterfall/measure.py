@@ -186,7 +186,11 @@ async def one_turn(pcm, speech_start, speech_end, llm_model, oai, eou_ms=None, s
             try:
                 raw = await asyncio.wait_for(tts.recv(), timeout=0.6)
             except asyncio.TimeoutError:
-                if llm_finished.is_set() and last_chunk is not None and last_chunk > last_flush:
+                # Also stop if the last flush produced no audio at all (for example text
+                # that was only punctuation), instead of waiting for the run timeout.
+                if llm_finished.is_set() and last_chunk is not None and (
+                    last_chunk > last_flush or now() - last_flush > 2.0
+                ):
                     ev.append((last_chunk, "tts_done", {}))
                     tts_done.set()
                     return
