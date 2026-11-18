@@ -13,7 +13,7 @@ Anything in a mobile app bundle can be extracted, including every `EXPO_PUBLIC_*
 
 | Method and path | What it does |
 |---|---|
-| `POST /session` | Calls `POST /atoms/v1/conversation/register-call` for `AGENT_ID` and returns `{ token, expiresIn, sampleRate }`. The app connects to `wss://api.smallest.ai/atoms/v1/agent/connect?token=<token>&mode=webcall&sample_rate=<rate>`. Rate limited per client address (`SESSIONS_PER_MINUTE`, default 10). |
+| `POST /session` | Calls `POST /atoms/v1/conversation/register-call` for `AGENT_ID` and returns `{ token, expiresIn }`. The app picks the audio rate itself and connects to `wss://api.smallest.ai/atoms/v1/agent/connect?token=<token>&mode=webcall&sample_rate=<rate>`. Rate limited per client address (`SESSIONS_PER_MINUTE`, default 10). |
 | `GET /agent` | Returns the agent's name, voice, speed and language, plus `editable`. No prompt, no secrets. |
 | `POST /agent/config` | Body `{ voiceId?, voiceModel?, speed?, language? }`. Validates the values, writes them to the live branch's draft and publishes it. Returns `{ revision }`. **Disabled unless `ALLOW_AGENT_EDITS=true`.** |
 | `GET /healthz` | `{ ok: true }` |

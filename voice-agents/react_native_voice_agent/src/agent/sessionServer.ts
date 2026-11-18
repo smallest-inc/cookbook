@@ -6,7 +6,6 @@
 export interface SessionToken {
   token: string;
   expiresIn: number;
-  sampleRate: number;
 }
 
 export interface AgentSnapshot {

@@ -6,7 +6,6 @@
 export interface SessionToken {
   token: string;
   expiresIn: number;
-  sampleRate: number;
 }
 
 async function call<T>(serverUrl: string, method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {

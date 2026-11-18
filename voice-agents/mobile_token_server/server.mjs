@@ -81,7 +81,6 @@ async function mintSessionToken() {
   return {
     token: data.access_token,
     expiresIn: data.expires_in ?? 30,
-    sampleRate: data.sample_rate ?? 24000,
   };
 }
 

@@ -337,6 +337,9 @@ def main() -> int:
             if _remove_env_keys(ENV_PATH, _LEGACY_BUNDLED_KEYS):
                 print("  removed EXPO_PUBLIC_SMALLEST_API_KEY / EXPO_PUBLIC_AGENT_ID from .env "
                       "(they would ship inside the app bundle).")
+            if not env.get("EXPO_PUBLIC_TOKEN_SERVER_URL"):
+                write_env(ENV_PATH, {"EXPO_PUBLIC_TOKEN_SERVER_URL": DEFAULT_TOKEN_SERVER_URL})
+                print(f"  added EXPO_PUBLIC_TOKEN_SERVER_URL={DEFAULT_TOKEN_SERVER_URL} to .env.")
             print("The session server still needs SMALLEST_API_KEY in its environment.")
             print("Run `node --env-file=.env ../mobile_token_server/server.mjs`, then `npx expo run:ios`.")
             return 0
