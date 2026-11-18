@@ -37,7 +37,12 @@ def load_profiles() -> dict[str, list[str]]:
 def matrix_profile_names() -> list[str]:
     with open(PRESETS_PATH) as f:
         raw = json.load(f)
-    return [n for n, s in raw.items() if not n.startswith("_") and s.get("matrix")]
+    names = [n for n, s in raw.items() if not n.startswith("_") and s.get("matrix")]
+    # The matrix runs presets through stream_client.py, which only offers "cli" presets.
+    not_cli = [n for n in names if not raw[n].get("cli")]
+    if not_cli:
+        raise SystemExit(f"presets.json: {not_cli} set \"matrix\": true but not \"cli\": true")
+    return names
 
 
 PROFILES = load_profiles()
