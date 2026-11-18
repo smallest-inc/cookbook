@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Saturn — Meeting Intelligence",
+  "version": "1.0.0",
+  "description": "Real-time AI assistant for Google Meet. Transcribes via Smallest.ai and surfaces insights in Saturn.",
+  "permissions": ["storage", "activeTab", "tabs", "tabCapture", "sidePanel"],
+  "host_permissions": [
+    "https://meet.google.com/*",
+    "http://localhost:3000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://meet.google.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Saturn — Meeting Intelligence"
+  }
+}
