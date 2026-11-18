@@ -130,7 +130,7 @@ class GovernedSupportAgent(OutputCrewNode):
         # Let the LLM call tools, then buffer the final reply so it can be
         # scanned before TTS speaks it. Nothing is yielded until the scan.
         full_response = ""
-        for _ in range(MAX_TOOL_ROUNDS + 1):
+        for round_no in range(MAX_TOOL_ROUNDS + 1):
             response = await self.llm.chat(
                 messages=self.context.messages,
                 stream=True,
@@ -147,17 +147,20 @@ class GovernedSupportAgent(OutputCrewNode):
             if not tool_calls:
                 full_response = text
                 break
+            if round_no == MAX_TOOL_ROUNDS:
+                # Cap reached: run no more tools this turn, fall back.
+                logger.warning(f"Tool round cap ({MAX_TOOL_ROUNDS}) reached, not running more tools")
+                full_response = (
+                    "Sorry, I couldn't finish that request. "
+                    "Let me get a person to help you."
+                )
+                break
 
             logger.info(f"Tool calls: {[tc.name for tc in tool_calls]}")
             results: List[ToolResult] = await self.tool_registry.execute(
                 tool_calls=tool_calls, parallel=True
             )
             await self._add_tool_turn(tool_calls, results)
-        else:
-            full_response = (
-                "Sorry, I couldn't finish that request. "
-                "Let me get a person to help you."
-            )
 
         cleaned, pii = await redact(full_response)
         if pii:
