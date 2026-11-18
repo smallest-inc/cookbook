@@ -52,6 +52,12 @@ Build AI voice agents with the [Voice Agents SDK](https://docs.smallest.ai/voice
 | [campaigns](./campaigns/) | Audiences, outbound campaigns |
 | [analytics](./analytics/) | Call logs, transcripts, post-call metrics |
 
+## Latency
+
+| Example | What You'll Learn |
+|---------|-------------------|
+| [latency_waterfall](./latency_waterfall/) | Time every stage of one turn (Pulse end of turn, Electron first token, Lightning first audio) and see what a shorter end-of-turn wait does |
+
 ## Quick Start
 
 ### Step 1: Create env + install base deps (once, from repo root)
