@@ -106,6 +106,7 @@ tts=smallestai.TTS(
     model="lightning_v3.1_pro",
     voice_id="meher",
     language="en",
+    # word_timestamps=True,  # opt in to per-word timing events (base-queue EN/HI voices)
 )
 ```
 
