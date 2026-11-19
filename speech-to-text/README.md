@@ -23,6 +23,7 @@ Convert audio to text using Smallest AI's Pulse Speech-to-Text API. Supports 30+
 | [Streaming Transcription](./websocket/streaming-text-output-transcription/) | Stream audio files via WebSocket |
 | [Realtime Microphone](./websocket/realtime-microphone-transcription/) | Gradio web UI with live microphone transcription |
 | [Jarvis Voice Assistant](./websocket/jarvis/) | Always-on assistant with wake word, LLM, and TTS |
+| [Customer Harness](./customer-harness/) | Mic → augmentation → streaming/offline STT with reproduction recipes, preset profiles, browser latency UI |
 
 ## Quick Start
 
