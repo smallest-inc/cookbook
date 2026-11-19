@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Agent config picker. Mirrors the React Native cookbook's settings sheet.
-/// Runs the full 5-step draft → publish → activate REST flow on Apply.
+/// Runs the full branch draft → publish REST flow on Apply.
 struct SettingsSheet: View {
     @Binding var isPresented: Bool
     let apiKey: String

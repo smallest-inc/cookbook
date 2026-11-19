@@ -1,0 +1,4 @@
+# word_timestamps.py passes additional_headers= to websockets.connect, which needs websockets 14 or newer.
+# The root requirements.txt only pins websockets>=11, so install this file too.
+websockets>=14
+python-dotenv>=1.0

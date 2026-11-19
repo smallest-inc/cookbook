@@ -1,175 +1,274 @@
-"""
-Governed Voice Agent: PII Redaction & Cost Caps for Voice AI
-============================================================
+"""Governed voice agent: TealTiger guardrails around a Smallest AI crew node.
 
-This example demonstrates how to add governance to a Smallest AI voice agent:
-1. PII detection in transcribed speech (before it reaches the LLM)
-2. Cost budget enforcement per call session
-3. Tool authorization for voice-triggered actions
-4. Structured audit trail for voice compliance (HIPAA, PCI-DSS)
-
-The scenario: A customer support voice agent handles calls where callers
-speak sensitive data (SSNs, credit card numbers, account numbers). Without
-governance, this PII flows through the STT → LLM → TTS pipeline unscanned.
+Every user turn is scanned before it reaches the LLM (PII is redacted in the
+conversation context), tool results are scanned before they go back to the
+LLM, and every LLM response is scanned before it is spoken. The LLM can call
+three tools (lookup_account, check_balance, transfer_to_human). A per-call
+turn cap and a per-turn tool-round cap end runaway sessions gracefully.
 
 Requirements:
     pip install smallestai tealtiger
 
 Run:
     export SMALLEST_API_KEY="your-key"
+    export OPENAI_API_KEY="your-openai-key"
+    export TRANSFER_NUMBER="+15550100"   # optional: human line for transfers
     python app.py
 """
 
-from smallestai.agentic import (
-    AtomsCrewApp,
-    OutputCrewNode,
-    function_tool,
-    ToolRegistry,
+import json
+import os
+from typing import List
+
+from dotenv import load_dotenv
+from loguru import logger
+
+from smallestai.atoms.crew.clients.openai import OpenAIClient
+from smallestai.atoms.crew.clients.types import ToolCall, ToolResult
+from smallestai.atoms.crew.events import (
+    SDKAgentTransferConversationEvent,
+    SDKEvent,
+    SDKSystemUserJoinedEvent,
+    TransferOption,
+    TransferOptionType,
 )
-from tealtiger import observe, TealEngine, PolicyMode
+from smallestai.atoms.crew.nodes import OutputCrewNode
+from smallestai.atoms.crew.server import AtomsCrewApp
+from smallestai.atoms.crew.session import CrewSession
+from smallestai.atoms.crew.tools import ToolRegistry, function_tool
+from tealtiger import GuardrailEngine, PIIDetectionGuardrail
+
+load_dotenv()
+
+# ─────────────────────────────────────────────────────────────────
+# Step 1: Configure TealTiger guardrails
+# ─────────────────────────────────────────────────────────────────
+
+# One engine scans both directions: caller speech before the LLM sees it,
+# and the LLM's reply before TTS speaks it.
+guardrails = GuardrailEngine()
+guardrails.register_guardrail(PIIDetectionGuardrail())
+
+MAX_TURNS_PER_CALL = 20  # runaway-loop cap
+MAX_TOOL_ROUNDS = 3  # tool calls the LLM may chain within one turn
+
+# Optional human line for transfer_to_human. Without it the agent says a person
+# will follow up instead of promising a live transfer.
+TRANSFER_NUMBER = os.getenv("TRANSFER_NUMBER", "").strip()
+
+
+async def redact(text: str) -> tuple[str, list[str]]:
+    """Scan text with the guardrail engine; return (redacted_text, pii_types)."""
+    result = await guardrails.execute(text)
+    if result.passed:
+        return text, []
+
+    found: list[str] = []
+    for entry in result.results:
+        for detection in entry["result"].get("metadata", {}).get("detections", []):
+            found.append(detection["type"])
+            text = text.replace(detection["value"], f"[{detection['type'].upper()} REDACTED]")
+    return text, found
 
 
 # ─────────────────────────────────────────────────────────────────
-# Step 1: Configure TealTiger governance for voice
-# ─────────────────────────────────────────────────────────────────
-
-engine = TealEngine(
-    policies=[
-        # PII Detection: Scan transcribed speech for sensitive data
-        {
-            "type": "pii",
-            "action": "REDACT",
-            "patterns": ["ssn", "credit_card", "phone", "email", "account_number"],
-            # PII is redacted BEFORE it reaches the LLM
-        },
-
-        # Cost Governance: Cap per-call spend (voice = STT + LLM + TTS per turn)
-        {
-            "type": "cost_limit",
-            "max_per_session": 2.00,  # $2 max per call
-            "action": "BLOCK",
-        },
-
-        # Tool Authorization: Only allow safe tools for voice agents
-        {
-            "type": "tool_allowlist",
-            "tools": ["lookup_account", "check_balance", "transfer_to_human"],
-        },
-
-        # Rate Limiting: Prevent runaway agent loops
-        {
-            "type": "rate_limit",
-            "max_calls": 20,
-            "window": "5m",
-        },
-    ],
-    mode=PolicyMode.ENFORCE,
-)
-
-
-# ─────────────────────────────────────────────────────────────────
-# Step 2: Define voice agent tools (with governance)
-# ─────────────────────────────────────────────────────────────────
-
-tool_registry = ToolRegistry()
-
-
-@function_tool(tool_registry)
-def lookup_account(account_id: str) -> str:
-    """Look up a customer account by ID."""
-    # In production, this queries your database
-    return f"Account {account_id}: Premium tier, active since 2024"
-
-
-@function_tool(tool_registry)
-def check_balance(account_id: str) -> str:
-    """Check account balance."""
-    return f"Account {account_id} balance: $1,234.56"
-
-
-@function_tool(tool_registry)
-def transfer_to_human(reason: str) -> str:
-    """Transfer the call to a human agent."""
-    return f"Transferring to human agent. Reason: {reason}"
-
-
-# ─────────────────────────────────────────────────────────────────
-# Step 3: Create the governed voice agent
+# Step 2: The governed agent node
 # ─────────────────────────────────────────────────────────────────
 
 SYSTEM_PROMPT = """You are a customer support agent for Acme Corp.
-Help callers with account inquiries, balance checks, and transfers.
+Help callers with account lookups and balance checks.
+
+Tools:
+- lookup_account and check_balance take the caller's account ID.
+- transfer_to_human hands the caller to a person. Use it for complex issues
+  or when the caller asks for a human.
 
 IMPORTANT:
 - Never repeat sensitive information back to the caller
-- If the caller provides their SSN or card number, acknowledge receipt
+- If the caller provides an SSN or card number, acknowledge receipt
   without repeating it
-- For complex issues, transfer to a human agent
+- Keep replies short; they are spoken aloud
 """
 
 
 class GovernedSupportAgent(OutputCrewNode):
-    """Voice agent with TealTiger governance at every turn."""
+    """Voice agent with guardrails at every turn."""
 
-    async def generate_response(self, transcript: str) -> str:
-        """Process caller speech with governance."""
-
-        # Governance evaluates the transcript BEFORE it reaches the LLM
-        # If PII is detected, it's redacted in the transcript
-        # If cost budget is exceeded, the call is ended gracefully
-
-        decision = engine.evaluate(
-            content=transcript,
-            context={
-                "stage": "input",
-                "call_id": self.call_context.get("call_id", "unknown"),
-            },
+    def __init__(self):
+        super().__init__(name="governed-support-agent")
+        self.llm = OpenAIClient(
+            model="gpt-4o-mini",
+            api_key=os.getenv("OPENAI_API_KEY"),
         )
+        self.turns = 0
 
-        if decision.action == "BLOCK":
-            # Budget exceeded or policy violation
-            return (
+        self.tool_registry = ToolRegistry()
+        self.tool_registry.discover(self)
+        self.tool_schemas = self.tool_registry.get_schemas()
+
+        self.context.add_message({"role": "system", "content": SYSTEM_PROMPT})
+
+    async def generate_response(self):
+        """One governed turn: redact input, cap turns, scan output."""
+        self.turns += 1
+        if self.turns > MAX_TURNS_PER_CALL:
+            yield (
                 "I apologize, but I need to end this call. "
                 "Please call back or visit our website for further assistance."
             )
+            return
 
-        if decision.action == "REDACT":
-            # PII was detected and redacted — use cleaned transcript
-            transcript = decision.redacted_content
+        # Redact PII in the caller's last message BEFORE the LLM sees it.
+        for message in reversed(self.context.messages):
+            if message["role"] == "user":
+                cleaned, pii = await redact(message["content"])
+                if pii:
+                    logger.warning(f"Redacted PII from caller turn: {pii}")
+                    message["content"] = cleaned
+                break
 
-        # Now the LLM only sees redacted content
-        response = await self.llm.generate(
-            system_prompt=SYSTEM_PROMPT,
-            user_message=transcript,
-            tools=tool_registry,
+        # Let the LLM call tools, then buffer the final reply so it can be
+        # scanned before TTS speaks it. Nothing is yielded until the scan.
+        full_response = ""
+        for round_no in range(MAX_TOOL_ROUNDS + 1):
+            response = await self.llm.chat(
+                messages=self.context.messages,
+                stream=True,
+                tools=self.tool_schemas,
+            )
+            text = ""
+            tool_calls: List[ToolCall] = []
+            async for chunk in response:
+                if chunk.content:
+                    text += chunk.content
+                if chunk.tool_calls:
+                    tool_calls.extend(chunk.tool_calls)
+
+            if not tool_calls:
+                full_response = text
+                break
+            if round_no == MAX_TOOL_ROUNDS:
+                # Cap reached: run no more tools this turn, fall back.
+                logger.warning(f"Tool round cap ({MAX_TOOL_ROUNDS}) reached, not running more tools")
+                full_response = (
+                    "Sorry, I couldn't finish that request. "
+                    "Let me get a person to help you."
+                )
+                break
+
+            logger.info(f"Tool calls: {[tc.name for tc in tool_calls]}")
+            results: List[ToolResult] = await self.tool_registry.execute(
+                tool_calls=tool_calls, parallel=True
+            )
+            await self._add_tool_turn(tool_calls, results)
+
+        cleaned, pii = await redact(full_response)
+        if pii:
+            logger.warning(f"Redacted PII from agent response: {pii}")
+
+        if cleaned:
+            self.context.add_message({"role": "assistant", "content": cleaned})
+            yield cleaned
+
+    async def _add_tool_turn(self, tool_calls: List[ToolCall], results: List[ToolResult]):
+        """Record the tool calls and their (redacted) results in the context."""
+        tool_messages = []
+        for tc, result in zip(tool_calls, results):
+            content = "" if result.content is None else str(result.content)
+            content, pii = await redact(content)
+            if pii:
+                logger.warning(f"Redacted PII from {tc.name} result: {pii}")
+            tool_messages.append({"role": "tool", "tool_call_id": tc.id, "content": content})
+
+        self.context.add_messages([
+            {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                    {
+                        "id": tc.id,
+                        "type": "function",
+                        "function": {
+                            "name": tc.name,
+                            "arguments": tc.arguments
+                            if isinstance(tc.arguments, str)
+                            else json.dumps(tc.arguments),
+                        },
+                    }
+                    for tc in tool_calls
+                ],
+            },
+            *tool_messages,
+        ])
+
+    @function_tool()
+    def lookup_account(self, account_id: str) -> str:
+        """Look up a customer account by ID.
+
+        Args:
+            account_id: The account identifier.
+        """
+        return f"Account {account_id}: Premium tier, active since 2024"
+
+    @function_tool()
+    def check_balance(self, account_id: str) -> str:
+        """Check account balance.
+
+        Args:
+            account_id: The account identifier.
+        """
+        return f"Account {account_id} balance: $1,234.56"
+
+    @function_tool()
+    async def transfer_to_human(self, reason: str) -> str:
+        """Transfer the call to a human agent.
+
+        Args:
+            reason: Why the caller needs a human.
+        """
+        logger.info(f"Transfer requested: {reason}")
+        if not TRANSFER_NUMBER:
+            return (
+                "No human line is configured for this demo. Tell the caller a "
+                "person will follow up, and do not promise a live transfer."
+            )
+        await self.speak("Sure, I'll connect you to a person now. Please hold.")
+        await self.send_event(
+            SDKAgentTransferConversationEvent(
+                transfer_call_number=TRANSFER_NUMBER,
+                transfer_options=TransferOption(type=TransferOptionType.COLD_TRANSFER),
+                on_hold_music="relaxing_sound",
+            )
         )
-
-        # Scan the response before TTS speaks it
-        output_decision = engine.evaluate(
-            content=response,
-            context={"stage": "output"},
-        )
-
-        if output_decision.action == "REDACT":
-            response = output_decision.redacted_content
-
-        return response
+        return "Transfer started. Do not say anything else."
 
 
 # ─────────────────────────────────────────────────────────────────
-# Step 4: Run the voice agent
+# Step 3: Run the voice agent
 # ─────────────────────────────────────────────────────────────────
 
-app = AtomsCrewApp(
-    agent=GovernedSupportAgent(
-        model="gpt-4o-mini",
-        voice="sophia",
-        language="en",
-    ),
-)
+
+async def setup_session(session: CrewSession):
+    agent = GovernedSupportAgent()
+    session.add_node(agent)
+    await session.start()
+
+    @session.on_event("on_event_received")
+    async def on_event_received(_, event: SDKEvent):
+        if isinstance(event, SDKSystemUserJoinedEvent):
+            greeting = "Hello! You've reached Acme Corp support. How can I help you today?"
+            agent.context.add_message({"role": "assistant", "content": greeting})
+            await agent.speak(greeting)
+
+    await session.wait_until_complete()
+    logger.success("Session complete")
+
 
 if __name__ == "__main__":
     print("Starting governed voice agent...")
-    print("Governance: PII redaction, $2/call budget, tool allowlisting")
-    print("Mode: ENFORCE (violations are blocked)")
+    print(
+        f"Guardrails: PII redaction on caller input, tool results and agent output; "
+        f"{MAX_TURNS_PER_CALL}-turn cap per call; {MAX_TOOL_ROUNDS} tool rounds per turn"
+    )
+    app = AtomsCrewApp(setup_handler=setup_session)
     app.run()

@@ -1,23 +1,72 @@
 # SDK Usage
 
-> **Coming Soon** — The Python SDK does not yet support Lightning v3.1. Once it does, this example will cover sync, async, and streaming patterns via the SDK.
+Text-to-speech through the `smallestai` Python SDK. One client covers sync, async, and streaming.
 
-## In the Meantime
+```bash
+pip install smallestai
+export SMALLEST_API_KEY="your-key"
+```
 
-All cookbook examples use the Lightning v3.1 REST and WebSocket APIs directly, which work great. See:
+## Sync synthesis
 
-- [Getting Started](../getting-started/) — REST API synthesis (Python + JS)
-- [Streaming](../streaming/) — SSE and WebSocket streaming (Python + JS)
-- [Voices](../voices/) — List and preview all v3.1 voices
+```python
+from smallestai import SmallestAI
 
-## What This Will Cover
+client = SmallestAI()  # reads SMALLEST_API_KEY from the environment
 
-- **Sync synthesis** — Simple blocking call, best for scripts and CLIs
-- **Async synthesis** — Non-blocking, ideal for web servers and async pipelines
-- **Streaming** — WebSocket-based streaming for real-time audio delivery
-- **Utility methods** — List voices, get languages, manage cloned voices
+audio = b"".join(client.waves.synthesize_tts(
+    text="Hello from the Python SDK!",
+    voice_id="sophia",
+    model="lightning_v3.1",
+    sample_rate=24000,
+    output_format="wav",
+))
+with open("hello.wav", "wb") as f:
+    f.write(audio)
+```
+
+## Async synthesis
+
+```python
+import asyncio
+from smallestai import AsyncSmallestAI
+
+async def main():
+    client = AsyncSmallestAI()
+    chunks = []
+    async for chunk in client.waves.synthesize_tts(
+        text="Async works the same way.",
+        voice_id="sophia",
+        model="lightning_v3.1",
+    ):
+        chunks.append(chunk)
+    with open("hello_async.wav", "wb") as f:
+        f.write(b"".join(chunks))
+
+asyncio.run(main())
+```
+
+## Streaming over WebSocket
+
+```python
+from smallestai.waves import WavesStreamingTTS, TTSConfig
+
+config = TTSConfig(voice_id="sophia", model="lightning_v3.1", api_key="YOUR_API_KEY")
+streaming_tts = WavesStreamingTTS(config)
+for chunk in streaming_tts.synthesize("Streaming audio, chunk by chunk."):
+    ...  # play or buffer each PCM chunk as it arrives
+```
+
+For SSE streaming use `client.waves.synthesize_sse_tts(...)` with the same payload.
+
+## Utility methods
+
+```python
+voices = client.waves.get_voices(model="lightning-v3.1")
+clones = client.waves.list_voice_clones()
+```
 
 ## API Reference
 
 - [Python SDK on GitHub](https://github.com/smallest-inc/smallest-python-sdk)
-- [Lightning v3.1 API](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1)
+- [TTS documentation](https://docs.smallest.ai/waves/documentation/text-to-speech-lightning/quickstart)
