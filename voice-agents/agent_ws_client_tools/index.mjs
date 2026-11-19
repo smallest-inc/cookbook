@@ -74,8 +74,10 @@ async function runTool(name, args) {
 
 async function main() {
   const token = await mintToken();
-  const wsUrl = `${BASE.replace(/^http/, "ws")}/atoms/v1/agent/connect?token=${token}`;
-  console.log(`opening ${wsUrl.slice(0, 60)}...`);
+  const wsBase = `${BASE.replace(/^http/, "ws")}/atoms/v1/agent/connect`;
+  const wsUrl = `${wsBase}?token=${encodeURIComponent(token)}`;
+  // Log only the endpoint. The token is a credential, so it never goes to the console.
+  console.log(`opening ${wsBase}`);
 
   const ws = new WebSocket(wsUrl);
   const send = (obj) => ws.send(JSON.stringify(obj));

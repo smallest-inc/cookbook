@@ -1,4 +1,4 @@
-# Agents playbook — `agent_ws_client_tools`
+# Agents playbook for `agent_ws_client_tools`
 
 Minimal end-to-end demo of the client-tools protocol on the Atoms Agent WebSocket. If you are Claude / Cursor / Codex following this file, the steps below cover the full flow.
 
@@ -13,7 +13,7 @@ Minimal end-to-end demo of the client-tools protocol on the Atoms Agent WebSocke
 
 - **Add a tool:** append to the `TOOLS` array in `index.mjs` (JSON Schema in `parameters`), then add a branch in `runTool` for the new `name`.
 - **Fire-and-forget side effects (logging, UI):** set `expectsResponse: false` on the tool declaration. The agent will not wait for a result and `timeout_ms` will have no effect.
-- **Tighten the timeout:** set `timeout_ms` per tool (clamped 1000–60000, default 15000). If the tool exceeds the timeout, the server sends `tool_timeout` back to the agent.
+- **Tighten the timeout:** set `timeout_ms` per tool (clamped 1000 to 60000, default 15000). If the tool exceeds the timeout, the server sends `tool_timeout` back to the agent.
 - **Handle audio:** this sample skips `output_audio.delta` frames. For a full browser client, decode the base64 PCM16 chunks and play them through an `AudioWorklet` at the negotiated `sample_rate` from `session.created`.
 
 ## Gotchas
@@ -26,8 +26,8 @@ Minimal end-to-end demo of the client-tools protocol on the Atoms Agent WebSocke
 
 ## Files
 
-- `index.mjs` — the runnable client
-- `package.json` — deps (just `ws`)
-- `README.md` — human-readable overview
+- `index.mjs`: the runnable client
+- `package.json`: deps (just `ws`)
+- `README.md`: human-readable overview
 
 Requires Node 18 or later.
