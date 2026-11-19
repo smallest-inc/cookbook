@@ -9,7 +9,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 import wave
+from urllib.parse import urlparse
 
 import numpy as np
 import requests
@@ -50,12 +52,7 @@ def main() -> int:
         default="pulse",
         help="STT model (query param).",
     )
-    p.add_argument(
-        "--api-key",
-        default="",
-        help="Smallest API key. Falls back to SMALLEST_API_KEY env var.",
-    )
-    p.add_argument("--language", default="english")
+    p.add_argument("--language", default="en", help="ISO 639-1 code, for example en or hi.")
     p.add_argument("--word-timestamps", action=argparse.BooleanOptionalAction, default=False)
     p.add_argument("--diarize", action=argparse.BooleanOptionalAction, default=False)
     p.add_argument("--numerals", default="auto", choices=["auto", "true", "false"])
@@ -85,8 +82,16 @@ def main() -> int:
         "sample_rate": sr,
         "encoding": "linear16",
     }
-    api_key = args.api_key or os.getenv("SMALLEST_API_KEY", "")
-    headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
+    # The key is read from the environment only, never from argv.
+    api_key = os.getenv("SMALLEST_API_KEY", "")
+    headers = {}
+    if api_key:
+        parsed = urlparse(args.url)
+        if parsed.scheme != "https" and parsed.hostname not in {"localhost", "127.0.0.1", "::1"}:
+            raise SystemExit("Refusing to send SMALLEST_API_KEY over plain http:// to a non-local host. Use https://.")
+        headers = {"Authorization": f"Bearer {api_key}"}
+    else:
+        print("note: SMALLEST_API_KEY is not set, sending without auth", file=sys.stderr)
     r = requests.post(args.url, params=params, data=body, headers=headers, timeout=120)
     r.raise_for_status()
     print(json.dumps(r.json(), indent=2))

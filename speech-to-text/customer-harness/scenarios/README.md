@@ -1,8 +1,18 @@
 # Scenario WAVs
 
-Drop 16 kHz mono `.wav` files here. Each becomes one row in `run_matrix.py`.
+Drop 16 kHz mono 16-bit `.wav` files here. Each file becomes one scenario in
+`run_matrix.py` (one row per profile and augmentation).
 
-Suggested minimal set (record with `mic_record.py`):
+To get started without recording, generate the set below with Smallest TTS:
+
+```
+python ../generate_scenarios.py
+```
+
+For real tuning, record the same phrases yourself (with `mic_record.py`) or use
+real call audio. `*.wav` in this folder is git-ignored.
+
+Suggested minimal set:
 
 | filename                    | what to say                                                |
 | --------------------------- | ---------------------------------------------------------- |
@@ -12,7 +22,7 @@ Suggested minimal set (record with `mic_record.py`):
 | `rahul_choudhary.wav`       | "Rahul Choudhary"                                          |
 | `twenty_five_thousand.wav`  | "twenty five thousand rupees"                              |
 | `open_ended_query.wav`      | "please transfer twenty five thousand to Rahul Choudhary"  |
-| `long_dictation.wav`        | any ~30 s reading                                          |
+| `long_dictation.wav`        | any 20 to 30 s reading                                     |
 
 Example recording command:
 

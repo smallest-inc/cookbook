@@ -18,25 +18,34 @@ import tempfile
 import time
 
 
-# PROFILES map 1:1 to stream_client.py PRESETS. Kept as flat CLI flags so we
-# can pass profile-specific --keywords per row without polluting the preset
-# definition itself. When you add a preset there, mirror it here.
-PROFILES = {
-    "voice_agent_open": [
-        "--preset=voice_agent_open",
-    ],
-    "voice_agent_short_reply": [
-        "--preset=voice_agent_short_reply",
-        "--keywords=yes:3,no:3,one:2,two:2,three:2,four:2,five:2",
-    ],
-    "ivr": [
-        "--preset=ivr",
-        "--keywords=one:2,two:2,three:2,four:2,five:2,six:2,seven:2,eight:2,nine:2,zero:2,star:2,pound:2",
-    ],
-    "dictation": [
-        "--preset=dictation",
-    ],
-}
+# Profiles come from presets.json, the same file stream_client.py and
+# live.html read. Each profile runs as `stream_client.py --preset=<name>`, so
+# its knobs (including keywords) are defined in one place only.
+PRESETS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "presets.json")
+
+
+def load_profiles() -> dict[str, list[str]]:
+    with open(PRESETS_PATH) as f:
+        raw = json.load(f)
+    return {
+        name: [f"--preset={name}"]
+        for name, spec in raw.items()
+        if not name.startswith("_") and spec.get("cli")
+    }
+
+
+def matrix_profile_names() -> list[str]:
+    with open(PRESETS_PATH) as f:
+        raw = json.load(f)
+    names = [n for n, s in raw.items() if not n.startswith("_") and s.get("matrix")]
+    # The matrix runs presets through stream_client.py, which only offers "cli" presets.
+    not_cli = [n for n in names if not raw[n].get("cli")]
+    if not_cli:
+        raise SystemExit(f"presets.json: {not_cli} set \"matrix\": true but not \"cli\": true")
+    return names
+
+
+PROFILES = load_profiles()
 
 
 AUGMENTATIONS = {
@@ -89,7 +98,6 @@ def _summarize(events: list[dict]) -> dict:
 def _build_cmd(
     wav: str,
     url: str,
-    api_key: str,
     jsonl: str,
     profile_flags: list[str],
     aug_flags: list[str],
@@ -103,28 +111,39 @@ def _build_cmd(
         *profile_flags,
         *aug_flags,
     ]
-    if api_key:
-        cmd.append(f"--api-key={api_key}")
+    # No API key on the command line: argv is visible to every local user via
+    # `ps`. The child reads SMALLEST_API_KEY from the inherited environment.
     return cmd
 
 
 def run_one(
     wav: str,
     url: str,
-    api_key: str,
     profile_flags: list[str],
     aug_flags: list[str],
+    timeout_s: float,
 ) -> dict:
     with tempfile.NamedTemporaryFile("r", suffix=".jsonl", delete=False) as tmp:
         jsonl = tmp.name
-    cmd = _build_cmd(wav, url, api_key, jsonl, profile_flags, aug_flags)
+    cmd = _build_cmd(wav, url, jsonl, profile_flags, aug_flags)
     t0 = time.monotonic()
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=60, check=False)
+    error = ""
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout_s, check=False)
+        exit_code: int | str = proc.returncode
+        if proc.returncode != 0:
+            tail = (proc.stderr or "").strip().splitlines()
+            error = tail[-1][:200] if tail else f"exit {proc.returncode}"
+    except subprocess.TimeoutExpired:
+        # Record the failure and keep sweeping instead of aborting the run.
+        exit_code = "timeout"
+        error = f"no result within {timeout_s:g}s"
     walltime_ms = int((time.monotonic() - t0) * 1000)
 
     summary = _summarize(_load_events(jsonl))
     summary["walltime_ms"] = walltime_ms
-    summary["exit_code"] = proc.returncode
+    summary["exit_code"] = exit_code
+    summary["error"] = error
     return summary
 
 
@@ -137,9 +156,10 @@ def main() -> int:
         help="Streaming WebSocket URL.",
     )
     p.add_argument(
-        "--api-key",
-        default="",
-        help="Smallest API key. Falls back to SMALLEST_API_KEY env var.",
+        "--timeout",
+        type=float,
+        default=60.0,
+        help="Seconds allowed per run. A run that exceeds it is recorded as a failed row.",
     )
     p.add_argument("--out-csv", default="run_matrix_results.csv")
     p.add_argument(
@@ -148,14 +168,21 @@ def main() -> int:
         help=f"one of {list(PROFILES.keys())} or 'all'",
     )
     args = p.parse_args()
-    api_key = args.api_key or os.getenv("SMALLEST_API_KEY", "")
+    if not os.getenv("SMALLEST_API_KEY"):
+        print("note: SMALLEST_API_KEY is not set; runs will connect without auth", file=sys.stderr)
 
     wavs = sorted(glob.glob(os.path.join(args.scenarios, "*.wav")))
     if not wavs:
         print(f"no WAVs found in {args.scenarios}", file=sys.stderr)
         return 1
 
-    profiles = PROFILES if args.profile == "all" else {args.profile: PROFILES[args.profile]}
+    if args.profile == "all":
+        profiles = {name: PROFILES[name] for name in matrix_profile_names()}
+    elif args.profile in PROFILES:
+        profiles = {args.profile: PROFILES[args.profile]}
+    else:
+        print(f"unknown profile {args.profile!r}; choose from {list(PROFILES)} or 'all'", file=sys.stderr)
+        return 2
 
     fieldnames = [
         "scenario",
@@ -168,6 +195,7 @@ def main() -> int:
         "last_partial_change_after_final_ms",
         "walltime_ms",
         "exit_code",
+        "error",
     ]
     with open(args.out_csv, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fieldnames)
@@ -177,7 +205,7 @@ def main() -> int:
             for pname, pflags in profiles.items():
                 for aname, aflags in AUGMENTATIONS.items():
                     print(f"[{scenario}] {pname} × {aname}", flush=True)
-                    result = run_one(wav, args.url, api_key, pflags, aflags)
+                    result = run_one(wav, args.url, pflags, aflags, args.timeout)
                     row = {
                         "scenario": scenario,
                         "profile": pname,

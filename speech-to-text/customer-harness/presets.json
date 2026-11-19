@@ -1,0 +1,99 @@
+{
+  "_comment": "Single source of truth for presets. stream_client.py (--preset), run_matrix.py (--profile) and live.html (preset dropdown, served by live_server.py at /presets.json) all read this file. \"cli\": true means stream_client.py can send every param in the preset. \"matrix\": true means run_matrix.py includes it in --profile all. Values are streaming query params.",
+  "default": {
+    "note": "Server defaults. Good baseline.",
+    "cli": false,
+    "matrix": false,
+    "params": {}
+  },
+  "voice_agent_open": {
+    "note": "Open-ended user turns (support or sales agent). Longer EOU tolerance.",
+    "cli": true,
+    "matrix": true,
+    "params": {
+      "eou_timeout_ms": 900,
+      "endpointing": true,
+      "finalize_on_words": false,
+      "itn_normalize": true,
+      "word_timestamps": true
+    }
+  },
+  "voice_agent_short_reply": {
+    "note": "Yes, no and digit confirmations. Tight EOU, ITN off, boosted keywords.",
+    "cli": true,
+    "matrix": true,
+    "params": {
+      "eou_timeout_ms": 550,
+      "endpointing": true,
+      "finalize_on_words": false,
+      "itn_normalize": false,
+      "word_timestamps": true,
+      "keywords": "yes:3,no:3,one:2,two:2,three:2,four:2,five:2"
+    }
+  },
+  "ivr": {
+    "note": "Phone menus. Tight EOU, ITN off, digits and star/pound boosted. Uses whatever sample rate and encoding your audio has.",
+    "cli": true,
+    "matrix": true,
+    "params": {
+      "eou_timeout_ms": 500,
+      "endpointing": true,
+      "finalize_on_words": false,
+      "itn_normalize": false,
+      "word_timestamps": true,
+      "keywords": "one:2,two:2,three:2,four:2,five:2,six:2,seven:2,eight:2,nine:2,zero:2,star:2,pound:2"
+    }
+  },
+  "dictation": {
+    "note": "Long-form monologue. Loose EOU, ITN on.",
+    "cli": true,
+    "matrix": true,
+    "params": {
+      "eou_timeout_ms": 1400,
+      "endpointing": true,
+      "finalize_on_words": false,
+      "itn_normalize": true,
+      "word_timestamps": true
+    }
+  },
+  "meeting_diarize": {
+    "note": "Word and sentence timestamps plus speaker diarization for meetings.",
+    "cli": false,
+    "matrix": false,
+    "params": {
+      "diarize": true,
+      "word_timestamps": true,
+      "sentence_timestamps": true,
+      "full_transcript": true,
+      "eou_timeout_ms": 1000
+    }
+  },
+  "pci_redacted_agent": {
+    "note": "Voice-agent flow with PII and PCI redaction (en and hi only).",
+    "cli": false,
+    "matrix": false,
+    "params": {
+      "eou_timeout_ms": 700,
+      "endpointing": true,
+      "itn_normalize": true,
+      "redact_pii": true,
+      "redact_pci": true
+    }
+  },
+  "keywords_demo": {
+    "note": "Bias one proper-noun spelling. Edit keywords freely.",
+    "cli": true,
+    "matrix": false,
+    "params": {
+      "keywords": "Choudhary:3"
+    }
+  },
+  "raw_no_formatting": {
+    "note": "format=false gives lowercase text with no punctuation and no ITN.",
+    "cli": false,
+    "matrix": false,
+    "params": {
+      "format": false
+    }
+  }
+}

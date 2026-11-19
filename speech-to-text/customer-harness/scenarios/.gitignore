@@ -1,0 +1,3 @@
+# Scenario audio is generated locally or recorded by you. Keep it out of git,
+# since real recordings can contain customer speech.
+*.wav
