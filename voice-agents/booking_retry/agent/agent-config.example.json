@@ -1,0 +1,31 @@
+{
+  "name": "booking-retry-agent",
+  "description": "Outbound booking agent for the booking_retry cookbook recipe.",
+  "workflowType": "single_prompt",
+  "slmModel": "gpt-4o",
+  "language": { "default": "en", "supported": ["en"], "switching": { "isEnabled": false } },
+  "firstMessage": "Hello, this is an automated assistant calling from the clinic about the appointment you asked for. Is now a good time for one minute?",
+  "defaultVariables": { "customer_name": "there", "service": "appointment", "attempt": 1 },
+  "voiceMailDetectionConfig": {
+    "enabled": true,
+    "endText": "Hello, this is an automated assistant calling from the clinic about your appointment request. I am sorry I missed you. I will try you again later, or you can call the clinic back anytime. Goodbye."
+  },
+  "sessionTimeoutConfig": { "timeoutTimeInSecs": 300 },
+  "redactionConfig": { "isEnabled": true },
+  "postCallAnalytics": {
+    "summaryPrompt": "Summarize the call in two sentences: who answered, and whether a day and time was agreed. Do not include health details.",
+    "dispositionMetrics": [
+      {
+        "identifier": "booking_status",
+        "dispositionMetricPrompt": "What was the result of this call? Use no_conversation if nobody spoke to the agent.",
+        "dispositionMetricType": "ENUM",
+        "choices": ["booked", "declined", "callback_requested", "do_not_call", "wrong_number", "voicemail", "no_conversation"]
+      },
+      {
+        "identifier": "booked_slot",
+        "dispositionMetricPrompt": "If an appointment was booked, the agreed day and time in plain words. Otherwise leave empty.",
+        "dispositionMetricType": "STRING"
+      }
+    ]
+  }
+}

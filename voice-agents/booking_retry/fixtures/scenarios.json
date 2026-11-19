@@ -1,0 +1,27 @@
+{
+  "+12025550101": [
+    {"status": "completed", "duration": 74, "disconnect_reason": "agent_hangup", "metrics": {"booking_status": "booked"}}
+  ],
+  "+12025550102": [
+    {"status": "no_answer"},
+    {"status": "no_answer"},
+    {"status": "completed", "duration": 61, "disconnect_reason": "agent_hangup", "metrics": {"booking_status": "booked"}}
+  ],
+  "+12025550103": [
+    {"status": "completed", "duration": 14, "disconnect_reason": "agent_hangup", "agent_text": "Hello, this is an automated assistant. I am sorry I missed you. I will try you again later, or call us back anytime."},
+    {"status": "completed", "duration": 52, "disconnect_reason": "user_hangup", "metrics": {"booking_status": "declined"}}
+  ],
+  "+12025550104": [
+    {"start_error": "transient"},
+    {"status": "failed", "failure_reason": "carrier error (fixture)"},
+    {"status": "no_answer"},
+    {"status": "no_answer"}
+  ],
+  "+12025550105": [
+    {"status": "completed", "duration": 33, "disconnect_reason": "user_hangup", "metrics": {"booking_status": "do_not_call"}}
+  ],
+  "+12025550106": [
+    {"status": "completed", "duration": 12, "disconnect_reason": "agent_hangup", "agent_text": "Hello, this is an automated assistant. I am sorry I missed you. I will try you again later, or call us back anytime."},
+    {"status": "completed", "duration": 11, "disconnect_reason": "agent_hangup", "agent_text": "Hello, this is an automated assistant. I am sorry I missed you. I will try you again later, or call us back anytime."}
+  ]
+}

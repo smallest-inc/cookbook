@@ -1,0 +1,7 @@
+id,name,phone,timezone,service,consent,consent_source
+c001,Test Person One,+12025550101,America/New_York,consultation,yes,fictional demo data
+c002,Test Person Two,+12025550102,America/New_York,checkup,yes,fictional demo data
+c003,Test Person Three,+12025550103,America/Chicago,follow_up,yes,fictional demo data
+c004,Test Person Four,+12025550104,America/Los_Angeles,consultation,yes,fictional demo data
+c005,Test Person Five,+12025550105,America/New_York,checkup,yes,fictional demo data
+c006,Test Person Six,+12025550106,America/New_York,consultation,yes,fictional demo data
