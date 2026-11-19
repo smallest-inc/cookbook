@@ -5,8 +5,10 @@ const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_BACKOFF_MS = [500, 1000, 2000, 5000, 15000];
 
 export interface AtomsClientConfig {
-  apiKey: string;
-  agentId: string;
+  // Returns a fresh short-lived Agent WebSocket token from your session server
+  // (see ../mobile_token_server). Tokens are single-use, so it is called again
+  // for every reconnect. The app never holds the Smallest API key.
+  getToken: () => Promise<string>;
   sampleRate: number;
   onEvent: (event: ServerEvent) => void;
   onOpen: () => void;
@@ -30,7 +32,7 @@ export class AtomsClient {
 
   start(): void {
     this.explicitlyClosed = false;
-    this.connect();
+    void this.connect();
   }
 
   sendMicChunk(base64Int16LE: string): void {
@@ -53,12 +55,28 @@ export class AtomsClient {
     this.ws = null;
   }
 
-  private connect(): void {
-    const { apiKey, agentId, sampleRate } = this.config;
+  private async connect(): Promise<void> {
+    const { getToken, sampleRate } = this.config;
+
+    let token: string;
+    try {
+      token = await getToken();
+    } catch (e) {
+      this.config.onFatalError({
+        kind: 'network',
+        message: e instanceof Error ? e.message : 'could not get a session token',
+        retryable: true,
+      });
+      return;
+    }
+    // The user may have ended the session while the token request was in flight.
+    if (this.explicitlyClosed) return;
+
+    // The token is bound to one agent by the server that minted it, so no
+    // agent_id or API key goes on the URL.
     const url =
       'wss://api.smallest.ai/atoms/v1/agent/connect' +
-      `?token=${encodeURIComponent(apiKey)}` +
-      `&agent_id=${encodeURIComponent(agentId)}` +
+      `?token=${encodeURIComponent(token)}` +
       `&mode=webcall&sample_rate=${sampleRate}`;
 
     let ws: WebSocket;
@@ -119,7 +137,7 @@ export class AtomsClient {
 
       const delay = RECONNECT_BACKOFF_MS[this.reconnectAttempt] ?? 15000;
       this.reconnectAttempt += 1;
-      this.reconnectTimer = setTimeout(() => this.connect(), delay);
+      this.reconnectTimer = setTimeout(() => { void this.connect(); }, delay);
     };
   }
 }

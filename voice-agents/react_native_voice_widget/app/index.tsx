@@ -4,9 +4,10 @@ import { AtomsWidget } from '@/widget/AtomsWidget';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 
-// EXPO_PUBLIC_* are inlined into the JS bundle at build time by Metro.
-const API_KEY  = process.env.EXPO_PUBLIC_SMALLEST_API_KEY;
-const AGENT_ID = process.env.EXPO_PUBLIC_AGENT_ID;
+// EXPO_PUBLIC_* are inlined into the JS bundle at build time by Metro, so
+// only a non-secret URL goes here. The session server (../mobile_token_server)
+// holds SMALLEST_API_KEY and AGENT_ID.
+const TOKEN_SERVER_URL = process.env.EXPO_PUBLIC_TOKEN_SERVER_URL;
 
 /**
  * Host demo — a fake clinic receptionist dashboard. The AtomsWidget is
@@ -61,7 +62,7 @@ export default function HostDemoApp() {
       </SafeAreaView>
 
       {/* Widget lives in the tree alongside the host content. Floats on top. */}
-      <AtomsWidget apiKey={API_KEY} agentId={AGENT_ID} label="Ask AI" />
+      <AtomsWidget serverUrl={TOKEN_SERVER_URL} label="Ask AI" />
     </View>
   );
 }

@@ -18,13 +18,13 @@ export default function YourScreen() {
   return (
     <View style={{ flex: 1 }}>
       {/* ...your existing app content... */}
-      <AtomsWidget apiKey={API_KEY} agentId={AGENT_ID} label="Ask AI" />
+      <AtomsWidget serverUrl={TOKEN_SERVER_URL} label="Ask AI" />
     </View>
   );
 }
 ```
 
-The widget renders a floating pill in the bottom-right and manages everything else — session lifecycle, mic permission, audio capture + playback, transcript, error handling. Two props only (`apiKey`, `agentId`); the optional `label` customizes the pill text.
+The widget renders a floating pill in the bottom-right and manages everything else: session lifecycle, mic permission, audio capture + playback, transcript, error handling. One required prop, `serverUrl`: the URL of your session server ([`../mobile_token_server`](../mobile_token_server/)), which holds the API key and hands the widget a short-lived token per connection. The optional `label` customizes the pill text. Never pass an API key to the widget: anything in the app bundle can be extracted.
 
 ## What's inside
 
@@ -36,7 +36,8 @@ The widget renders a floating pill in the bottom-right and manages everything el
 | Status line | `src/widget/StatusLine.tsx` | Dot + label (Connecting / Listening / Speaking / Error). |
 | Waveform | `src/widget/Waveform.tsx` | 9-bar animated VU meter, center-weighted envelope. |
 | Action row | `src/widget/ActionRow.tsx` + `MicButton.tsx` | Keyboard + mic + close. Mic has a pulsing halo when active. |
-| Transport | `src/agent/AtomsClient.ts` | WSS client with exponential-backoff reconnect + auth hard-stop. |
+| Session server client | `src/agent/sessionServer.ts` | `POST /session` on your session server for a short-lived, single-use agent token. |
+| Transport | `src/agent/AtomsClient.ts` | WSS client that fetches a fresh token per connection, with exponential-backoff reconnect + auth hard-stop. |
 | Audio | `src/agent/audioCapture.ts`, `audioPlayback.ts` | Mic tap + gapless PCM playback via `react-native-audio-api`. |
 | State | `src/hooks/useAtomsSession.ts` | Session state machine + mic-chunk counter + mute gate. |
 | Theme | `src/theme/colors.ts`, `typography.ts` | Smallest brand palette (teal, cream, coral, near-black). |
@@ -60,11 +61,18 @@ npm install
 cp .env.example .env
 # paste your SMALLEST_API_KEY into .env
 python3 scripts/setup_agent.py
-# → writes EXPO_PUBLIC_AGENT_ID back to .env automatically
+# writes AGENT_ID and EXPO_PUBLIC_TOKEN_SERVER_URL to .env
 
-# 3. Regenerate native projects + build
+# 3. Start the session server (keeps the API key off the phone)
+node --env-file=.env ../mobile_token_server/server.mjs
+
+# 4. Regenerate native projects + build (in another terminal)
 npx expo prebuild --clean
 ```
+
+Only `EXPO_PUBLIC_TOKEN_SERVER_URL` is bundled into the app, and it is just a URL. `SMALLEST_API_KEY` and `AGENT_ID` stay in `.env` for the setup script and the session server. If your `.env` still has `EXPO_PUBLIC_SMALLEST_API_KEY` from an older version, the setup script removes it; rotate that key if you ever shipped a build with it.
+
+Set `EXPO_PUBLIC_TOKEN_SERVER_URL` for where the app runs: `http://localhost:8787` on the iOS simulator, `http://10.0.2.2:8787` on the Android emulator, or `http://<your-computer-LAN-IP>:8787` on a physical phone (start the server with `HOST=0.0.0.0` in that case). Plain `http://` is for local development only; in production, host the server behind HTTPS with your own user authentication.
 
 The setup script is idempotent — re-running updates the agent in place instead of creating duplicates. Flags (`--voice`, `--model`, `--name`, `--force-create`) work the same as in the Hearthside cookbook.
 
@@ -123,7 +131,7 @@ Brand palette lives in `src/theme/colors.ts`. The widget reads from this file on
 ### Change the pill copy / position
 
 ```tsx
-<AtomsWidget label="Talk to us" apiKey={K} agentId={I} />
+<AtomsWidget label="Talk to us" serverUrl={TOKEN_SERVER_URL} />
 ```
 
 For a different corner, edit `pillContainer` in `AtomsWidget.tsx` (absolute positioning, 4 lines).

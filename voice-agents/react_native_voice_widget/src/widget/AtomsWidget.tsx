@@ -15,21 +15,24 @@ import { ActionRow } from './ActionRow';
  * with a live session: transcript, status, waveform, and a mic button.
  *
  * Consumer:
- *   <AtomsWidget apiKey={KEY} agentId={ID} />
+ *   <AtomsWidget serverUrl={TOKEN_SERVER_URL} />
+ *
+ * serverUrl points at your session server (see ../mobile_token_server),
+ * which holds the Smallest API key. Never pass an API key to the app.
  *
  * The pill and sheet are pointer-events-scoped; the host app below them keeps
  * receiving gestures. No full-screen takeover.
  */
 export interface AtomsWidgetProps {
-  apiKey: string | undefined;
-  agentId: string | undefined;
+  /** Session server URL that mints short-lived agent tokens. */
+  serverUrl: string | undefined;
   /** Label on the pill. Defaults to "Ask AI". */
   label?: string;
 }
 
-export function AtomsWidget({ apiKey, agentId, label = 'Ask AI' }: AtomsWidgetProps) {
+export function AtomsWidget({ serverUrl, label = 'Ask AI' }: AtomsWidgetProps) {
   const [open, setOpen] = useState(false);
-  const session = useAtomsSession({ apiKey, agentId });
+  const session = useAtomsSession({ serverUrl });
   const { status, start, stop } = session;
 
   // Session tracks the sheet's visibility. One rule callers reason about:

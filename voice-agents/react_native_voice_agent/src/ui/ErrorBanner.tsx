@@ -20,7 +20,7 @@ const TITLE_BY_KIND: Record<SessionError['kind'], string> = {
 
 const HINT_BY_KIND: Record<SessionError['kind'], string> = {
   permission:     'Grant microphone access in Settings and try again.',
-  'missing-config': 'Fill SMALLEST_API_KEY and AGENT_ID in the .env file at the project root.',
+  'missing-config': 'Set EXPO_PUBLIC_TOKEN_SERVER_URL in .env and start the session server (see mobile_token_server).',
   network:        'Check your connection and retry.',
   auth:           'Check your API key and agent ID in .env.',
   server:         'The agent returned an error. Check the message below.',

@@ -13,8 +13,10 @@ Two modes, chosen automatically from .env:
      place. Otherwise creates a fresh agent. In both cases: writes the
      full single-prompt config (prompt, voice, language, model) into the
      live branch's draft and publishes it, which makes the new revision
-     live. Writes AGENT_ID (and EXPO_PUBLIC_* mirrors for Metro bundle
-     inlining) into .env.
+     live. Writes AGENT_ID and EXPO_PUBLIC_TOKEN_SERVER_URL into .env.
+     The API key is never written under an EXPO_PUBLIC_ name, because
+     those are inlined into the app bundle; the app gets short-lived
+     tokens from ../mobile_token_server instead.
 
 Usage:
     cd voice-agents/atoms_hearthside_rn
@@ -325,7 +327,14 @@ def main() -> int:
     if existing_id and not args.force_create:
         if not api_key:
             print(f"Using existing AGENT_ID={existing_id} from .env. Skipping creation.")
-            print("No API key needed for this path. Run `npx expo run:ios` next.")
+            if _remove_env_keys(ENV_PATH, _LEGACY_BUNDLED_KEYS):
+                print("  removed EXPO_PUBLIC_SMALLEST_API_KEY / EXPO_PUBLIC_AGENT_ID from .env "
+                      "(they would ship inside the app bundle).")
+            if not env.get("EXPO_PUBLIC_TOKEN_SERVER_URL"):
+                write_env(ENV_PATH, {"EXPO_PUBLIC_TOKEN_SERVER_URL": DEFAULT_TOKEN_SERVER_URL})
+                print(f"  added EXPO_PUBLIC_TOKEN_SERVER_URL={DEFAULT_TOKEN_SERVER_URL} to .env.")
+            print("The session server still needs SMALLEST_API_KEY in its environment.")
+            print("Run `node --env-file=.env ../mobile_token_server/server.mjs`, then `npx expo run:ios`.")
             return 0
         if verify_agent_exists(api_key, existing_id):
             print(f"Found AGENT_ID={existing_id} on your account. Skipping creation.")
@@ -369,14 +378,44 @@ def main() -> int:
     return 0
 
 
+# Names that must never be in .env: Metro inlines every EXPO_PUBLIC_* value
+# into the JS bundle, where anyone with the app can read it. Older versions
+# of this script wrote these, so they are removed on every run.
+_LEGACY_BUNDLED_KEYS = ("EXPO_PUBLIC_SMALLEST_API_KEY", "EXPO_PUBLIC_AGENT_ID")
+DEFAULT_TOKEN_SERVER_URL = "http://localhost:8787"
+
+
+def _remove_env_keys(path: Path, keys: tuple[str, ...]) -> list[str]:
+    if not path.exists():
+        return []
+    removed: list[str] = []
+    kept: list[str] = []
+    for line in path.read_text().splitlines():
+        name = line.split("=", 1)[0].strip() if "=" in line else ""
+        if name in keys:
+            removed.append(name)
+            continue
+        kept.append(line)
+    if removed:
+        path.write_text("\n".join(kept) + "\n")
+    return removed
+
+
 def _mirror_env_for_expo(api_key: str, agent_id: str) -> None:
-    write_env(ENV_PATH, {
-        "SMALLEST_API_KEY": api_key,
-        "AGENT_ID": agent_id,
-        "EXPO_PUBLIC_SMALLEST_API_KEY": api_key,
-        "EXPO_PUBLIC_AGENT_ID": agent_id,
-    })
+    # SMALLEST_API_KEY and AGENT_ID stay unprefixed: the setup script and the
+    # session server read them, Metro does not bundle them. The app only gets
+    # the session server URL.
+    updates = {"SMALLEST_API_KEY": api_key, "AGENT_ID": agent_id}
+    if not load_dotenv(ENV_PATH).get("EXPO_PUBLIC_TOKEN_SERVER_URL"):
+        updates["EXPO_PUBLIC_TOKEN_SERVER_URL"] = DEFAULT_TOKEN_SERVER_URL
+    write_env(ENV_PATH, updates)
+    removed = _remove_env_keys(ENV_PATH, _LEGACY_BUNDLED_KEYS)
     print(f"Wrote {ENV_PATH}.")
+    if removed:
+        print(f"  removed {', '.join(removed)} (they would have shipped inside the app bundle).")
+        print("  If you built the app with them before, rotate that API key in the dashboard.")
+    print("Start the session server before the app:")
+    print("  node --env-file=.env ../mobile_token_server/server.mjs")
 
 
 if __name__ == "__main__":
