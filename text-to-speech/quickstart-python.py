@@ -9,7 +9,7 @@ Usage:
     export SMALLEST_API_KEY="your-api-key"
     python quickstart-python.py
 
-Docs: https://docs.smallest.ai/waves/documentation/text-to-speech-lightning/quickstart
+Docs: https://docs.smallest.ai/models/text-to-speech/quickstart
 """
 
 import os

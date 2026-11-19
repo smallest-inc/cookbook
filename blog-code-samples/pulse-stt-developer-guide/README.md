@@ -217,7 +217,7 @@ See [demo-app/README.md](./demo-app/README.md) for detailed instructions.
 
 ## 🔗 Resources
 
-- [Waves Documentation](https://waves-docs.smallest.ai)
+- [Waves Documentation](https://docs.smallest.ai/models/overview)
 - [Smallest AI Console](https://app.smallest.ai)
 - [Python SDK](https://github.com/smallest-inc/smallest-python-sdk)
 - [Discord Community](https://discord.gg/5evETqguJs)

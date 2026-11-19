@@ -42,7 +42,8 @@ Non-streaming for clarity. The same endpoint also speaks the plain `chat/complet
 
 ## API Reference
 
-- [Waves API Reference](https://docs.smallest.ai/waves/api-reference)
+- [Electron tool calling guide](https://docs.smallest.ai/models/llm/tool-function-calling)
+- [Electron chat completions API](https://docs.smallest.ai/api-reference/models/llm-chat-completions/electron-chat-completions)
 
 ## Next Steps
 

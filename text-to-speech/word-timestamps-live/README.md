@@ -70,8 +70,8 @@ Saved to out.wav
 
 ## API Reference
 
-- [Live TTS WebSocket](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/live-tts-web-socket)
-- [Waves API Reference](https://docs.smallest.ai/waves/api-reference)
+- [TTS WebSocket API](https://docs.smallest.ai/api-reference/models/text-to-speech/tts)
+- [Word timestamps guide](https://docs.smallest.ai/models/text-to-speech/word-timestamps)
 
 ## Next Steps
 

@@ -11,7 +11,7 @@ Usage:
     python websocket-python.py --text "Hello world" --voice zoravar
     python websocket-python.py --text "..." --voice meher --out hello.wav
 
-Docs: https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/live-tts-web-socket
+Docs: https://docs.smallest.ai/api-reference/models/text-to-speech/tts
 """
 
 import argparse

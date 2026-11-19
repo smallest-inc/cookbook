@@ -21,7 +21,7 @@ Smallest AI offers an end-to-end Voice AI suite for developers building real-tim
 
 This cookbook contains practical examples and tutorials for building with Smallest AI's APIs. Each example is self-contained and demonstrates a real-world use case — from basic transcription to fully autonomous voice agents.
 
-**Documentation:** [Waves (STT & TTS)](https://waves-docs.smallest.ai) · [Voice Agents](https://docs.smallest.ai/voice-agents/developer-guide) · [Python SDK](https://github.com/smallest-inc/smallest-python-sdk)
+**Documentation:** [Waves (STT & TTS)](https://docs.smallest.ai/models/overview) · [Voice Agents](https://docs.smallest.ai/voice-agents/developer-guide) · [Python SDK](https://github.com/smallest-inc/smallest-python-sdk)
 
 ---
 
@@ -104,7 +104,7 @@ uv run voice-agents/bank_csr/app.py
 
 ## Speech-to-Text Examples
 
-Convert audio and video to text with industry-leading accuracy. Supports 30+ languages with features like speaker diarization, word timestamps, and emotion detection. Powered by [Pulse STT](https://waves-docs.smallest.ai/v4.0.0/content/speech-to-text-new/overview).
+Convert audio and video to text with industry-leading accuracy. Supports 30+ languages with features like speaker diarization, word timestamps, and emotion detection. Powered by [Pulse STT](https://docs.smallest.ai/models/speech-to-text/overview).
 
 - [Getting Started](./speech-to-text/getting-started/) — Basic transcription, the simplest way to start
 - [Jarvis Voice Assistant](./speech-to-text/websocket/jarvis/) — Always-on assistant with wake word detection, LLM reasoning, and TTS
@@ -118,7 +118,7 @@ Convert audio and video to text with industry-leading accuracy. Supports 30+ lan
 
 ## Text-to-Speech Examples
 
-Generate natural-sounding speech from text with real-time latency. 80+ voices across 4 languages (en, hi, es, ta) with 44.1 kHz quality and ~200ms latency. Powered by [Lightning TTS v3.1](https://waves-docs.smallest.ai/v4.0.0/content/api-references/lightning-v3.1).
+Generate natural-sounding speech from text with real-time latency. 80+ voices across 4 languages (en, hi, es, ta) with 44.1 kHz quality and ~200ms latency. Powered by [Lightning TTS v3.1](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech).
 
 - [Quickstart](./text-to-speech/quickstart/) — Generate speech in 5 lines of code, under 2 minutes
 - [Getting Started](./text-to-speech/getting-started/) — Configurable synthesis with voice, speed, language, output format
@@ -139,7 +139,7 @@ Generate natural-sounding speech from text with real-time latency. 80+ voices ac
 
 ## Speech-to-Speech Examples
 
-Full-duplex voice conversations with a single model: stream microphone audio in, get spoken responses back. Powered by [Hydra](https://docs.smallest.ai/waves/documentation/speech-to-speech-hydra/overview) over `wss://api.smallest.ai/waves/v1/s2s`.
+Full-duplex voice conversations with a single model: stream microphone audio in, get spoken responses back. Powered by [Hydra](https://docs.smallest.ai/models/speech-to-speech/overview) over `wss://api.smallest.ai/waves/v1/s2s`.
 
 - [Hydra Realtime Demo](./speech-to-speech/hydra-realtime-demo/) — Browser client with multi-agent presets, client-side tool calling, a live wire-log of every WebSocket frame, and an audio-reactive orb. Mirror of [smallest-inc/hydra_agents](https://github.com/smallest-inc/hydra_agents).
 

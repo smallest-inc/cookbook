@@ -266,7 +266,7 @@ server → { "type": "response.output_audio.delta", "delta": "<b64 pcm16>" }
         Full event reference: see the{" "}
         <a
           className="text-ink-100 underline underline-offset-2 hover:text-ink-200"
-          href="https://docs.smallest.ai/waves/documentation/speech-to-speech-hydra/managing-sessions"
+          href="https://docs.smallest.ai/models/speech-to-speech/managing-sessions"
           target="_blank"
           rel="noreferrer"
         >

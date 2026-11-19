@@ -1,6 +1,6 @@
 # LLM
 
-Text generation with [Electron](https://docs.smallest.ai/waves/api-reference), Smallest AI's LLM, via an OpenAI-compatible `chat/completions` endpoint.
+Text generation with [Electron](https://docs.smallest.ai/models/llm/overview), Smallest AI's LLM, via an OpenAI-compatible `chat/completions` endpoint.
 
 ## Endpoint
 

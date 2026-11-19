@@ -67,10 +67,10 @@ node stream_ws.js "This text will be streamed via WebSocket."
 
 ## API Reference
 
-- [Synthesize speech (REST sync)](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/synthesize-speech)
-- [Stream speech (SSE)](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/synthesize-speech-sse)
-- [Live TTS WebSocket](https://docs.smallest.ai/waves/api-reference/api-reference/text-to-speech/live-tts-web-socket)
-- [Lightning v3.1 Pro model card](https://docs.smallest.ai/waves/model-cards/text-to-speech/lightning-v-3-1-pro)
+- [Synthesize speech (REST sync)](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Stream speech (SSE)](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech-sse)
+- [Live TTS WebSocket](https://docs.smallest.ai/api-reference/models/text-to-speech/tts)
+- [Lightning v3.1 Pro model card](https://docs.smallest.ai/model-cards/text-to-speech/lightning-v-3-1-pro)
 
 ## Next Steps
 

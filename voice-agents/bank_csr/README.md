@@ -1,6 +1,6 @@
 # 🏦 Bank CSR — AI Voice Banking Agent
 
-A production-grade voice-based Customer Support Representative (**"Rekha"**) for an India-based bank, built with the [Voice Agents SDK](https://docs.smallest.ai). Rekha handles identity verification, live SQL queries against a real database, deterministic number-crunching, banking actions (FD creation/breaking, TDS certificates), compliance audit logging, and call transfers — all over a phone call.
+A production-grade voice-based Customer Support Representative (**"Rekha"**) for an India-based bank, built with the [Voice Agents SDK](https://docs.smallest.ai/voice-agents/developer-guide). Rekha handles identity verification, live SQL queries against a real database, deterministic number-crunching, banking actions (FD creation/breaking, TDS certificates), compliance audit logging, and call transfers, all over a phone call.
 
 > **"How much did I spend on Amazon in the last 2 years, and how is it trending?"**
 >
@@ -567,7 +567,7 @@ This example uses the following Voice Agents SDK components:
 | `SDKAgentEndCallEvent` | `smallestai.atoms.crew.events` | End call |
 | `SDKSystemUserJoinedEvent` | `smallestai.atoms.crew.events` | User joined trigger |
 
-Full SDK docs: [docs.smallest.ai](https://docs.smallest.ai)
+Full SDK docs: [docs.smallest.ai](https://docs.smallest.ai/voice-agents/developer-guide)
 
 ---
 

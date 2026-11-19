@@ -75,8 +75,8 @@ Hydra expects a live audio stream. The script sends one 100 ms chunk every 100 m
 
 ## API Reference
 
-- [Hydra overview and event reference](https://docs.smallest.ai/waves/documentation/speech-to-speech-hydra/overview)
-- [Waves API Reference](https://docs.smallest.ai/waves/api-reference)
+- [Hydra overview](https://docs.smallest.ai/models/speech-to-speech/overview)
+- [Hydra speech-to-speech API](https://docs.smallest.ai/api-reference/models/speech-to-speech/speech-to-speech)
 
 ## Next Steps
 

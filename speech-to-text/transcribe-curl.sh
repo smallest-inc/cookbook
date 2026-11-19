@@ -6,7 +6,7 @@
 #     export SMALLEST_API_KEY="your-api-key"
 #     bash transcribe-curl.sh
 #
-# Docs: https://docs.smallest.ai/waves/documentation/speech-to-text-pulse/quickstart
+# Docs: https://docs.smallest.ai/models/speech-to-text/quickstart
 
 curl -X POST "https://api.smallest.ai/waves/v1/stt/?model=pulse&language=en" \
   -H "Authorization: Bearer $SMALLEST_API_KEY" \

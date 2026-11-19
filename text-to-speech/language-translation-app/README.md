@@ -85,8 +85,8 @@ language-translation-app/
 
 ## API Reference
 
-- [Lightning TTS](https://docs.smallest.ai/waves/documentation/text-to-speech-lightning/overview)
-- [Pulse STT](https://docs.smallest.ai/waves/documentation/speech-to-text-pulse/overview)
+- [Lightning TTS](https://docs.smallest.ai/models/text-to-speech/overview)
+- [Pulse STT](https://docs.smallest.ai/models/speech-to-text/overview)
 
 ## Next Steps
 

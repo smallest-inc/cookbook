@@ -58,4 +58,5 @@ curl "https://api.smallest.ai/waves/v1/voice-cloning" \
 
 ## API Reference
 
-- [Voice Cloning guide](https://docs.smallest.ai/waves/documentation/voice-cloning/how-to-vc)
+- [Voice cloning with the Python SDK](https://docs.smallest.ai/models/voice-cloning/instant-clone-python-sdk)
+- [Voice Cloning API](https://docs.smallest.ai/api-reference/models/text-to-speech/create-voice-clone)

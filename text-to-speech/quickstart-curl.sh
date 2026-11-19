@@ -8,7 +8,7 @@
 #     export SMALLEST_API_KEY="your-api-key"
 #     bash quickstart-curl.sh
 #
-# Docs: https://docs.smallest.ai/waves/documentation/text-to-speech-lightning/quickstart
+# Docs: https://docs.smallest.ai/models/text-to-speech/quickstart
 
 curl -X POST "https://api.smallest.ai/waves/v1/tts" \
   -H "Authorization: Bearer $SMALLEST_API_KEY" \

@@ -501,7 +501,7 @@ export default function Home() {
               Smallest AI
             </a>
             {' '}•{' '}
-            <a href="https://waves-docs.smallest.ai" target="_blank" rel="noopener noreferrer" className="text-[#43B6B6] hover:text-[#FFCF72] transition-colors">
+            <a href="https://docs.smallest.ai/models/overview" target="_blank" rel="noopener noreferrer" className="text-[#43B6B6] hover:text-[#FFCF72] transition-colors">
               Documentation
             </a>
           </p>
