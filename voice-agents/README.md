@@ -51,6 +51,7 @@ Build AI voice agents with the [Voice Agents SDK](https://docs.smallest.ai/voice
 |---------|-------------------|
 | [knowledge_base_rag](./knowledge_base_rag/) | KB creation, PDF upload, URL scraping |
 | [campaigns](./campaigns/) | Audiences, outbound campaigns |
+| [booking_retry](./booking_retry/) | Outbound booking agent that retries on no answer, failure or voicemail. Backoff, caps, calling window, SQLite ledger, offline tests |
 | [analytics](./analytics/) | Call logs, transcripts, post-call metrics |
 | [agent_ws_client_tools](./agent_ws_client_tools/) | Node.js client tools on the Agent WebSocket: `session.update`, `function_call`, `function_call.result` |
 
