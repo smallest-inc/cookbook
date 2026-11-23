@@ -1,0 +1,3 @@
+{"audio": "audio/clip_0001.wav", "text": "Reference transcript here", "language": "en", "tags": ["group_a"]}
+{"audio": "audio/clip_0002.wav", "text": "참조 전사 텍스트", "language": "ko", "tags": ["group_b"]}
+{"audio": "audio/clip_0003.wav", "text": "Another reference transcript", "language": "en", "emotion": "happy", "gender": "female", "tags": ["group_a"]}
