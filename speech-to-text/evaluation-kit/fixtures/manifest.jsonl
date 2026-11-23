@@ -1,0 +1,4 @@
+{"id": "en_01", "audio": "audio/en/en_01.flac", "text": "thee study medicine", "language": "en", "tags": ["en", "librispeech"]}
+{"id": "en_02", "audio": "audio/en/en_02.flac", "text": "there is a more or less elaborate system of rank and grades", "language": "en", "tags": ["en", "librispeech"]}
+{"id": "ko_03", "audio": "audio/ko/ko_03.flac", "text": "폭탄 한 발이 총독 집무실 밖에서 폭발했다.", "language": "ko", "tags": ["ko", "fleurs"], "gender": "female"}
+{"id": "hi_04", "audio": "audio/hi/hi_04.flac", "text": "पिरामिडों पर दृश्य प्रदर्शित किए जाते हैं और विभिन्न पिरामिड दिखाये जाते हैं", "language": "hi", "tags": ["hi", "fleurs"], "gender": "female"}
