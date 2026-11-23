@@ -4,6 +4,8 @@ Self-contained reference scripts for measuring Pulse STT **accuracy** (Word Erro
 
 Both scripts are single-file, no imports from this repo. Copy either one anywhere and run.
 
+For public test sets (ESB, FLEURS), languages beyond English and Hindi (with CER for Korean, Japanese and Chinese), per-folder breakdowns, CSV output, or Pulse 2.0 end-of-turn, emotion and gender scoring, use the [STT WER Bench](../../recipes/stt-wer-bench/) recipe. It reads this folder layout too: `uv run src/make_manifest.py DATA_DIR --language hi --from-metadata-csv` from that folder.
+
 ## Scripts
 
 | Script | Endpoint | Reports |

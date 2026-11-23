@@ -1,0 +1,37 @@
+# Settings for `make run` (src/run_eval.py --config config/bench.yaml).
+# Any flag on the command line overrides the value here.
+# Keys are the run_eval.py flag names with underscores.
+
+# Which audio to score.
+#   manifest  your own clips (Track 3). Build the manifest with `make manifest`.
+#   esb       English benchmark sets from the Open ASR Leaderboard (Track 1).
+#   fleurs    Google FLEURS in any locale (Track 2).
+suite: manifest
+
+# Your clips. `make manifest AUDIO=my_audio LANG=en` writes this file.
+# Start with 20 to 50 clips from real calls, with transcripts you have checked by hand.
+manifest: my_audio/manifest.jsonl
+
+# pulse      multilingual, streaming. The default for most languages.
+# pulse-pro  multilingual, pre-recorded (HTTP) only.
+# pulse-2    English only, streaming only. Adds end-of-turn, emotion and gender.
+model: pulse
+
+# Leave unset to use each clip's own language from the manifest.
+# language: en
+
+# Leave unset: CER for Korean, Japanese, Chinese, Cantonese and Thai, WER for the rest.
+# metric: wer
+
+# Clips sent at once. Lower it if you see rate-limit errors.
+concurrency: 8
+
+# Cap clips per dataset for a quick check. Remove for a full run.
+# limit: 50
+
+# Extra Pulse query parameters, for example keyword boosting.
+# param: ["keywords=Smallest:2"]
+
+# Where results go: results/<run_name>/summary.md, summary.csv, and results.csv per dataset.
+out: results
+run_name: my_audio_pulse

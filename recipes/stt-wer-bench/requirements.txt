@@ -1,0 +1,13 @@
+# Extras for the evaluation kit. requests and python-dotenv come
+# from the root requirements.txt. websockets is pinned higher than the root
+# because the client uses the newer connect(additional_headers=...) API.
+websockets>=14.0
+numpy>=1.24
+soundfile>=0.12
+librosa>=0.10
+jiwer>=3.0
+whisper-normalizer>=0.1.12
+huggingface_hub>=0.23
+pyarrow>=14.0
+pytest>=8.0
+pyyaml>=6.0

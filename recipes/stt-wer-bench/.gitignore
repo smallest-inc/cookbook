@@ -1,0 +1,5 @@
+results/
+my_audio/
+.env
+.ruff_cache/
+.pytest_cache/

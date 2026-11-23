@@ -1,0 +1,3 @@
+# Keeps import order the same whether ruff runs from the repo root or from here.
+[lint.isort]
+known-first-party = ["conftest", "loaders", "make_manifest", "pulse_client", "run_eval", "scoring"]

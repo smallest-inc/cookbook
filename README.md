@@ -102,6 +102,12 @@ uv run voice-agents/bank_csr/app.py
 
 ---
 
+## Recipes
+
+End-to-end use cases with one settings file to edit and a three-command run. [See all recipes](./recipes/).
+
+- [STT WER Bench on Your Own Audio](./recipes/stt-wer-bench/): score Pulse on your own recordings, in your language, and on public benchmarks
+
 ## Speech-to-Text Examples
 
 Convert audio and video to text with industry-leading accuracy. Supports 30+ languages with features like speaker diarization, word timestamps, and emotion detection. Powered by [Pulse STT](https://docs.smallest.ai/models/speech-to-text/overview).
