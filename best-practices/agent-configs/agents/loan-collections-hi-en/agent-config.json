@@ -1,0 +1,218 @@
+{
+  "name": "Business loan collections (hi/en, outbound)",
+  "description": "Outbound Hindi and English agent for a business loan EMI that is 20+ days past due. Cookbook example with fictional data.",
+  "workflowType": "single_prompt",
+  "slmModel": "electron",
+  "language": {
+    "default": "hi",
+    "supported": [
+      "hi",
+      "en"
+    ],
+    "switching": {
+      "isEnabled": true,
+      "minWordsForDetection": 2,
+      "strongSignalThreshold": 0.7,
+      "weakSignalThreshold": 0.3,
+      "minConsecutiveForWeakThresholdSwitch": 2
+    }
+  },
+  "synthesizer": {
+    "voiceConfig": {
+      "model": "waves_lightning_v3_1_pro",
+      "voiceId": "zoravar",
+      "gender": "male"
+    },
+    "speed": 1,
+    "consistency": 0.5,
+    "similarity": 0,
+    "enhancement": 1,
+    "sampleRate": 24000
+  },
+  "muteUserUntilFirstBotResponse": true,
+  "allowInterruptions": true,
+  "waitForUserToSpeakFirst": false,
+  "interruptionBackoffTimer": 0,
+  "smartTurnConfig": {
+    "isEnabled": true,
+    "waitTimeInSecs": 1.5
+  },
+  "voiceDetectionConfig": {
+    "confidence": 0.8,
+    "minVolume": 0.65,
+    "triggerTimeInSecs": 0.2,
+    "releaseTimeInSecs": 0.4
+  },
+  "denoisingConfig": {
+    "isEnabled": true
+  },
+  "voiceMailDetectionConfig": {
+    "enabled": true,
+    "endText": "Terminating call, you can call us back anytime. Thank you for calling."
+  },
+  "llmIdleTimeoutConfig": {
+    "chatTimeoutTimeInSecs": 30,
+    "webcallTimeoutTimeInSecs": 8,
+    "telephonyTimeoutTimeInSecs": 8
+  },
+  "sessionTimeoutConfig": {
+    "timeoutTimeInSecs": 900
+  },
+  "timezone": {
+    "label": "(GMT+5:30) Chennai, Kolkata, Mumbai, New Delhi",
+    "offset": 5.5
+  },
+  "backgroundSound": "call_center",
+  "enableStyleGuide": true,
+  "speechFormatting": true,
+  "allowInboundCall": false,
+  "firstMessage": "नमस्ते, मैं {{agent_name}} हूँ, एक AI असिस्टेंट। क्या मेरी बात {{customer_name}} जी से हो रही है?",
+  "defaultVariables": {
+    "entity_name": "Smallest Finance",
+    "agent_name": "Rohan",
+    "voice_presentation": "male",
+    "customer_name": "Rajesh",
+    "product": "Business Loan",
+    "is_moving_asset": "FALSE",
+    "vehicle_name": "not_applicable",
+    "vehicle_last4": "not_applicable",
+    "loan_last4": "4827",
+    "full_loan_amount": "5,00,000",
+    "loan_tenure": "3 years",
+    "emi_overdue_date": "10 November",
+    "emi_overdue_amt": "18,076",
+    "additional_interest": "250",
+    "bounce_charges": "1,180",
+    "billed_emi_ai_overdue_amt": "18,326",
+    "total_due_amount": "19,506",
+    "next_emi_date": "10 December",
+    "next_emi_amt": "18,076",
+    "dpd": "20+",
+    "max_ptp_date": "5 December",
+    "last_ptp_date": "23 November",
+    "bounce_reason": "Insufficient Funds",
+    "bounce_date": "10 November",
+    "mop": "SI",
+    "casa_account_type": "Business",
+    "casa_last4": "7391",
+    "casa_balance": "8,000",
+    "represented_on_t4": "TRUE",
+    "represented_on_t8": "TRUE",
+    "representation_date": "not_available",
+    "payment_app": "Smallest Finance app",
+    "customer_care_number": "1800 000 0000",
+    "past_transcripts": "10 November: SI presentation failed, Insufficient Funds. 14 November: T+4 re-presentation failed. 14 November: reminder call, customer cited delayed payments from buyers, no commitment given. 18 November: T+8 re-presentation failed. 22 November: customer promised full payment by 23 November. 23 November: promised date passed, payment not received. 25 and 26 November: calls not answered."
+  },
+  "pronunciationDicts": [],
+  "redactionConfig": {
+    "isEnabled": true
+  },
+  "tools": [
+    {
+      "type": "end_call",
+      "name": "end_call",
+      "description": "End the call ONLY after a spoken closing turn, and ONLY when one of these has been reached: the customer said the payment is done. Or they committed to a specific date on or before the max PTP date. Or a specific callback day and time window was captured. Or a verified terminal condition applies - not the customer, third party, deceased, driving or unsafe, a dispute maintained after the verification pass, or three consecutive turns of abuse with no engagement. Or refusal exhaustion - ceiling stated, three refusals worked, three levers used, callback offered and declined. Or the customer asked to end the call again after you explained once that this is about an overdue account and offered a better time. Do NOT end the call on: a first or second refusal, a vague or non-committal answer, a date beyond the ceiling, irritation or sarcasm, a threat, an accusation of harassment, a loan denial you have not yet verified, being told the customer is busy with no slot captured, or a silence. If none of the listed outcomes has been reached, keep the conversation going instead of calling this.",
+      "enabled": true
+    }
+  ],
+  "postCallAnalytics": {
+    "summaryPrompt": "Summarise the call in three sentences: whether identity was verified, the outcome (payment, promised date, callback slot or terminal condition), and any hardship, dispute or request not to be called.",
+    "dispositionMetrics": [
+      {
+        "identifier": "reason_for_non_payment",
+        "dispositionMetricPrompt": "The customer's primary stated reason for the EMI being unpaid. Use refused_to_state if they declined to give a reason, and not_discussed if the call ended before a reason was established.",
+        "dispositionMetricType": "ENUM",
+        "choices": [
+          "no_funds",
+          "business_slowdown_or_receivables_delayed",
+          "salary_delayed",
+          "medical_or_family_emergency",
+          "disputes_amount_or_charges",
+          "denies_loan",
+          "claims_already_paid",
+          "bank_or_mandate_issue",
+          "forgot_or_operational",
+          "refused_to_state",
+          "not_discussed",
+          "other"
+        ]
+      },
+      {
+        "identifier": "call_outcome",
+        "dispositionMetricPrompt": "Classify the single best outcome achieved on this call. paid_on_call: payment completed and confirmed during the call. ptp_within_window: customer committed to a specific date on or before the maximum permissible date. ptp_beyond_window: customer named a date after the maximum permissible date and never accepted one within it. callback_scheduled: no payment date, but a specific callback day and time window was captured. refused_to_commit: no date and no callback slot obtained. dispute_raised: customer denied or disputed the loan, amount or charges after verification. claims_already_paid. wrong_number. third_party. customer_deceased. unsafe_or_driving. abuse_terminated: call closed due to sustained abuse. other.",
+        "dispositionMetricType": "ENUM",
+        "choices": [
+          "paid_on_call",
+          "ptp_within_window",
+          "ptp_beyond_window",
+          "callback_scheduled",
+          "refused_to_commit",
+          "dispute_raised",
+          "claims_already_paid",
+          "wrong_number",
+          "third_party",
+          "customer_deceased",
+          "unsafe_or_driving",
+          "abuse_terminated",
+          "other"
+        ]
+      },
+      {
+        "identifier": "committed_payment_date",
+        "dispositionMetricPrompt": "The specific date the customer committed to complete payment by, if any. Null if the customer never named a date they agreed to. Resolve relative references such as tomorrow or day after against the call date.",
+        "dispositionMetricType": "DATETIME"
+      },
+      {
+        "identifier": "committed_date_within_ceiling",
+        "dispositionMetricPrompt": "True only if the customer committed to a specific payment date on or before the max PTP date stated in the call context. False if they committed to a later date, or gave no date at all.",
+        "dispositionMetricType": "BOOLEAN"
+      },
+      {
+        "identifier": "ceiling_communicated",
+        "dispositionMetricPrompt": "Compliance check. True if the agent explicitly told the customer the last date by which payment can be accepted (the max PTP date). This is required whenever the customer asked for more time or refused to give a date.",
+        "dispositionMetricType": "BOOLEAN"
+      },
+      {
+        "identifier": "refusal_rounds_worked",
+        "dispositionMetricPrompt": "Count how many distinct times the customer refused, deflected or gave a non-committal answer to a request for a payment date, and the agent responded by continuing the conversation rather than closing. Count 0 if the customer committed on the first ask.",
+        "dispositionMetricType": "INTEGER"
+      },
+      {
+        "identifier": "levers_used",
+        "dispositionMetricPrompt": "Which persuasion arguments did the agent actually deploy, from its approved list: the broken prior commitment on the earlier promised date; auto-debit being exhausted so nothing will be debited automatically; the account crossing 30 days past due and being reported to credit bureaus; the next EMI stacking on top; additional interest and charges continuing to accrue; the reduced EMI-plus-additional-interest amount that clears the delinquency; the branch route for restructuring or a waiver not pausing the due date. List the ones used. Reply none if the agent used no argument beyond repeating the ask. Flag any consequence stated that is not on this list.",
+        "dispositionMetricType": "STRING"
+      },
+      {
+        "identifier": "callback_slot",
+        "dispositionMetricPrompt": "The specific day and approximate time the customer agreed to be called back on, if a slot was captured and confirmed by the agent. Null if no specific slot was agreed, including when the customer only said something vague like 'call me later' or the agent assigned a time itself.",
+        "dispositionMetricType": "DATETIME"
+      },
+      {
+        "identifier": "customer_hostility",
+        "dispositionMetricPrompt": "The highest level of hostility the customer showed. none: cooperative or neutral. irritated: annoyed, curt or sarcastic. accusatory: accused the agent of harassing or threatening them. abusive: used abusive or obscene language, or threatened the agent.",
+        "dispositionMetricType": "ENUM",
+        "choices": [
+          "none",
+          "irritated",
+          "accusatory",
+          "abusive"
+        ]
+      },
+      {
+        "identifier": "premature_call_end",
+        "dispositionMetricPrompt": "Quality check on the agent, not the customer. True if the agent ended the call without any of these: a confirmed payment, a committed payment date, a captured callback slot with a specific day and time, a verified dispute, or a verified terminal condition (wrong number, third party, deceased, unsafe to talk, or three consecutive turns of abuse). Also true if the agent ended the call because the customer was hostile, refused once, was vague, or said they were busy without a slot being captured. False if the customer hung up first. Also false if the customer asked to end the call a second time after the agent explained the call once and offered a better time.",
+        "dispositionMetricType": "BOOLEAN"
+      },
+      {
+        "identifier": "compliance_breach",
+        "dispositionMetricPrompt": "True if the agent did any of the following: threatened legal action, police, a field or home visit, repossession, or contacting the customer's employer or family; shamed, lectured or argued with the customer; asked for an OTP, PIN, CVV, password or full card, account, Aadhaar or PAN number; disclosed account details to an unverified person; stated an amount, rate, date or charge not present in the call context; promised a waiver, settlement or restructuring; claimed a system action such as raising a ticket or updating do-not-call preferences; told the customer to pay whenever funds are available or on any open-ended timeline; or said anything implying the missed payment or a timeline beyond the max PTP date was acceptable; claimed to be human or denied being an AI assistant; kept pressing for payment after the customer asked twice to end the call; or agreed a callback time outside 8 AM to 7 PM that the customer did not ask for.",
+        "dispositionMetricType": "BOOLEAN"
+      },
+      {
+        "identifier": "dnd_requested",
+        "dispositionMetricPrompt": "True if the customer asked not to be called again, or asked to be put on a do-not-call list, at any point during this call.",
+        "dispositionMetricType": "BOOLEAN"
+      }
+    ]
+  }
+}

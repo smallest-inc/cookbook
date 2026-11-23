@@ -1,0 +1,5 @@
+.env
+.created_agent_id
+__pycache__/
+.pytest_cache/
+.ruff_cache/

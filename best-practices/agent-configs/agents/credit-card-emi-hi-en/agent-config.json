@@ -1,0 +1,134 @@
+{
+  "name": "Credit card EMI conversion (hi/en, inbound)",
+  "description": "Inbound Hindi and English agent that converts a recent credit card transaction into EMI. Cookbook example with fictional data.",
+  "workflowType": "single_prompt",
+  "slmModel": "electron",
+  "language": {
+    "default": "hi",
+    "supported": [
+      "en",
+      "hi"
+    ],
+    "switching": {
+      "isEnabled": true,
+      "minWordsForDetection": 2,
+      "strongSignalThreshold": 0.7,
+      "weakSignalThreshold": 0.3,
+      "minConsecutiveForWeakThresholdSwitch": 2
+    }
+  },
+  "synthesizer": {
+    "voiceConfig": {
+      "model": "waves_lightning_v3_1_pro",
+      "voiceId": "zariya",
+      "gender": "female"
+    },
+    "speed": 1,
+    "consistency": 0.5,
+    "similarity": 0,
+    "enhancement": 1,
+    "sampleRate": 24000
+  },
+  "muteUserUntilFirstBotResponse": true,
+  "allowInterruptions": true,
+  "waitForUserToSpeakFirst": false,
+  "interruptionBackoffTimer": 0,
+  "smartTurnConfig": {
+    "isEnabled": true,
+    "waitTimeInSecs": 2
+  },
+  "voiceDetectionConfig": {
+    "confidence": 0.8,
+    "minVolume": 0.65,
+    "triggerTimeInSecs": 0.2,
+    "releaseTimeInSecs": 0.4
+  },
+  "denoisingConfig": {
+    "isEnabled": true
+  },
+  "voiceMailDetectionConfig": {
+    "enabled": false,
+    "endText": "Terminating call, you can call us back anytime. Thank you for calling."
+  },
+  "llmIdleTimeoutConfig": {
+    "chatTimeoutTimeInSecs": 60,
+    "webcallTimeoutTimeInSecs": 8,
+    "telephonyTimeoutTimeInSecs": 8
+  },
+  "sessionTimeoutConfig": {
+    "timeoutTimeInSecs": 900
+  },
+  "timezone": {
+    "label": "(GMT+5:30) Chennai, Kolkata, Mumbai, New Delhi",
+    "offset": 5.5
+  },
+  "backgroundSound": "call_center",
+  "enableStyleGuide": true,
+  "speechFormatting": true,
+  "allowInboundCall": true,
+  "firstMessage": "नमस्ते {{customer_name}} जी, मैं {{entity_name}} की AI असिस्टेंट {{agent_name}} हूँ। बताइए, आज मैं आपकी कैसे मदद कर सकती हूँ?",
+  "defaultVariables": {
+    "agent_name": "Riya",
+    "entity_name": "Smallest Bank",
+    "voice_presentation": "female",
+    "customer_name": "Mamta"
+  },
+  "pronunciationDicts": [
+    {
+      "word": "Mamta",
+      "pronunciation": "ममता"
+    }
+  ],
+  "redactionConfig": {
+    "isEnabled": true
+  },
+  "tools": [
+    {
+      "type": "end_call",
+      "name": "end_call",
+      "description": "End the call ONLY after you have spoken a closing line, and ONLY when one of these is true: the EMI request has been recorded and the closing line delivered. Or the customer said they are not interested and confirmed they want to finish. Or the customer asked you to end the call and confirmed it when you checked. Or the customer avoided the question after one normal ask and one forced-choice follow-up, and then declined to continue. Do NOT end the call on: an unclear or garbled turn, a single unanswered question, the customer going quiet, irritation, an off-topic remark, or a request for a detail you do not have. In those cases stay on the call and return to your pending question.",
+      "enabled": true
+    }
+  ],
+  "postCallAnalytics": {
+    "summaryPrompt": "Summarise the call in two sentences: which transaction the customer chose, which tenure, and whether the EMI request was recorded.",
+    "dispositionMetrics": [
+      {
+        "identifier": "emi_request_recorded",
+        "dispositionMetricPrompt": "True if the customer confirmed a transaction and a tenure and the agent told them the request was taken down. False otherwise.",
+        "dispositionMetricType": "BOOLEAN"
+      },
+      {
+        "identifier": "transaction_chosen",
+        "dispositionMetricPrompt": "The merchant of the transaction the customer chose to convert, or none if they did not choose one.",
+        "dispositionMetricType": "ENUM",
+        "choices": [
+          "Brightline Electronics",
+          "Wellcare Pharmacy",
+          "Skyway Travels",
+          "Metro Digital",
+          "none"
+        ]
+      },
+      {
+        "identifier": "tenure_months",
+        "dispositionMetricPrompt": "The tenure in months the customer confirmed, or none.",
+        "dispositionMetricType": "ENUM",
+        "choices": [
+          "3",
+          "6",
+          "9",
+          "12",
+          "18",
+          "24",
+          "none"
+        ]
+      },
+      {
+        "identifier": "guardrail_breach",
+        "dispositionMetricPrompt": "True if the agent asked for or accepted an OTP, PIN, CVV, password, card expiry or full card number; said the EMI was booked, approved or confirmed; claimed an SMS, email or reference number; quoted a rate, fee or amount not in its prompt; cross-sold another product; or claimed to be human.",
+        "dispositionMetricType": "BOOLEAN"
+      }
+    ]
+  }
+}
