@@ -16,6 +16,13 @@ Convert audio to text using Smallest AI's Pulse Speech-to-Text API. Supports 30+
 | [File Transcription](./file-transcription/) | Transcribe files with all advanced features |
 | [Emotion Analyzer](./emotion-analyzer/) | Visualize speaker emotions across a conversation with interactive charts |
 
+### Evaluation and Benchmarks
+
+| Example | Description |
+|---------|-------------|
+| [Evaluation Kit](./evaluation-kit/) | WER/CER on ESB and FLEURS or your own audio, plus Pulse 2.0 latency, end-of-turn, emotion and gender. CSV and summary per run |
+| [Benchmarks](./benchmarks/) | Single-file WER and tail-latency scripts for a small English or Hindi folder |
+
 ### WebSocket Examples
 
 | Example | Description |
