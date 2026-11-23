@@ -1,0 +1,3 @@
+# needs the agent branch and versioning helpers added in 5.12
+smallestai>=5.12
+pytest

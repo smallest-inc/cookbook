@@ -243,6 +243,13 @@ Build voice AI applications using LangChain for chains, agents, memory, and prom
 
 ---
 
+## Best Practices
+
+Guides and known-good agent configs to start from.
+
+- [Voice agent prompting guide](./best-practices/voice_agent_prompting_guide.md)
+- [Agent configs](./best-practices/agent-configs/): Hindi and English credit card EMI (inbound) and loan collections (outbound) agents from sales demos, created in your own org with one command
+
 ## Language Support
 
 Each example includes implementations in:
