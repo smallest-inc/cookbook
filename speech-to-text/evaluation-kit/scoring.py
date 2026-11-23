@@ -11,7 +11,6 @@ import numpy as np
 CER_LANGS = {"ko", "ja", "zh", "yue", "th"}
 
 _en_norm = None
-_basic_norm = None
 
 
 def _english():
@@ -22,42 +21,64 @@ def _english():
     return _en_norm
 
 
-def _basic():
-    global _basic_norm
-    if _basic_norm is None:
-        from whisper_normalizer.basic import BasicTextNormalizer
-        _basic_norm = BasicTextNormalizer()
-    return _basic_norm
+def _ascii_digits(text: str) -> str:
+    """Map any Unicode decimal digit (Devanagari, Arabic-Indic, full-width, ...)
+    to 0-9, so "२०११" in a reference and "2011" in a hypothesis count as equal."""
+    out = []
+    for ch in text:
+        if not ch.isascii() and ch.isdecimal():
+            out.append(str(unicodedata.decimal(ch)))
+        else:
+            out.append(ch)
+    return "".join(out)
 
 
 def normalize(text: str, language: str | None) -> str:
+    """Normalize a reference or hypothesis before scoring.
+
+    English: Whisper's EnglishTextNormalizer (the Open ASR Leaderboard method),
+    which also writes spoken numbers as digits, expands contractions and
+    unifies British and American spelling.
+    Everything else: NFC, lower-case, Unicode digits to ASCII, punctuation and
+    symbols removed, whitespace collapsed. Combining marks are kept, so Hindi
+    matras and Korean jamo survive.
+    """
     text = text or ""
     if (language or "en").startswith("en"):
         # Whisper's normalizer deletes anything inside brackets. ESB references
         # have none, but other references (e.g. FLEURS) put spoken words in
         # parentheses, so keep the words and drop only the bracket characters.
         return _english()(re.sub(r"[()\[\]{}]", " ", text))
-    text = unicodedata.normalize("NFC", text).lower()
-    # strip punctuation / symbols, keep letters, marks and digits
-    text = "".join(ch if not unicodedata.category(ch)[0] in "PS" else " " for ch in text)
+    text = _ascii_digits(unicodedata.normalize("NFC", text).lower())
+    # strip punctuation / symbols (this includes the Devanagari danda),
+    # keep letters, marks and digits
+    text = "".join(" " if unicodedata.category(ch)[0] in "PS" else ch for ch in text)
     return re.sub(r"\s+", " ", text).strip()
 
 
-def metric_for(language: str | None) -> str:
-    return "cer" if (language or "en").split("-")[0] in CER_LANGS else "wer"
+def metric_for(language: str | None, override: str | None = None) -> str:
+    """CER for Korean, Japanese, Chinese, Cantonese and Thai; WER otherwise."""
+    if override:
+        return override
+    return "cer" if (language or "en").split("-")[0].split("_")[0] in CER_LANGS else "wer"
 
 
-def error_rate(refs: list[str], hyps: list[str], language: str | None) -> dict | None:
-    """Corpus-level WER (or CER for CJK/Thai), after normalization. Percent."""
-    metric = metric_for(language)
-    pairs = [(normalize(r, language), normalize(h, language)) for r, h in zip(refs, hyps)]
+def error_rate(refs: list[str], hyps: list[str], language: str | None,
+               metric: str | None = None) -> dict | None:
+    """Corpus-level WER (or CER for CJK/Thai), after normalization. Percent.
+
+    Corpus-level means total errors over total reference words, not the mean of
+    per-clip rates, so long clips weigh more than short ones.
+    """
+    metric = metric_for(language, metric)
+    pairs = [(normalize(r, language), normalize(h, language)) for r, h in zip(refs, hyps, strict=True)]
     if metric == "cer":
         # Korean spacing is inconsistent between annotators -> score without spaces
         pairs = [(r.replace(" ", ""), h.replace(" ", "")) for r, h in pairs]
     pairs = [(r, h) for r, h in pairs if r.strip()]
     if not pairs:
         return None
-    rs, hs = map(list, zip(*pairs))
+    rs, hs = map(list, zip(*pairs, strict=True))
     if metric == "cer":
         out = jiwer.process_characters(rs, hs)
         rate = out.cer
@@ -69,8 +90,9 @@ def error_rate(refs: list[str], hyps: list[str], language: str | None) -> dict |
             "insertions": out.insertions}
 
 
-def utterance_error(ref: str, hyp: str, language: str | None) -> float | None:
-    r = error_rate([ref], [hyp], language)
+def utterance_error(ref: str, hyp: str, language: str | None,
+                    metric: str | None = None) -> float | None:
+    r = error_rate([ref], [hyp], language, metric)
     return r["value"] if r else None
 
 
@@ -113,7 +135,7 @@ def classification_report(gold: list[str | None], pred: list[str | None]) -> dic
     """Scored on labeled clips that returned a prediction; `coverage` is the
     share of labeled clips that got one (the API omits emotion/gender for very
     short utterances or when classification times out)."""
-    labeled = [(g, p) for g, p in zip(gold, pred) if g is not None]
+    labeled = [(g, p) for g, p in zip(gold, pred, strict=True) if g is not None]
     if not labeled:
         return None
     pairs = [(g, p) for g, p in labeled if p is not None]
@@ -147,22 +169,22 @@ def latency_summary(rows: list[dict]) -> dict | None:
     lat = [r.get("latency") or {} for r in rows]
     if not any(lat):
         return None
-    ttfp = [l.get("first_partial_s") for l in lat]
-    fin = [l.get("final_after_speech_end_s") for l in lat]
+    ttfp = [x.get("first_partial_s") for x in lat]
+    fin = [x.get("final_after_speech_end_s") for x in lat]
     out = {
         "first_partial_ms_p50": pct(ttfp, 50), "first_partial_ms_p95": pct(ttfp, 95),
         "final_after_speech_end_ms_p50": pct(fin, 50), "final_after_speech_end_ms_p95": pct(fin, 95),
     }
-    eot = [l for l in lat if "eot_detected" in l]
+    eot = [x for x in lat if "eot_detected" in x]
     if not eot and all(v is None for v in out.values()):
         return None  # e.g. HTTP mode or non-real-time streaming
     if eot:
         n = len(eot)
-        delays = [l.get("eot_delay_s") for l in eot if l.get("eot_detected")]
+        delays = [x.get("eot_delay_s") for x in eot if x.get("eot_detected")]
         out.update({
             "eot_clips": n,
-            "eot_detect_rate_pct": round(100 * sum(l["eot_detected"] for l in eot) / n, 1),
-            "eot_premature_cutoff_pct": round(100 * sum(l["eot_premature"] for l in eot) / n, 1),
+            "eot_detect_rate_pct": round(100 * sum(x["eot_detected"] for x in eot) / n, 1),
+            "eot_premature_cutoff_pct": round(100 * sum(x["eot_premature"] for x in eot) / n, 1),
             "eot_delay_ms_p50": pct(delays, 50), "eot_delay_ms_p95": pct(delays, 95),
         })
     return out

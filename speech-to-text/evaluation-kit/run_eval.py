@@ -1,30 +1,36 @@
 #!/usr/bin/env python3
-"""Pulse STT evaluation kit.
+"""Pulse STT evaluation kit: score Pulse and Pulse 2.0 on public test sets or your own audio.
 
 Examples
   # 1) Quick check: 200 LibriSpeech clips, streaming
-  python run_eval.py --suite esb --subset librispeech_clean --limit 200
+  uv run run_eval.py --suite esb --subset librispeech_clean --limit 200
 
-  # 2) English accuracy on all 8 ESB sets
-  python run_eval.py --suite esb --model pulse
+  # 2) English accuracy on the ESB sets (WER)
+  uv run run_eval.py --suite esb --model pulse --limit 500
 
-  # 3) Korean accuracy (CER) on FLEURS
-  python run_eval.py --suite fleurs --locale ko_kr --model pulse
+  # 3) Korean and other languages on FLEURS (CER for ko/ja/zh, WER otherwise)
+  uv run run_eval.py --suite fleurs --locale ko_kr --model pulse
+  uv run run_eval.py --suite fleurs --locale hi_in,es_419 --model pulse --limit 100
 
   # 4) Your own recordings
-  python run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse-2
+  uv run make_manifest.py my_audio --language en
+  uv run run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse
 
   # 5) Pulse 2.0 real-time checks: latency, end-of-turn, emotion, gender
-  python run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse-2 --eot
-  python run_eval.py --suite fleurs --locale en_us --model pulse-2 --eot --limit 300
+  uv run run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse-2 --eot
+
+Reads SMALLEST_API_KEY from the environment (or a .env file). The key is never
+printed or written to disk.
 
 Outputs go to results/<run-name>/<dataset>/ : results.jsonl (one line per clip,
-resumable) and summary.json, plus results/<run-name>/summary.{json,md}.
+resumable), results.csv and summary.json, plus results/<run-name>/summary.md,
+summary.csv and summary.json for the whole run.
 """
 from __future__ import annotations
 
 import argparse
 import asyncio
+import csv
 import json
 import os
 import sys
@@ -36,7 +42,9 @@ import loaders
 import scoring
 from pulse_client import http_transcribe, join_finals, speech_bounds, stream_transcribe
 
+MODELS = ["pulse", "pulse-2", "pulse-pro"]
 HTTP_ONLY_MODELS = {"pulse-pro"}
+STREAMING_ONLY_MODELS = {"pulse-2"}
 
 
 def parse_params(items: list[str]) -> dict:
@@ -122,7 +130,7 @@ async def run_clip(sample: loaders.Sample, args, params: dict) -> dict:
     row["hypothesis"] = res["transcript"]
     row["wall_s"] = round(time.perf_counter() - t_wall, 3)
     if sample.text:
-        row["error_rate"] = scoring.utterance_error(sample.text, res["transcript"], language)
+        row["error_rate"] = scoring.utterance_error(sample.text, res["transcript"], language, args.metric)
     return row
 
 
@@ -140,8 +148,8 @@ async def transcribe_dataset(name: str, make_iter, out_dir: Path, args, params: 
                 pass
     try:
         it = make_iter()
-    except FileNotFoundError as e:
-        print(f"  ! {name}: {e}")
+    except Exception as e:  # noqa: BLE001 - dataset missing, offline, or Hub error: skip with a clear note
+        print(f"  ! {name}: skipped, could not open the dataset ({type(e).__name__}: {str(e)[:200]})")
         return
 
     sem = asyncio.Semaphore(args.concurrency)
@@ -154,7 +162,7 @@ async def transcribe_dataset(name: str, make_iter, out_dir: Path, args, params: 
         nonlocal n_new, n_err
         try:
             row = await run_clip(sample, args, params)
-        except Exception as e:  # keep going; failed clips are retried on the next run
+        except Exception as e:  # noqa: BLE001 - keep going; failed clips are retried on the next run
             row = {"id": sample.id, "error": str(e)[:500], "reference": sample.text, "tags": sample.tags}
             n_err += 1
             print(f"    [err] {sample.id}: {str(e)[:160]}", file=sys.stderr, flush=True)
@@ -172,8 +180,8 @@ async def transcribe_dataset(name: str, make_iter, out_dir: Path, args, params: 
         while True:
             try:
                 sample = await asyncio.to_thread(next, it, _end)
-            except FileNotFoundError as e:
-                print(f"  ! {name}: {e}")
+            except Exception as e:  # noqa: BLE001 - e.g. the Hub went away mid-run; keep what we have
+                print(f"  ! {name}: stopped reading the dataset ({type(e).__name__}: {str(e)[:200]})")
                 break
             if sample is _end:
                 break
@@ -187,7 +195,50 @@ async def transcribe_dataset(name: str, make_iter, out_dir: Path, args, params: 
     print(f"  ✓ {name}: {n_new} new clips, {n_err} errors, {time.time() - t0:.0f}s", flush=True)
 
 
-def summarize_dataset(name: str, res_path: Path) -> dict | None:
+CSV_FIELDS = ["dataset", "id", "language", "tags", "duration_s", "metric", "error_rate",
+              "reference", "hypothesis", "emotion_ref", "emotion_pred", "gender_ref", "gender_pred",
+              "first_partial_ms", "final_after_speech_end_ms", "eot_detected", "eot_premature",
+              "eot_delay_ms", "request_ms", "wall_s", "error"]
+
+
+def _csv_safe(value):
+    """Keep spreadsheet apps from running a transcript as a formula."""
+    if isinstance(value, str) and value[:1] in ("=", "+", "-", "@", "\t", "\r"):
+        return "'" + value
+    return value
+
+
+def _ms(seconds):
+    return None if seconds is None else round(seconds * 1000)
+
+
+def clip_csv_row(dataset: str, r: dict, metric: str | None = None) -> dict:
+    lat = r.get("latency") or {}
+    row = {
+        "dataset": dataset, "id": r.get("id"), "language": r.get("language"),
+        "tags": "|".join(r.get("tags") or []), "duration_s": r.get("duration_s"),
+        "metric": scoring.metric_for(r.get("language"), metric) if r.get("reference") else None,
+        "error_rate": r.get("error_rate"), "reference": r.get("reference"),
+        "hypothesis": r.get("hypothesis"),
+        "emotion_ref": r.get("emotion_ref"), "emotion_pred": r.get("emotion_pred"),
+        "gender_ref": r.get("gender_ref"), "gender_pred": r.get("gender_pred"),
+        "first_partial_ms": _ms(lat.get("first_partial_s")),
+        "final_after_speech_end_ms": _ms(lat.get("final_after_speech_end_s")),
+        "eot_detected": lat.get("eot_detected"), "eot_premature": lat.get("eot_premature"),
+        "eot_delay_ms": _ms(lat.get("eot_delay_s")), "request_ms": _ms(lat.get("request_s")),
+        "wall_s": r.get("wall_s"), "error": r.get("error"),
+    }
+    return {k: _csv_safe(v) for k, v in row.items()}
+
+
+def write_csv(path: Path, fields: list[str], rows: list[dict]) -> None:
+    with path.open("w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
+        w.writeheader()
+        w.writerows(rows)
+
+
+def summarize_dataset(name: str, res_path: Path, metric: str | None = None) -> dict | None:
     if not res_path.exists():
         return None
     rows = {}
@@ -198,11 +249,14 @@ def summarize_dataset(name: str, res_path: Path) -> dict | None:
         if r.get("finals") is not None and "error" not in r:
             r["hypothesis"] = join_finals(r["finals"])  # keeps --rescore consistent
             if r.get("reference"):
-                r["error_rate"] = scoring.utterance_error(r["reference"], r["hypothesis"], r["language"])
+                r["error_rate"] = scoring.utterance_error(r["reference"], r["hypothesis"], r["language"], metric)
         rows[r["id"]] = r  # last successful write wins
     ok = [r for r in rows.values() if "error" not in r]
     failed = len(rows) - len(ok)
     summ = {"dataset": name, "clips": len(ok), "failed": failed}
+    if failed:
+        # distinct reasons, so "model not enabled" or "language not enabled" is visible in the report
+        summ["errors"] = sorted({r["error"][:240] for r in rows.values() if "error" in r})[:5]
 
     by_lang = defaultdict(list)
     for r in ok:
@@ -211,7 +265,7 @@ def summarize_dataset(name: str, res_path: Path) -> dict | None:
     summ["accuracy"] = {}
     for lang, rs in by_lang.items():
         summ["accuracy"][lang] = scoring.error_rate([r["reference"] for r in rs],
-                                                    [r["hypothesis"] for r in rs], lang)
+                                                    [r["hypothesis"] for r in rs], lang, metric)
     # per-tag breakdown (useful for your own audio grouped into folders)
     tags = sorted({t for r in ok for t in r.get("tags", [])})
     if len(tags) > 1:
@@ -221,7 +275,7 @@ def summarize_dataset(name: str, res_path: Path) -> dict | None:
             if rs:
                 lang = rs[0]["language"]
                 summ["by_tag"][t] = scoring.error_rate([r["reference"] for r in rs],
-                                                       [r["hypothesis"] for r in rs], lang)
+                                                       [r["hypothesis"] for r in rs], lang, metric)
     emo = scoring.classification_report(
         [scoring.canon(r.get("emotion_ref"), scoring.EMOTION_ALIASES) for r in ok],
         [r.get("emotion_pred") for r in ok])
@@ -236,16 +290,46 @@ def summarize_dataset(name: str, res_path: Path) -> dict | None:
     lat = scoring.latency_summary(ok)
     if lat:
         summ["latency"] = lat
-    (res_path.parent / "summary.json").write_text(json.dumps(summ, indent=2, ensure_ascii=False))
+    (res_path.parent / "summary.json").write_text(json.dumps(summ, indent=2, ensure_ascii=False),
+                                                 encoding="utf-8")
+    write_csv(res_path.parent / "results.csv", CSV_FIELDS,
+              [clip_csv_row(name, r, metric) for r in rows.values()])
     return summ
 
 
 def fmt(v, suffix=""):
-    return "—" if v is None else f"{v}{suffix}"
+    return "n/a" if v is None else f"{v}{suffix}"
+
+
+SUMMARY_FIELDS = ["dataset", "language", "clips", "failed", "metric", "error_rate_pct",
+                  "substitutions", "deletions", "insertions",
+                  "first_partial_ms_p50", "first_partial_ms_p95",
+                  "final_after_speech_end_ms_p50", "final_after_speech_end_ms_p95",
+                  "eot_detect_rate_pct", "eot_premature_cutoff_pct", "eot_delay_ms_p50", "eot_delay_ms_p95",
+                  "emotion_accuracy_pct", "emotion_macro_f1_pct", "gender_accuracy_pct", "gender_macro_f1_pct"]
+
+
+def summary_csv_rows(summaries: list[dict]) -> list[dict]:
+    rows = []
+    for s in summaries:
+        lat = s.get("latency") or {}
+        emo, gen = s.get("emotion") or {}, s.get("gender") or {}
+        extra = {k: lat.get(k) for k in SUMMARY_FIELDS if k in lat}
+        extra.update({"emotion_accuracy_pct": emo.get("accuracy"), "emotion_macro_f1_pct": emo.get("macro_f1"),
+                      "gender_accuracy_pct": gen.get("accuracy"), "gender_macro_f1_pct": gen.get("macro_f1")})
+        accs = [(lang, a) for lang, a in (s.get("accuracy") or {}).items() if a] or [(None, None)]
+        for lang, acc in accs:
+            acc = acc or {}
+            rows.append({"dataset": s["dataset"], "language": lang, "clips": acc.get("n", s["clips"]),
+                         "failed": s["failed"],
+                         "metric": acc.get("metric"), "error_rate_pct": acc.get("value"),
+                         "substitutions": acc.get("substitutions"), "deletions": acc.get("deletions"),
+                         "insertions": acc.get("insertions"), **extra})
+    return rows
 
 
 def write_report(summaries: list[dict], run_dir: Path, args) -> str:
-    lines = [f"# Pulse STT evaluation — {args.run_name}", "",
+    lines = [f"# Pulse STT evaluation: {args.run_name}", "",
              f"Model: `{args.model}` · mode: `{args.mode}`"
              + (" · real-time pacing" if (args.realtime or args.eot) else "")
              + (" · end-of-turn mode" if args.eot else ""), ""]
@@ -260,6 +344,9 @@ def write_report(summaries: list[dict], run_dir: Path, args) -> str:
                          f"{acc['value']:.2f}% | {s['failed']} |")
             if s["dataset"].startswith("esb/") and acc["metric"] == "wer":
                 all_wer.append(acc["value"])
+    for s in summaries:
+        if not any(s.get("accuracy", {}).values()) and s["failed"]:
+            lines.append(f"| {s['dataset']} | {s['clips']} | n/a | n/a | {s['failed']} |")
     if len(all_wer) > 1:
         lines.append(f"| **ESB average ({len(all_wer)} sets)** | | WER | "
                      f"**{sum(all_wer) / len(all_wer):.2f}%** | |")
@@ -284,8 +371,8 @@ def write_report(summaries: list[dict], run_dir: Path, args) -> str:
     lat = [s for s in summaries if s.get("latency") and "first_partial_ms_p50" in s["latency"]]
     if lat:
         lines += ["", "## Latency & end-of-turn (ms)", "",
-                  "| Dataset | First partial p50 / p95 | Final after speech end p50 / p95 "
-                  "| EOT detected | Premature cut-off | EOT delay p50 / p95 |",
+                  ("| Dataset | First partial p50 / p95 | Final after speech end p50 / p95 "
+                   "| EOT detected | Premature cut-off | EOT delay p50 / p95 |"),
                   "|---|---|---|---:|---:|---|"]
         for s in lat:
             L = s["latency"]
@@ -294,52 +381,90 @@ def write_report(summaries: list[dict], run_dir: Path, args) -> str:
                 f"| {fmt(L.get('final_after_speech_end_ms_p50'))} / {fmt(L.get('final_after_speech_end_ms_p95'))} "
                 f"| {fmt(L.get('eot_detect_rate_pct'), '%')} | {fmt(L.get('eot_premature_cutoff_pct'), '%')} "
                 f"| {fmt(L.get('eot_delay_ms_p50'))} / {fmt(L.get('eot_delay_ms_p95'))} |")
+    errs = [(s["dataset"], e) for s in summaries for e in s.get("errors", [])]
+    if errs:
+        lines += ["", "## Failed clips (first reasons; re-run the same command to retry them)", ""]
+        lines += [f"- `{d}`: {e}" for d, e in errs]
     md = "\n".join(lines) + "\n"
     (run_dir / "summary.md").write_text(md, encoding="utf-8")
-    (run_dir / "summary.json").write_text(json.dumps(summaries, indent=2, ensure_ascii=False))
+    (run_dir / "summary.json").write_text(json.dumps(summaries, indent=2, ensure_ascii=False),
+                                          encoding="utf-8")
+    write_csv(run_dir / "summary.csv", SUMMARY_FIELDS, summary_csv_rows(summaries))
     return md
 
 
-async def main():
+def positive_int(value: str) -> int:
+    n = int(value)
+    if n < 1:
+        raise argparse.ArgumentTypeError("must be 1 or more")
+    return n
+
+
+def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--suite", required=True, choices=["esb", "fleurs", "manifest"])
     ap.add_argument("--subset", default="all", help="ESB subsets, comma-separated (default: all 8)")
     ap.add_argument("--locale", default="ko_kr", help="FLEURS locale(s), comma-separated (default ko_kr)")
     ap.add_argument("--manifest", help="JSONL manifest for --suite manifest")
     ap.add_argument("--name", help="dataset name for --suite manifest (default: folder name)")
-    ap.add_argument("--model", default="pulse", choices=["pulse", "pulse-2", "pulse-pro"])
+    ap.add_argument("--model", default="pulse", choices=MODELS)
     ap.add_argument("--mode", choices=["streaming", "http"], help="default: http for pulse-pro, else streaming")
     ap.add_argument("--language", help="force a language code (default: from dataset)")
+    ap.add_argument("--metric", choices=["wer", "cer"],
+                    help="force the metric (default: CER for ko/ja/zh/yue/th, WER otherwise)")
     ap.add_argument("--realtime", action="store_true", help="stream at 1x speed and record latency")
     ap.add_argument("--eot", action="store_true",
                     help="pulse-2 end-of-turn test: real-time, no manual finalize, trailing silence")
     ap.add_argument("--trailing-silence", type=float, default=2.0, help="seconds of silence after speech in --eot")
     ap.add_argument("--param", action="append", default=[],
-                    help="extra API query param, e.g. --param keywords=... --param diarize=true")
-    ap.add_argument("--limit", type=int, help="max clips per dataset")
-    ap.add_argument("--concurrency", type=int, default=8)
+                    help="extra API query param, e.g. --param keywords=... --param itn_normalize=true")
+    ap.add_argument("--limit", type=positive_int, help="max clips per dataset")
+    ap.add_argument("--concurrency", type=positive_int, default=8)
     ap.add_argument("--out", default="results")
     ap.add_argument("--run-name", help="results sub-folder (default: <suite>_<model>)")
     ap.add_argument("--rescore", action="store_true", help="skip transcription; rebuild summaries only")
-    ap.add_argument("--api-key", default=os.environ.get("SMALLEST_API_KEY"))
-    args = ap.parse_args()
+    return ap
 
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse and validate flags. Exits with a one-line message on a bad combination."""
+    args = build_parser().parse_args(argv)
     if args.mode is None:
         args.mode = "http" if args.model in HTTP_ONLY_MODELS else "streaming"
     if args.model in HTTP_ONLY_MODELS and args.mode != "http":
         sys.exit(f"{args.model} is available on the pre-recorded (HTTP) endpoint only; use --mode http")
-    if args.mode == "http" and args.model == "pulse-2":
+    if args.mode == "http" and args.model in STREAMING_ONLY_MODELS:
         sys.exit("pulse-2 is streaming-only; use --mode streaming")
     if args.eot and args.model != "pulse-2":
         sys.exit("--eot uses the built-in end-of-turn model, which is part of pulse-2")
     if args.eot and args.mode == "http":
         sys.exit("--eot requires streaming")
+    if args.trailing_silence < 0:
+        sys.exit("--trailing-silence must be 0 or more")
     if args.model == "pulse-2" and args.suite == "fleurs" and \
             any(not loc.startswith("en_") for loc in args.locale.split(",")):
         sys.exit("pulse-2 is English-only; for Korean use --model pulse (e.g. --suite fleurs --locale ko_kr)")
-    if not args.rescore and not args.api_key:
-        sys.exit("Set SMALLEST_API_KEY (or pass --api-key).")
+    if args.suite == "manifest":
+        if not args.manifest:
+            sys.exit("--suite manifest requires --manifest path/to/manifest.jsonl")
+        if not Path(args.manifest).is_file():
+            sys.exit(f"manifest not found: {args.manifest}")
     args.run_name = args.run_name or f"{args.suite}_{args.model}" + ("_eot" if args.eot else "")
+    return args
+
+
+async def main(argv: list[str] | None = None) -> None:
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+    args = parse_args(argv)
+    # The key stays in memory only: it is never printed, logged or written to results.
+    args.api_key = os.environ.get("SMALLEST_API_KEY", "").strip()
+    if not args.rescore and not args.api_key:
+        sys.exit("Set SMALLEST_API_KEY in your environment or a .env file "
+                 "(create one at app.smallest.ai/dashboard/api-keys).")
 
     params = parse_params(args.param)
     run_dir = Path(args.out) / args.run_name
@@ -351,11 +476,11 @@ async def main():
             await transcribe_dataset(name, make_iter, run_dir / name, args, params)
 
     summaries = [s for name, _ in jobs
-                 if (s := summarize_dataset(name, run_dir / name / "results.jsonl"))]
+                 if (s := summarize_dataset(name, run_dir / name / "results.jsonl", args.metric))]
     if not summaries:
         sys.exit("No results to summarize.")
     print("\n" + write_report(summaries, run_dir, args))
-    print(f"Saved: {run_dir / 'summary.md'}")
+    print(f"Saved: {run_dir / 'summary.md'} (also summary.csv, and results.csv per dataset)")
 
 
 if __name__ == "__main__":

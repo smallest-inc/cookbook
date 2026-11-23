@@ -12,7 +12,6 @@ from __future__ import annotations
 import asyncio
 import io
 import json
-import os
 import time
 from urllib.parse import urlencode
 
@@ -21,12 +20,17 @@ import requests
 import soundfile as sf
 import websockets
 
-# Override for on-prem / dedicated deployments via env vars.
-WS_URL = os.environ.get("SMALLEST_WS_URL", "wss://api.smallest.ai/waves/v1/stt/live")
-HTTP_URL = os.environ.get("SMALLEST_HTTP_URL", "https://api.smallest.ai/waves/v1/stt/")
+# Public Pulse endpoints. The API key is only ever sent to these hosts.
+WS_URL = "wss://api.smallest.ai/waves/v1/stt/live"
+HTTP_URL = "https://api.smallest.ai/waves/v1/stt/"
 
 SAMPLE_RATE = 16000
 CHUNK_MS = 160
+
+
+class PulseRequestError(RuntimeError):
+    """The API rejected the request itself (bad key, language not enabled,
+    bad parameter). Retrying will not help, so this is raised straight away."""
 
 
 def _bool(v) -> str:
@@ -109,7 +113,7 @@ async def stream_transcribe(
             ) as ws:
                 t0 = time.perf_counter()
 
-                async def sender():
+                async def sender(t0: float = t0):
                     for i, off in enumerate(range(0, len(pcm), chunk)):
                         if realtime:
                             target = t0 + i * CHUNK_MS / 1000
@@ -126,7 +130,7 @@ async def stream_transcribe(
                     while True:
                         try:
                             msg = await asyncio.wait_for(ws.recv(), timeout=recv_timeout_s)
-                        except asyncio.TimeoutError:
+                        except TimeoutError:
                             if send_task.done():
                                 break
                             continue
@@ -137,6 +141,8 @@ async def stream_transcribe(
                             continue
                         data = json.loads(msg)
                         if data.get("error") or data.get("type") == "error":
+                            if data.get("error_code"):
+                                raise PulseRequestError(f"server error: {data}")
                             raise RuntimeError(f"server error: {data}")
                         mtype = data.get("type", "transcription")
                         if mtype in ("speech_started", "speech_ended"):
@@ -173,6 +179,16 @@ async def stream_transcribe(
             transcript = join_finals(finals)
             return {"transcript": transcript, "finals": finals, "events": events,
                     "first_partial_t": first_partial_t}
+        except PulseRequestError:
+            raise
+        except websockets.exceptions.InvalidStatus as e:
+            code = getattr(getattr(e, "response", None), "status_code", None)
+            if code is not None and 400 <= code < 500 and code != 429:
+                raise PulseRequestError(f"WebSocket handshake rejected with HTTP {code}") from None
+            last_err = e
+            if attempt < max_retries:
+                await asyncio.sleep(1.5 * (2 ** attempt))
+                continue
         except (websockets.exceptions.WebSocketException, RuntimeError, OSError) as e:
             last_err = e
             if attempt < max_retries:
@@ -202,11 +218,14 @@ def http_transcribe(audio: np.ndarray, api_key: str, model: str = "pulse-pro",
             elapsed = time.perf_counter() - t0
             if r.status_code == 429 or r.status_code >= 500:
                 raise RuntimeError(f"HTTP {r.status_code}: {r.text[:200]}")
-            r.raise_for_status()
+            if r.status_code >= 400:
+                raise PulseRequestError(f"HTTP {r.status_code}: {r.text[:200]}")
             data = r.json()
             return {"transcript": (data.get("transcription") or "").strip(),
                     "finals": [], "events": [], "first_partial_t": None,
                     "request_s": elapsed, "raw_metadata": data.get("metadata")}
+        except PulseRequestError:
+            raise
         except (requests.RequestException, RuntimeError, ValueError) as e:
             last_err = e
             if attempt < max_retries:

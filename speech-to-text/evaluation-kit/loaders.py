@@ -11,9 +11,9 @@ from __future__ import annotations
 
 import io
 import json
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterator
 
 import librosa
 import numpy as np
@@ -58,7 +58,7 @@ def decode_audio(blob: bytes | None = None, path: str | Path | None = None) -> n
                            dtype="float32", always_2d=False)
         if data.ndim > 1:
             data = data.mean(axis=1)
-    except Exception:
+    except (RuntimeError, TypeError, ValueError):  # sf.LibsndfileError is a RuntimeError
         # fallback for formats libsndfile can't read (e.g. some mp3/m4a)
         src = str(path) if path is not None else io.BytesIO(blob)
         data, sr = librosa.load(src, sr=None, mono=True)
@@ -152,7 +152,7 @@ def load_manifest(manifest: Path, limit: int | None = None) -> Iterator[Sample]:
     root = manifest.parent
     with manifest.open(encoding="utf-8") as f:
         n = 0
-        for i, line in enumerate(f):
+        for line in f:
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
