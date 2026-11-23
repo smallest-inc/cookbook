@@ -1,0 +1,6 @@
+# The ledger holds phone numbers. Never commit it or your real contacts file.
+*.sqlite
+*.sqlite-journal
+contacts.csv
+contacts.local.csv
+.env

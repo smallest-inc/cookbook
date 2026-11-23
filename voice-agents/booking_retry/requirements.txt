@@ -1,0 +1,4 @@
+# Extra dependencies for this recipe. The root requirements.txt already covers
+# smallestai and python-dotenv. 5.12 or newer is needed for the call APIs used here.
+smallestai>=5.12.0
+pytest>=8.0
