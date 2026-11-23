@@ -10,12 +10,12 @@ so a layout like
 
 gets tags ["group_a", "subgroup"], and the report breaks results down per tag.
 
-    uv run make_manifest.py my_audio --language en
+    uv run src/make_manifest.py my_audio --language en
 
 Already using the older speech-to-text/benchmarks layout (DATA_DIR/audio/ plus
 a metadata.csv with audio_filename,transcript)? Convert it in one step:
 
-    uv run make_manifest.py DATA_DIR --language hi --from-metadata-csv
+    uv run src/make_manifest.py DATA_DIR --language hi --from-metadata-csv
 
 Output: <folder>/manifest.jsonl (or --out). Clips without a transcript are
 listed too; they are transcribed but not scored.

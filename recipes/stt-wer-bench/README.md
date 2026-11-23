@@ -1,8 +1,20 @@
-# Pulse STT Evaluation Kit
+# STT WER Bench on Your Own Audio
 
-Measure how accurate Pulse speech to text is on public benchmarks, in your language, and on your own recordings, and check Pulse 2.0 latency and end-of-turn detection. Every run writes one summary table plus per-clip CSV and JSONL.
+Score Pulse speech to text on your own recordings, in your language, and on public benchmarks, then share one summary table.
 
-This kit was written by **Harshita Jain** at Smallest AI for customers evaluating Pulse. This recipe ports it into the cookbook with small changes listed under [Changes from the original kit](#changes-from-the-original-kit).
+**Demo video.** Not recorded yet; it will go here.
+
+**Run it in 3 commands** (with `SMALLEST_API_KEY` in `.env`):
+
+```bash
+make setup
+make manifest AUDIO=my_audio CLIP_LANG=en    # a folder of clips, each with a .txt transcript
+make run                                     # writes results/my_audio_pulse/summary.md
+```
+
+No audio yet? `make smoke` scores the four bundled public clips.
+
+This bench was written by **Harshita Jain** at Smallest AI for customers evaluating Pulse. This recipe ports it into the cookbook with small changes listed under [Changes from the original kit](#changes-from-the-original-kit). Coding agents: read [AGENTS.md](./AGENTS.md).
 
 ## Features
 
@@ -31,24 +43,30 @@ uv pip install -r requirements.txt
 
 ## Usage
 
+Settings live in [`config/bench.yaml`](./config/bench.yaml), with a comment on every choice. `make run` uses it, and any flag overrides it:
+
+```bash
+uv run src/run_eval.py --config config/bench.yaml --model pulse-pro --run-name my_audio_pulse_pro
+```
+
 Smoke test on the four bundled clips (English, Hindi, Korean):
 
 ```bash
-uv run run_eval.py --suite manifest --manifest fixtures/manifest.jsonl --model pulse
+uv run src/run_eval.py --suite manifest --manifest fixtures/manifest.jsonl --model pulse
 ```
 
 Quick check on 200 LibriSpeech clips (about 5 minutes):
 
 ```bash
-uv run run_eval.py --suite esb --subset librispeech_clean --limit 200
+uv run src/run_eval.py --suite esb --subset librispeech_clean --limit 200
 ```
 
 ### Track 1, English accuracy (ESB)
 
 ```bash
-uv run run_eval.py --suite esb --model pulse --limit 500
-uv run run_eval.py --suite esb --subset librispeech_clean,librispeech_other,earnings22 --limit 500
-uv run run_eval.py --suite esb --model pulse-pro --limit 500     # pre-recorded endpoint
+uv run src/run_eval.py --suite esb --model pulse --limit 500
+uv run src/run_eval.py --suite esb --subset librispeech_clean,librispeech_other,earnings22 --limit 500
+uv run src/run_eval.py --suite esb --model pulse-pro --limit 500     # pre-recorded endpoint
 ```
 
 Subsets: `ami`, `earnings22`, `gigaspeech`, `librispeech_clean`, `librispeech_other`, `spgispeech`, `tedlium`, `voxpopuli`. TED-LIUM is not published in the Hub mirror, so the kit skips it and averages the other 7. With `--limit`, clips are sampled evenly across each set, because the Hub files are sorted by clip length and the first N would be only the longest clips.
@@ -56,8 +74,8 @@ Subsets: `ami`, `earnings22`, `gigaspeech`, `librispeech_clean`, `librispeech_ot
 ### Track 2, Korean and other languages (FLEURS)
 
 ```bash
-uv run run_eval.py --suite fleurs --locale ko_kr --model pulse
-uv run run_eval.py --suite fleurs --locale hi_in,ja_jp,es_419 --model pulse --limit 200
+uv run src/run_eval.py --suite fleurs --locale ko_kr --model pulse
+uv run src/run_eval.py --suite fleurs --locale hi_in,ja_jp,es_419 --model pulse --limit 200
 ```
 
 Korean is scored on CER with spaces ignored, because Korean word spacing differs between annotators. FLEURS references contain digits (`2011년`); if Pulse writes a number out in words it counts as an error, so check `results.csv` when reviewing.
@@ -71,8 +89,8 @@ my_audio/
 ```
 
 ```bash
-uv run make_manifest.py my_audio --language en        # sub-folders become tags
-uv run run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse
+uv run src/make_manifest.py my_audio --language en        # sub-folders become tags
+uv run src/run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse
 ```
 
 Or write `manifest.jsonl` yourself, one clip per line (see [`examples/manifest.example.jsonl`](./examples/manifest.example.jsonl)):
@@ -90,10 +108,10 @@ Or write `manifest.jsonl` yourself, one clip per line (see [`examples/manifest.e
 | `emotion` | no | `neutral`, `happy`, `angry`, `sad`, `fear`, `disgust`, for Track 4 |
 | `gender` | no | `male` or `female`, for Track 4 |
 
-Already have a dataset in the [`benchmarks/`](../benchmarks/) layout (`audio/` plus `metadata.csv`)? Convert it:
+Already have a dataset in the [`benchmarks/`](../../speech-to-text/benchmarks/) layout (`audio/` plus `metadata.csv`)? Convert it:
 
 ```bash
-uv run make_manifest.py path/to/data_dir --language hi --from-metadata-csv
+uv run src/make_manifest.py path/to/data_dir --language hi --from-metadata-csv
 ```
 
 Boost product names with `--param keywords=...` (format in the [API reference](https://docs.smallest.ai/api-reference/models/speech-to-text/speech-to-text)). Any other API option goes the same way, for example `--param itn_normalize=true`.
@@ -101,8 +119,8 @@ Boost product names with `--param keywords=...` (format in the [API reference](h
 ### Track 4, Pulse 2.0 real-time (end-of-turn, emotion, gender)
 
 ```bash
-uv run run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse-2 --eot --concurrency 2
-uv run run_eval.py --suite fleurs --locale en_us --model pulse-2 --eot --limit 300 --concurrency 2
+uv run src/run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse-2 --eot --concurrency 2
+uv run src/run_eval.py --suite fleurs --locale en_us --model pulse-2 --eot --limit 300 --concurrency 2
 ```
 
 `--eot` streams audio at real-time speed, does not send a manual finalize, and appends 2 s of silence (`--trailing-silence`) so the built-in end-of-turn model decides when the speaker has finished. For latency only, use `--realtime` with any streaming model.
@@ -121,8 +139,8 @@ Use clips that hold a single turn (one person speaking once), run at low concurr
 ### All flags
 
 ```bash
-uv run run_eval.py --help
-uv run make_manifest.py --help
+uv run src/run_eval.py --help
+uv run src/make_manifest.py --help
 ```
 
 ## Recommended Usage
@@ -130,14 +148,14 @@ uv run make_manifest.py --help
 - Before a deal or a migration, run Track 3 on 50 to 200 real recordings from the prospect's product, with human transcripts, and share `summary.md`
 - Compare models on the same audio by running `--model pulse`, then `--model pulse-pro` or `--model pulse-2`, with different `--run-name`s
 - Track regressions on a model update by keeping a fixed manifest and re-running it
-- For quick WER and tail-latency numbers on a small English or Hindi folder without extra dependencies, see [Benchmarks](../benchmarks/)
+- For quick WER and tail-latency numbers on a small English or Hindi folder without extra dependencies, see [Benchmarks](../../speech-to-text/benchmarks/)
 
 ## How It Works
 
-1. A loader (`loaders.py`) yields clips as 16 kHz mono float32 audio. ESB and FLEURS are read as Parquet straight from the Hugging Face Hub, downloading only the row groups that hold sampled clips. Manifests are read from disk.
-2. `pulse_client.py` sends each clip to Pulse. Streaming goes to `wss://api.smallest.ai/waves/v1/stt/live` in 160 ms chunks of 16-bit PCM. `pulse-pro` goes to `POST https://api.smallest.ai/waves/v1/stt/`. Network errors and 429/5xx are retried with backoff. Requests the API rejects outright (bad key, model or language not enabled) fail at once with the server's reason.
-3. `scoring.py` normalizes reference and hypothesis, then computes corpus-level WER or CER with `jiwer`, so a long clip weighs more than a short one.
-4. `run_eval.py` appends each clip to `results.jsonl` as it finishes, then builds the summaries. Re-running the same command skips finished clips and retries failed ones.
+1. A loader (`src/loaders.py`) yields clips as 16 kHz mono float32 audio. ESB and FLEURS are read as Parquet straight from the Hugging Face Hub, downloading only the row groups that hold sampled clips. Manifests are read from disk.
+2. `src/pulse_client.py` sends each clip to Pulse. Streaming goes to `wss://api.smallest.ai/waves/v1/stt/live` in 160 ms chunks of 16-bit PCM. `pulse-pro` goes to `POST https://api.smallest.ai/waves/v1/stt/`. Network errors and 429/5xx are retried with backoff. Requests the API rejects outright (bad key, model or language not enabled) fail at once with the server's reason.
+3. `src/scoring.py` normalizes reference and hypothesis, then computes corpus-level WER or CER with `jiwer`, so a long clip weighs more than a short one.
+4. `src/run_eval.py` appends each clip to `results.jsonl` as it finishes, then builds the summaries. Re-running the same command skips finished clips and retries failed ones.
 
 ### Normalization
 
@@ -152,17 +170,24 @@ Script mixing is not normalized. If the reference has `पिरामिड` an
 ## Structure
 
 ```
-evaluation-kit/
-├── run_eval.py          # entry point: runs a suite, writes results and summaries
-├── make_manifest.py     # folder of audio + .txt, or benchmarks/ metadata.csv -> manifest.jsonl
-├── pulse_client.py      # streaming (WebSocket) and pre-recorded (HTTP) Pulse client
-├── loaders.py           # ESB, FLEURS and manifest loaders
-├── scoring.py           # normalization, WER/CER, emotion and gender F1, latency and end-of-turn stats
+stt-wer-bench/
+├── README.md            # this file
+├── AGENTS.md            # how a coding agent should run, test and adapt this recipe
+├── CLAUDE.md            # points to AGENTS.md
+├── .env.example         # SMALLEST_API_KEY, never a real value
+├── config/bench.yaml    # the settings for `make run`, one comment per choice
+├── src/
+│   ├── run_eval.py      # entry point: runs a suite, writes results and summaries
+│   ├── make_manifest.py # folder of audio + .txt, or benchmarks/ metadata.csv -> manifest.jsonl
+│   ├── pulse_client.py  # streaming (WebSocket) and pre-recorded (HTTP) Pulse client
+│   ├── loaders.py       # ESB, FLEURS and manifest loaders
+│   └── scoring.py       # normalization, WER/CER, emotion and gender F1, latency and end-of-turn stats
 ├── fixtures/            # four public clips (LibriSpeech, FLEURS) and their manifest
 ├── examples/            # manifest format example
 ├── tests/               # offline tests, no key or network needed
-├── requirements.txt
-└── .env.sample
+├── docs/how-i-built-it.md
+├── Makefile             # make setup, run, smoke, manifest, esb, fleurs, eot, test
+└── requirements.txt
 ```
 
 ## Example Output
@@ -209,17 +234,18 @@ Contact support@smallest.ai to enable a language in your region or Pulse 2.0 on 
 The tests are offline. They replace the network client with a fake, so no key is needed and nothing is sent.
 
 ```bash
-uv run pytest tests -q
+make test        # or: uv run pytest tests -q
 ```
 
 ## Changes from the original kit
 
-- Lives in the cookbook layout, runs with `uv run`, and loads `.env`
+- Lives in the cookbook recipe layout (`src/`, `config/bench.yaml`, `Makefile`, `AGENTS.md`), runs with `uv run` or `make`, and loads `.env`
+- `--config` reads settings from a YAML file; flags still override it
 - The API key comes only from `SMALLEST_API_KEY`. The `--api-key` flag is gone so keys do not end up in shell history, and the endpoint override variables are gone so the key is only sent to `api.smallest.ai`
 - Adds `results.csv` per dataset and `summary.csv` per run (cells that look like spreadsheet formulas are escaped)
 - `make_manifest.py --from-metadata-csv` converts the `benchmarks/` layout
 - Normalization maps native digits to ASCII for non-English scripts; `--metric` forces WER or CER
-- Requests the API rejects (model or language not enabled, bad key) fail at once with the reason, and the report lists failure reasons
+- Requests the API rejects (model or language not enabled, bad key) fail at once with the reason, and the report lists failure reasons and counts them on each language's own row
 - A dataset that cannot be downloaded is skipped with a note instead of stopping the run
 - Bundled public fixtures and offline tests
 
@@ -234,8 +260,9 @@ uv run pytest tests -q
 
 ## Next Steps
 
-- [Benchmarks](../benchmarks/): single-file WER and tail-latency scripts
-- [Customer Harness](../customer-harness/): reproduce customer failure cases with augmentation presets
-- [Emotion Analyzer](../emotion-analyzer/): visualize per-utterance emotion across a conversation
+- [Benchmarks](../../speech-to-text/benchmarks/): single-file WER and tail-latency scripts
+- [How I built it](./docs/how-i-built-it.md): the walkthrough behind this recipe
+- [Customer Harness](../../speech-to-text/customer-harness/): reproduce customer failure cases with augmentation presets
+- [Emotion Analyzer](../../speech-to-text/emotion-analyzer/): visualize per-utterance emotion across a conversation
 
 Questions about the kit: open an issue on this repo or email support@smallest.ai.

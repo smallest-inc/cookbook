@@ -6,10 +6,10 @@ import subprocess
 import sys
 
 import pytest
-from conftest import FIXTURES, KIT
 
 import pulse_client
 import run_eval
+from conftest import FIXTURES, KIT
 
 FAKE_KEY = "test-key-not-real-for-offline-tests"
 
@@ -146,6 +146,16 @@ def test_pulse2_eot_reports_latency_and_rejects_non_english(tmp_path, fake):
     assert all("English-only" in e["error"] for e in errors)
     md = (tmp_path / "t" / "summary.md").read_text(encoding="utf-8")
     assert "Latency & end-of-turn" in md
+    # failures are counted on their own language's row, not repeated on the English row
+    assert summary["failed_by_language"] == {"hi": 1, "ko": 1}
+    assert "| custom/fixtures (en) | 2 | WER | " in md
+    assert md.split("| custom/fixtures (en) |")[1].splitlines()[0].endswith("| 0 |")
+    assert "| custom/fixtures (ko) | 0 | n/a | n/a | 1 |" in md
+    with (tmp_path / "t" / "summary.csv").open(encoding="utf-8", newline="") as f:
+        by_lang = {r["language"]: r for r in csv.DictReader(f)}
+    assert by_lang["en"]["failed"] == "0"
+    assert by_lang["ko"]["failed"] == "1"
+    assert by_lang["ko"]["clips"] == "0"
 
 
 def test_a_dataset_that_cannot_be_opened_is_skipped_not_fatal(tmp_path, fake, capsys):
@@ -191,12 +201,13 @@ def test_param_parsing():
 
 def _cli(*args, env=None):
     env = {k: v for k, v in (env or os.environ).items() if k != "SMALLEST_API_KEY"}
+    # fixed interpreter and arguments from this test file only
     return subprocess.run([sys.executable, *args], cwd=KIT, env=env, capture_output=True,
                           text=True, timeout=120, check=False)
 
 
 def test_missing_key_is_a_clear_message_not_a_traceback(tmp_path):
-    p = _cli("run_eval.py", "--suite", "manifest", "--manifest", "fixtures/manifest.jsonl",
+    p = _cli("src/run_eval.py", "--suite", "manifest", "--manifest", "fixtures/manifest.jsonl",
              "--out", str(tmp_path), "--limit", "2")
     assert p.returncode != 0
     assert "Set SMALLEST_API_KEY" in p.stderr
@@ -204,7 +215,7 @@ def test_missing_key_is_a_clear_message_not_a_traceback(tmp_path):
 
 
 def test_help_works_for_both_scripts():
-    for script in ("run_eval.py", "make_manifest.py"):
+    for script in ("src/run_eval.py", "src/make_manifest.py"):
         p = _cli(script, "--help")
         assert p.returncode == 0 and "usage:" in p.stdout
 
@@ -254,3 +265,45 @@ def test_http_transcribe_sends_key_only_to_smallest(monkeypatch):
     assert seen["auth"] == f"Bearer {FAKE_KEY}"
     assert seen["params"] == {"model": "pulse", "language": "hi"}
     assert seen["timeout"]
+
+
+def _write(tmp_path, text):
+    p = tmp_path / "bench.yaml"
+    p.write_text(text, encoding="utf-8")
+    return str(p)
+
+
+def test_config_file_sets_defaults_and_flags_override(tmp_path):
+    cfg = _write(tmp_path, f"suite: manifest\nmanifest: {FIXTURES / 'manifest.jsonl'}\n"
+                           "model: pulse-pro\nlimit: 3\nlocale: [ko_kr, hi_in]\n")
+    args = run_eval.parse_args(["--config", cfg])
+    assert (args.suite, args.model, args.mode, args.limit) == ("manifest", "pulse-pro", "http", 3)
+    assert args.locale == "ko_kr,hi_in"
+    args = run_eval.parse_args(["--config", cfg, "--model", "pulse", "--limit", "1"])
+    assert (args.model, args.mode, args.limit) == ("pulse", "streaming", 1)
+
+
+@pytest.mark.parametrize("text", [
+    "suite: manifest\nmodle: pulse\n",          # typo in a key
+    "suite: manifest\nmodel: whisper\n",        # not a Pulse model
+    "suite: everything\n",                      # not a suite
+    "suite: esb\nlimit: 0\n",                   # bad number
+    "- just\n- a list\n",                       # not key: value
+])
+def test_bad_config_is_a_clear_exit(tmp_path, text):
+    with pytest.raises(SystemExit):
+        run_eval.parse_args(["--config", _write(tmp_path, text)])
+
+
+def test_suite_is_still_required_without_config():
+    with pytest.raises(SystemExit):
+        run_eval.parse_args([])
+
+
+def test_shipped_config_parses(tmp_path, monkeypatch):
+    # The shipped config points at my_audio/, which you create; check it loads with a stand-in manifest.
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "my_audio").mkdir()
+    (tmp_path / "my_audio" / "manifest.jsonl").write_text("", encoding="utf-8")
+    args = run_eval.parse_args(["--config", str(KIT / "config" / "bench.yaml")])
+    assert (args.suite, args.model, args.run_name) == ("manifest", "pulse", "my_audio_pulse")

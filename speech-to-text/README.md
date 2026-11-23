@@ -20,7 +20,7 @@ Convert audio to text using Smallest AI's Pulse Speech-to-Text API. Supports 30+
 
 | Example | Description |
 |---------|-------------|
-| [Evaluation Kit](./evaluation-kit/) | WER/CER on ESB and FLEURS or your own audio, plus Pulse 2.0 latency, end-of-turn, emotion and gender. CSV and summary per run |
+| [STT WER Bench](../recipes/stt-wer-bench/) | WER/CER on your own audio, ESB or FLEURS, plus Pulse 2.0 latency, end-of-turn, emotion and gender. CSV and summary per run |
 | [Benchmarks](./benchmarks/) | Single-file WER and tail-latency scripts for a small English or Hindi folder |
 
 ### WebSocket Examples

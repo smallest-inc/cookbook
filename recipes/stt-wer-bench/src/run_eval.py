@@ -3,21 +3,21 @@
 
 Examples
   # 1) Quick check: 200 LibriSpeech clips, streaming
-  uv run run_eval.py --suite esb --subset librispeech_clean --limit 200
+  uv run src/run_eval.py --suite esb --subset librispeech_clean --limit 200
 
   # 2) English accuracy on the ESB sets (WER)
-  uv run run_eval.py --suite esb --model pulse --limit 500
+  uv run src/run_eval.py --suite esb --model pulse --limit 500
 
   # 3) Korean and other languages on FLEURS (CER for ko/ja/zh, WER otherwise)
-  uv run run_eval.py --suite fleurs --locale ko_kr --model pulse
-  uv run run_eval.py --suite fleurs --locale hi_in,es_419 --model pulse --limit 100
+  uv run src/run_eval.py --suite fleurs --locale ko_kr --model pulse
+  uv run src/run_eval.py --suite fleurs --locale hi_in,es_419 --model pulse --limit 100
 
-  # 4) Your own recordings
-  uv run make_manifest.py my_audio --language en
-  uv run run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse
+  # 4) Your own recordings (or put the settings in config/bench.yaml and pass --config)
+  uv run src/make_manifest.py my_audio --language en
+  uv run src/run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse
 
   # 5) Pulse 2.0 real-time checks: latency, end-of-turn, emotion, gender
-  uv run run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse-2 --eot
+  uv run src/run_eval.py --suite manifest --manifest my_audio/manifest.jsonl --model pulse-2 --eot
 
 Reads SMALLEST_API_KEY from the environment (or a .env file). The key is never
 printed or written to disk.
@@ -163,7 +163,8 @@ async def transcribe_dataset(name: str, make_iter, out_dir: Path, args, params: 
         try:
             row = await run_clip(sample, args, params)
         except Exception as e:  # noqa: BLE001 - keep going; failed clips are retried on the next run
-            row = {"id": sample.id, "error": str(e)[:500], "reference": sample.text, "tags": sample.tags}
+            row = {"id": sample.id, "error": str(e)[:500], "reference": sample.text, "tags": sample.tags,
+                   "language": args.language or sample.language or "en"}
             n_err += 1
             print(f"    [err] {sample.id}: {str(e)[:160]}", file=sys.stderr, flush=True)
         async with lock:
@@ -254,6 +255,12 @@ def summarize_dataset(name: str, res_path: Path, metric: str | None = None) -> d
     ok = [r for r in rows.values() if "error" not in r]
     failed = len(rows) - len(ok)
     summ = {"dataset": name, "clips": len(ok), "failed": failed}
+    # failures per language, so a language the account cannot use shows up on its own row
+    failed_by_lang = defaultdict(int)
+    for r in rows.values():
+        if "error" in r:
+            failed_by_lang[r.get("language") or "unknown"] += 1
+    summ["failed_by_language"] = dict(failed_by_lang)
     if failed:
         # distinct reasons, so "model not enabled" or "language not enabled" is visible in the report
         summ["errors"] = sorted({r["error"][:240] for r in rows.values() if "error" in r})[:5]
@@ -317,11 +324,15 @@ def summary_csv_rows(summaries: list[dict]) -> list[dict]:
         extra = {k: lat.get(k) for k in SUMMARY_FIELDS if k in lat}
         extra.update({"emotion_accuracy_pct": emo.get("accuracy"), "emotion_macro_f1_pct": emo.get("macro_f1"),
                       "gender_accuracy_pct": gen.get("accuracy"), "gender_macro_f1_pct": gen.get("macro_f1")})
-        accs = [(lang, a) for lang, a in (s.get("accuracy") or {}).items() if a] or [(None, None)]
+        fails = s.get("failed_by_language") or {}
+        accs = [(lang, a) for lang, a in (s.get("accuracy") or {}).items() if a]
+        accs += [(lang, None) for lang in sorted(fails) if lang not in dict(accs)]
+        accs = accs or [(None, None)]
         for lang, acc in accs:
             acc = acc or {}
-            rows.append({"dataset": s["dataset"], "language": lang, "clips": acc.get("n", s["clips"]),
-                         "failed": s["failed"],
+            rows.append({"dataset": s["dataset"], "language": lang,
+                         "clips": acc.get("n", 0 if lang in fails else s["clips"]),
+                         "failed": fails.get(lang, 0) if lang is not None else s["failed"],
                          "metric": acc.get("metric"), "error_rate_pct": acc.get("value"),
                          "substitutions": acc.get("substitutions"), "deletions": acc.get("deletions"),
                          "insertions": acc.get("insertions"), **extra})
@@ -341,12 +352,14 @@ def write_report(summaries: list[dict], run_dir: Path, args) -> str:
             if not acc:
                 continue
             lines.append(f"| {s['dataset']} ({lang}) | {acc['n']} | {acc['metric'].upper()} | "
-                         f"{acc['value']:.2f}% | {s['failed']} |")
+                         f"{acc['value']:.2f}% | {(s.get('failed_by_language') or {}).get(lang, 0)} |")
             if s["dataset"].startswith("esb/") and acc["metric"] == "wer":
                 all_wer.append(acc["value"])
     for s in summaries:
-        if not any(s.get("accuracy", {}).values()) and s["failed"]:
-            lines.append(f"| {s['dataset']} | {s['clips']} | n/a | n/a | {s['failed']} |")
+        scored = {lang for lang, acc in (s.get("accuracy") or {}).items() if acc}
+        for lang, n_failed in sorted((s.get("failed_by_language") or {}).items()):
+            if lang not in scored:
+                lines.append(f"| {s['dataset']} ({lang}) | 0 | n/a | n/a | {n_failed} |")
     if len(all_wer) > 1:
         lines.append(f"| **ESB average ({len(all_wer)} sets)** | | WER | "
                      f"**{sum(all_wer) / len(all_wer):.2f}%** | |")
@@ -400,9 +413,13 @@ def positive_int(value: str) -> int:
     return n
 
 
+SUITES = ("esb", "fleurs", "manifest")
+
+
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--suite", required=True, choices=["esb", "fleurs", "manifest"])
+    ap.add_argument("--config", help="YAML file of default settings, e.g. config/bench.yaml; flags override it")
+    ap.add_argument("--suite", choices=SUITES)
     ap.add_argument("--subset", default="all", help="ESB subsets, comma-separated (default: all 8)")
     ap.add_argument("--locale", default="ko_kr", help="FLEURS locale(s), comma-separated (default ko_kr)")
     ap.add_argument("--manifest", help="JSONL manifest for --suite manifest")
@@ -426,9 +443,44 @@ def build_parser() -> argparse.ArgumentParser:
     return ap
 
 
+def load_config(path: str, parser: argparse.ArgumentParser) -> dict:
+    """Read a YAML settings file. Keys are flag names with underscores (run_name, trailing_silence)."""
+    import yaml
+
+    p = Path(path)
+    if not p.is_file():
+        sys.exit(f"config not found: {path}")
+    data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    if not isinstance(data, dict):
+        sys.exit(f"{path}: expected key: value settings")
+    known = set(vars(parser.parse_args(["--suite", "esb"]))) - {"config"}
+    unknown = sorted(set(data) - known)
+    if unknown:
+        sys.exit(f"{path}: unknown settings {unknown}; use flag names with underscores")
+    for key, allowed in (("suite", SUITES), ("model", MODELS), ("mode", ("streaming", "http")),
+                         ("metric", ("wer", "cer"))):
+        if data.get(key) is not None and data[key] not in allowed:
+            sys.exit(f"{path}: {key} must be one of {list(allowed)}")
+    for key in ("limit", "concurrency"):
+        if data.get(key) is not None and (not isinstance(data[key], int) or data[key] < 1):
+            sys.exit(f"{path}: {key} must be a whole number of 1 or more")
+    if not isinstance(data.get("param", []), list):
+        sys.exit(f"{path}: param must be a list like [\"itn_normalize=true\"]")
+    for key in ("subset", "locale"):
+        if isinstance(data.get(key), list):
+            data[key] = ",".join(str(v) for v in data[key])
+    return data
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse and validate flags. Exits with a one-line message on a bad combination."""
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    pre, _ = parser.parse_known_args(argv)
+    if pre.config:
+        parser.set_defaults(**load_config(pre.config, parser))
+    args = parser.parse_args(argv)
+    if not args.suite:
+        sys.exit("--suite is required (esb, fleurs or manifest), as a flag or as suite: in --config")
     if args.mode is None:
         args.mode = "http" if args.model in HTTP_ONLY_MODELS else "streaming"
     if args.model in HTTP_ONLY_MODELS and args.mode != "http":

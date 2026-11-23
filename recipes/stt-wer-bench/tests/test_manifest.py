@@ -2,10 +2,10 @@ import json
 
 import numpy as np
 import pytest
-from conftest import FIXTURES
 
 import loaders
 import make_manifest
+from conftest import FIXTURES
 
 
 def test_folder_layout_becomes_tags_and_references(tmp_path):
