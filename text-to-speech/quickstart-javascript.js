@@ -16,28 +16,35 @@ const fs = require("fs");
 
 const API_KEY = process.env.SMALLEST_API_KEY;
 
-const response = await fetch(
-  "https://api.smallest.ai/waves/v1/tts",
-  {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      text: "Modern problems require modern solutions.",
-      voice_id: "meher",
-      model: "lightning_v3.1_pro",
-      sample_rate: 24000,
-      speed: 1.0,
-      language: "en",
-      output_format: "wav",
-    }),
-  }
-);
+async function main() {
+  const response = await fetch(
+    "https://api.smallest.ai/waves/v1/tts",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: "Modern problems require modern solutions.",
+        voice_id: "meher",
+        model: "lightning_v3.1_pro",
+        sample_rate: 24000,
+        speed: 1.0,
+        language: "en",
+        output_format: "wav",
+      }),
+    }
+  );
 
-if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+  if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
 
-const buffer = Buffer.from(await response.arrayBuffer());
-fs.writeFileSync("output.wav", buffer);
-console.log(`Saved output.wav (${buffer.length} bytes)`);
+  const buffer = Buffer.from(await response.arrayBuffer());
+  fs.writeFileSync("output.wav", buffer);
+  console.log(`Saved output.wav (${buffer.length} bytes)`);
+}
+
+main().catch((err) => {
+  console.error(err.message);
+  process.exit(1);
+});
