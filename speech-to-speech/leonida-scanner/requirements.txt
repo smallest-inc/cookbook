@@ -1,0 +1,5 @@
+# Runtime uses Python 3.10+ from the standard library only.
+# Optional checks, not required to run the app:
+#   ruff
+#   bandit
+#   pytest

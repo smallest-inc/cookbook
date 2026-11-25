@@ -1,0 +1,43 @@
+{
+	"name": "leonida-scanner-ui",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"imports": {
+		"#lib": "./src/lib/index.js",
+		"#lib/*": "./src/lib/*"
+	},
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+	},
+	"devDependencies": {
+		"@internationalized/date": "^3.12.4",
+		"@sveltejs/adapter-static": "^4.0.1",
+		"@sveltejs/kit": "^3.2.0",
+		"@sveltejs/vite-plugin-svelte": "^7.3.1",
+		"@tailwindcss/vite": "^4.3.5",
+		"@types/three": "^0.187.0",
+		"bits-ui": "^2.21.0",
+		"svelte": "^5.57.3",
+		"svelte-check": "^4.7.8",
+		"tailwind-variants": "^3.3.1",
+		"tailwindcss": "^4.3.5",
+		"typescript": "^6.0.3",
+		"vite": "^8.3.8"
+	},
+	"dependencies": {
+		"@fontsource-variable/geist-mono": "^5.3.0",
+		"@fontsource-variable/schibsted-grotesk": "^5.3.0",
+		"@lucide/svelte": "^1.74.0",
+		"@threlte/core": "^8.7.0",
+		"@threlte/extras": "^9.23.1",
+		"clsx": "^2.1.1",
+		"tailwind-merge": "^3.7.0",
+		"three": "^0.187.0"
+	}
+}
