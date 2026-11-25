@@ -6,8 +6,8 @@ import { randomAnswer, scoreGuess, extractGuess, LetterStatus } from "../lib/wor
 
 const MAX_GUESSES = 6;
 const WORD_LEN = 5;
-const VOICE = "avery";
-const MODEL = "lightning_v3.1";
+const VOICE = "jenna";
+const MODEL = "lightning_v3.1_pro";
 
 type Status = "idle" | "listening" | "speaking";
 const STATUS_LABEL: Record<Status, string> = { idle: "ready", listening: "listening", speaking: "speaking" };
@@ -265,7 +265,7 @@ function WordleGame({ apiKey, onExit }: { apiKey: string; onExit: (error?: strin
         <div className="logo">S</div>
         <div>
           <div className="title">Voice Wordle</div>
-          <div className="subtitle">Pulse STT · Lightning v3.1 TTS</div>
+          <div className="subtitle">Pulse STT · Lightning v3.1 Pro TTS</div>
         </div>
         <div className="status-pill" data-state={status}>
           <span className="dot" />

@@ -13,7 +13,7 @@ LANG_TO_VOICE_TAG = {
 }
 
 TTS_URL = "https://api.smallest.ai/waves/v1/tts"
-VOICES_URL = "https://api.smallest.ai/waves/v1/lightning-v3.1/get_voices"
+VOICES_URL = "https://api.smallest.ai/waves/v1/lightning-v3.1-pro/get_voices"
 
 
 def _fetch_raw_voices() -> list:
@@ -73,7 +73,7 @@ def synthesize_speech(
     speed: float = 1.0,
     output_format: str = "wav",
 ) -> Optional[bytes]:
-    """Generate speech with Lightning v3.1 on the unified TTS endpoint."""
+    """Generate speech with Lightning v3.1 Pro on the unified TTS endpoint."""
     if not SMALLEST_API_KEY:
         raise ValueError("SMALLEST_API_KEY environment variable is not set")
 
@@ -82,7 +82,7 @@ def synthesize_speech(
     payload = {
         "text": text,
         "voice_id": voice,
-        "model": "lightning_v3.1",
+        "model": "lightning_v3.1_pro",
         "language": lang,
         "speed": speed,
         "output_format": output_format,

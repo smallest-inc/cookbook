@@ -1,8 +1,8 @@
 # Text-to-Speech
 
-> **Powered by [Lightning TTS v3.1](https://docs.smallest.ai/model-cards/text-to-speech/lightning-v-3-1) and the new [Lightning v3.1 Pro](https://docs.smallest.ai/model-cards/text-to-speech/lightning-v-3-1-pro) pool.**
+> **Powered by [Lightning v3.1 Pro](https://docs.smallest.ai/model-cards/text-to-speech/lightning-v-3-1-pro).**
 
-Generate natural-sounding speech from text using Smallest AI's Lightning TTS API. 80+ voices on standard Lightning v3.1, plus a curated Pro voice catalog across American, British, and Indian accents. 44.1 kHz native sample rate, ~200ms latency.
+Generate natural-sounding speech from text using Smallest AI's Lightning TTS API. Lightning v3.1 Pro is the default model, with a curated catalog of American, British, and Indian voices. 44.1 kHz native sample rate, ~200ms latency.
 
 ## Try It Now (Zero Install)
 
@@ -14,7 +14,7 @@ curl -X POST https://api.smallest.ai/waves/v1/tts \
   --output hello.wav
 ```
 
-Drop the `model` field (or set it to `"lightning_v3.1"`) to use the standard pool — that pool has more voices, the full 12-language catalog, plus voice cloning. The unified `/waves/v1/tts` route serves both.
+Lightning v3.1 Pro is the default TTS model. Create voice clones with `model=lightning-v3.1-pro` so they keep working after the v3.1 retirement.
 
 Get your API key at [app.smallest.ai](https://app.smallest.ai/dashboard/settings/apikeys).
 
@@ -54,7 +54,7 @@ export SMALLEST_API_KEY="your-api-key-here"
 ```bash
 python text-to-speech/websocket-python.py --text "Hello from Zoravar" --voice zoravar
 python text-to-speech/websocket-python.py --text "Modern problems..." --voice meher --out demo.wav
-python text-to-speech/websocket-python.py --text "..." --voice meher --model lightning_v3.1 --rate 44100
+python text-to-speech/websocket-python.py --text "..." --voice meher --model lightning_v3.1_pro --rate 44100
 ```
 
 Flags: `--text` (required) · `--voice` (default `meher`) · `--model` (default `lightning_v3.1_pro`) · `--rate` (default `24000`) · `--out` (default `output.wav`).
@@ -128,9 +128,7 @@ uv run text-to-speech/getting-started/python/synthesize.py "Hello from Smallest 
 
 ## Supported Languages
 
-Standard Lightning v3.1: `en` English · `hi` Hindi · `mr` Marathi · `kn` Kannada · `ta` Tamil · `bn` Bengali · `gu` Gujarati · `te` Telugu · `ml` Malayalam · `pa` Punjabi · `or` Odia · `es` Spanish · `auto`
-
-Lightning v3.1 Pro: depends on the voice — Indian Pro voices speak `en` + `hi`; British and American Pro voices speak `en`. Query `GET /waves/v1/lightning-v3.1/get_voices` and read `tags.language` for the source of truth.
+Lightning v3.1 Pro: depends on the voice — Indian Pro voices speak `en` + `hi`; British and American Pro voices speak `en`. Query `GET /waves/v1/lightning-v3.1-pro/get_voices` and read `tags.language` for the source of truth.
 
 ## Output Formats
 
@@ -138,8 +136,8 @@ Lightning v3.1 Pro: depends on the voice — Indian Pro voices speak `en` + `hi`
 
 ## Documentation
 
-- [Lightning v3.1 REST](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
-- [Lightning v3.1 WebSocket](https://docs.smallest.ai/api-reference/models/text-to-speech/tts)
+- [Lightning v3.1 Pro REST](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Lightning v3.1 Pro WebSocket](https://docs.smallest.ai/api-reference/models/text-to-speech/tts)
 - [Voices API](https://docs.smallest.ai/api-reference/models/text-to-speech/get-waves-voices)
 - [Voice Cloning](https://docs.smallest.ai/api-reference/models/text-to-speech/create-voice-clone)
 - [Pronunciation Dicts](https://docs.smallest.ai/api-reference/models/text-to-speech/get-pronunciation-dicts)

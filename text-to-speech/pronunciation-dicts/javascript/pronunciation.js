@@ -13,8 +13,8 @@
 
 const fs = require("fs");
 
-const MODEL = "lightning-v3.1";
-const VOICE_ID = "sophia";
+const MODEL = "lightning_v3.1_pro";
+const VOICE_ID = "kaitlyn";
 const SAMPLE_RATE = 24000;
 const API_BASE = "https://api.smallest.ai/waves/v1";
 
@@ -74,6 +74,7 @@ async function synthesize(text, apiKey, pronunciationDicts) {
   const payload = {
     text,
     voice_id: VOICE_ID,
+    model: MODEL,
     sample_rate: SAMPLE_RATE,
     output_format: "wav",
   };
@@ -81,7 +82,7 @@ async function synthesize(text, apiKey, pronunciationDicts) {
     payload.pronunciation_dicts = pronunciationDicts;
   }
 
-  const response = await fetch(`${API_BASE}/${MODEL}/get_speech`, {
+  const response = await fetch(`${API_BASE}/tts`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,

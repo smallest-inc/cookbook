@@ -1,12 +1,12 @@
 # Real-time voice-chat widget
 
-> **Powered by [Pulse STT](https://smallest.ai) + [Electron LLM](https://smallest.ai) + [Lightning v3.1 TTS](https://smallest.ai) — all three Smallest AI products in one widget**
+> **Powered by [Pulse STT](https://smallest.ai) + [Electron LLM](https://smallest.ai) + [Lightning v3.1 Pro TTS](https://smallest.ai) — all three Smallest AI products in one widget**
 
 A Next.js + React chat widget that shows what a production voice-chat UX looks like when you combine all three Smallest AI products in parallel:
 
 - **Pulse STT** transcribes the user's voice live as they speak. Partial transcripts appear in the input box; the final transcript (with **Inverse Text Normalization** for numbers, dates, currency, phone numbers, etc.) is auto-submitted to the LLM.
 - **Electron** streams a reply via the OpenAI-compatible `chat/completions` endpoint. As soon as the first sentence is complete, that sentence is flushed to TTS — we don't wait for the full reply.
-- **Lightning v3.1 TTS** streams audio chunks back over WebSocket. The widget plays them gap-free via Web Audio's `AudioContext`, so the bot starts speaking while Electron is still generating.
+- **Lightning v3.1 Pro TTS** streams audio chunks back over WebSocket. The widget plays them gap-free via Web Audio's `AudioContext`, so the bot starts speaking while Electron is still generating.
 
 A single `SMALLEST_API_KEY` powers all three. No other provider needed.
 
@@ -70,7 +70,7 @@ Open the page, grant microphone permission, and **hold the mic button** while yo
               wss://api.smallest.ai  POST https://...  wss://api.smallest.ai
               /waves/v1/stt/live      /waves/v1/chat/    /waves/v1/tts/live
               ?model=pulse            completions
-              (Pulse STT)             (Electron LLM)    (Lightning v3.1)
+              (Pulse STT)             (Electron LLM)    (Lightning v3.1 Pro)
 ```
 
 Three transports for three jobs:
@@ -185,8 +185,8 @@ These cost us a debug session. Documented here so they don't cost the reader one
 
 ```typescript
 ws.send(JSON.stringify({
-  voice_id: "avery",
-  model: "lightning_v3.1",
+  voice_id: "jenna",
+  model: "lightning_v3.1_pro",
   text: "hello world",
   sample_rate: 24000,
   output_format: "pcm",       // ✓ valid
@@ -256,7 +256,7 @@ What you should **not** do: ship your `SMALLEST_API_KEY` in client-side JavaScri
 
 If you're already on the Vercel AI SDK, swap the manual WS plumbing for [`smallestai-vercel-provider`](https://www.npmjs.com/package/smallestai-vercel-provider) (currently `0.6.2`). It exposes:
 
-- `experimental_generateSpeech` for batch TTS (Lightning v3.1)
+- `experimental_generateSpeech` for batch TTS (Lightning v3.1 Pro)
 - `experimental_transcribe` for batch STT (Pulse, pre-recorded files)
 - **`smallestai.transcriptionStream("pulse", {...})` for streaming STT** — supports all the ITN flags directly (`itnNormalize`, `finalizeOnWords`, `eouTimeoutMs`, etc.) with `auth: "query"` or `signedUrl` for browser-safe streaming
 - Auto-reconnect on socket drops, microphone capture hooks, and a security-validated signed-URL flow that means **no proxy required for browser apps**
@@ -326,7 +326,7 @@ Each file is ≤ 250 lines. Read `lib/usePulseSTT.ts` first if you want to see t
 | Endpoint | Purpose | Auth |
 |---|---|---|
 | `wss://api.smallest.ai/waves/v1/stt/live?model=pulse` | Live STT | `Authorization: Bearer <SMALLEST_API_KEY>` |
-| `wss://api.smallest.ai/waves/v1/tts/live` | Streaming TTS (Lightning v3.1) | `Authorization: Bearer <SMALLEST_API_KEY>` |
+| `wss://api.smallest.ai/waves/v1/tts/live` | Streaming TTS (Lightning v3.1 Pro) | `Authorization: Bearer <SMALLEST_API_KEY>` |
 | `https://api.smallest.ai/waves/v1/chat/completions` | LLM (Electron, OpenAI-compatible) | `Authorization: Bearer <SMALLEST_API_KEY>` |
 
 One key, three services.

@@ -18,8 +18,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MODEL = "lightning-v3.1"
-VOICE_ID = "sophia"
+MODEL = "lightning_v3.1_pro"
+VOICE_ID = "kaitlyn"
 SAMPLE_RATE = 24000
 API_BASE = "https://api.smallest.ai/waves/v1"
 
@@ -72,6 +72,7 @@ def synthesize(text: str, api_key: str, pronunciation_dicts: list = None) -> byt
     payload = {
         "text": text,
         "voice_id": VOICE_ID,
+        "model": MODEL,
         "sample_rate": SAMPLE_RATE,
         "output_format": "wav",
     }
@@ -79,7 +80,7 @@ def synthesize(text: str, api_key: str, pronunciation_dicts: list = None) -> byt
         payload["pronunciation_dicts"] = pronunciation_dicts
 
     response = requests.post(
-        f"{API_BASE}/{MODEL}/get_speech",
+        f"{API_BASE}/tts",
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",

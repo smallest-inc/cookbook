@@ -28,10 +28,10 @@ This cookbook contains practical examples and tutorials for building with Smalle
 ## Try It Now (30 Seconds)
 
 ```bash
-curl -X POST https://api.smallest.ai/waves/v1/lightning-v3.1/get_speech \
+curl -X POST https://api.smallest.ai/waves/v1/tts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"text": "Hello from Smallest AI!", "voice_id": "sophia", "sample_rate": 24000, "output_format": "wav"}' \
+  -d '{"text": "Hello from Smallest AI!", "voice_id": "kaitlyn", "model": "lightning_v3.1_pro", "sample_rate": 24000, "output_format": "wav"}' \
   --output hello.wav
 ```
 
@@ -118,7 +118,7 @@ Convert audio and video to text with industry-leading accuracy. Supports 30+ lan
 
 ## Text-to-Speech Examples
 
-Generate natural-sounding speech from text with real-time latency. 80+ voices across 4 languages (en, hi, es, ta) with 44.1 kHz quality and ~200ms latency. Powered by [Lightning TTS v3.1](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech).
+Generate natural-sounding speech from text with real-time latency. 80+ voices across 4 languages (en, hi, es, ta) with 44.1 kHz quality and ~200ms latency. Powered by [Lightning v3.1 Pro](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech).
 
 - [Quickstart](./text-to-speech/quickstart/) — Generate speech in 5 lines of code, under 2 minutes
 - [Getting Started](./text-to-speech/getting-started/) — Configurable synthesis with voice, speed, language, output format

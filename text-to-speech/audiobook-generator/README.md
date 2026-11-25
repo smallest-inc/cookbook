@@ -25,7 +25,7 @@ uv run generate.py story.txt
 With custom options:
 
 ```bash
-uv run generate.py story.txt --voice magnus --speed 0.9 --chapter-marker "---"
+uv run generate.py story.txt --voice blake --speed 0.9 --chapter-marker "---"
 ```
 
 From inline text (for quick testing):
@@ -38,9 +38,9 @@ uv run generate.py --text "Once upon a time, in a land far away, there lived a c
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `--voice` | Narrator voice | `sophia` |
+| `--voice` | Narrator voice | `kaitlyn` |
 | `--speed` | Narration speed (0.5–2.0) | `1.0` |
-| `--model` | TTS model | `lightning-v3.1` |
+| `--model` | TTS model | `lightning_v3.1_pro` |
 | `--chapter-marker` | Text that separates chapters | `---` |
 | `--max-chunk` | Max characters per API call | `500` |
 | `--text` | Inline text instead of file | — |
@@ -64,7 +64,7 @@ audiobook_output/
 
 ## API Reference
 
-- [Lightning v3.1 API](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Lightning v3.1 Pro API](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
 
 ## Next Steps
 

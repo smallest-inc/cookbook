@@ -16,16 +16,16 @@ import {
   updateAgentConfig,
 } from '@/agent/sessionServer';
 
-// Curated v3.1 voices. These are stable catalog IDs that ship on every
-// org. For a full picker fetch GET /waves/v1/voices, but for a cookbook
-// demo an opinionated shortlist is friendlier.
+// Curated Lightning v3.1 Pro voices. These are stable catalog IDs that ship
+// on every org. For a full picker fetch GET /waves/v1/lightning-v3.1-pro/get_voices,
+// but for a cookbook demo an opinionated shortlist is friendlier.
 const VOICES: { id: string; label: string }[] = [
-  { id: 'magnus',   label: 'Magnus (warm British male)' },
-  { id: 'daniel',   label: 'Daniel (neutral male)' },
-  { id: 'emily',    label: 'Emily (friendly female)' },
-  { id: 'sophia',   label: 'Sophia (professional female)' },
-  { id: 'arjun',    label: 'Arjun (Indian English male)' },
-  { id: 'priya',    label: 'Priya (Indian English female)' },
+  { id: 'rupert',  label: 'Rupert (warm British male)' },
+  { id: 'austin',  label: 'Austin (neutral male)' },
+  { id: 'jenna',   label: 'Jenna (friendly female)' },
+  { id: 'kaitlyn', label: 'Kaitlyn (professional female)' },
+  { id: 'aayan',   label: 'Aayan (Indian English male)' },
+  { id: 'aarini',  label: 'Aarini (Indian English female)' },
 ];
 
 const LANGS: { code: string; label: string }[] = [

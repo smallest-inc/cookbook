@@ -66,7 +66,7 @@ DEFAULT_VOICE_ID = "<existing-provider-voice-id>"
 # After
 from pipecat.services.smallest.stt import SmallestSTTService
 from pipecat.services.smallest.tts import SmallestTTSService
-DEFAULT_VOICE_ID = "sophia"  # Smallest AI voice name
+DEFAULT_VOICE_ID = "kaitlyn"  # Smallest AI voice name
 ```
 
 The two startup functions that initialize STT and TTS:
@@ -96,16 +96,16 @@ Gradient Bang maps short in-game names to provider voice IDs. Replace the existi
 ```python
 # After (Smallest AI voice names)
 VOICES = {
-    "ariel":   {"voice_id": "sophia",   "language": "en"},
+    "ariel":   {"voice_id": "kaitlyn",   "language": "en"},
     "sterling":{"voice_id": "robert",   "language": "en"},
     "dani":    {"voice_id": "hannah",   "language": "en"},
     "caine":   {"voice_id": "lucas",    "language": "en"},
-    "voss":    {"voice_id": "magnus",   "language": "en"},
+    "voss":    {"voice_id": "blake",   "language": "en"},
     "gordon":  {"voice_id": "jordan",   "language": "en"},
     "priya":   {"voice_id": "sameera",  "language": "hi"},
     "lucia":   {"voice_id": "daniella", "language": "es"},
     "celeste": {"voice_id": "rachel",   "language": "en"},
-    "marco":   {"voice_id": "daniel",   "language": "en"},
+    "marco":   {"voice_id": "austin",   "language": "en"},
 }
 ```
 

@@ -60,7 +60,7 @@ node stream_ws.js "This text will be streamed via WebSocket."
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `MODEL` | TTS pool (`lightning_v3.1_pro` or `lightning_v3.1`) | `lightning_v3.1_pro` |
+| `MODEL` | TTS model | `lightning_v3.1_pro` |
 | `VOICE_ID` | Voice to use | `meher` |
 | `SAMPLE_RATE` | Audio sample rate in Hz | `24000` |
 | `SPEED` | Playback speed (0.5–2.0) | `1.0` |

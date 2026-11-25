@@ -113,7 +113,7 @@ Click **Activate** (toggle in the top right). n8n will display the form URL — 
 - Open **Synthesize speech** (Host A) and set a different `voiceId` for Avery's voice
 - Open **Synthesize speech1** (Host B) and change `voiceId` from `devansh` to any other voice
 
-Available voices include `sophia`, `robert`, `advika`, `vivaan`, `aisha`, `devansh`, and more. See [Voices and languages](https://docs.smallest.ai/models/text-to-speech/voices-languages) for the full list.
+Available voices include `kaitlyn`, `robert`, `aarini`, `vivaan`, `aisha`, `devansh`, and more. See [Voices and languages](https://docs.smallest.ai/models/text-to-speech/voices-languages) for the full list.
 
 **Change the podcast format**
 

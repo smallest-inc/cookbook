@@ -2,8 +2,7 @@
  * Text-to-Speech Quickstart — JavaScript
  * Generate speech using the unified Lightning TTS route.
  *
- * Targets the Lightning v3.1 Pro pool — drop the `model` field (or set it to
- * `"lightning_v3.1"`) to use the standard Lightning v3.1 pool instead.
+ * Targets Lightning v3.1 Pro, the default TTS model, on the unified `/waves/v1/tts` route.
  *
  * Usage:
  *     export SMALLEST_API_KEY="your-api-key"

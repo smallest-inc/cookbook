@@ -14,15 +14,18 @@ class SmallestService {
 
   private getOutboundCallUrl() {
     const trimmed = this.baseUrl.replace(/\/$/, '');
-    if (trimmed.endsWith('/api/v1')) {
+    if (trimmed.endsWith('/atoms/v1')) {
       return `${trimmed}/conversation/outbound`;
     }
-    return `${trimmed}/api/v1/conversation/outbound`;
+    if (trimmed.endsWith('/api/v1')) {
+      return `${trimmed.replace(/\/api\/v1$/, '/atoms/v1')}/conversation/outbound`;
+    }
+    return `${trimmed}/atoms/v1/conversation/outbound`;
   }
 
   /** Fallback URL if primary (api.smallest.ai) fails */
   private getOutboundCallFallbackUrl() {
-    return 'https://atoms-api.smallest.ai/api/v1/conversation/outbound';
+    return 'https://api.smallest.ai/atoms/v1/conversation/outbound';
   }
 
   async startReceptionistSession(opts: StartSessionParams) {

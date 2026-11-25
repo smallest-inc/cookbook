@@ -25,8 +25,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MODEL = "lightning_v3.1"
-VOICE_ID = "sophia"
+MODEL = "lightning_v3.1_pro"
+VOICE_ID = "kaitlyn"
 SAMPLE_RATE = 24000
 WS_URL = "wss://api.smallest.ai/waves/v1/tts/live"
 OUTPUT_FILE = "out.wav"

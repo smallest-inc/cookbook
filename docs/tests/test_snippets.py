@@ -16,10 +16,10 @@ import pytest
 
 API_KEY = os.environ.get("SMALLEST_API_KEY")
 SAMPLE_URL = "https://github.com/smallest-inc/cookbook/raw/main/speech-to-text/getting-started/samples/audio.wav"
-TTS_ENDPOINT = "https://api.smallest.ai/waves/v1/lightning-v3.1/get_speech"
+TTS_ENDPOINT = "https://api.smallest.ai/waves/v1/tts"
 STT_ENDPOINT = "https://api.smallest.ai/waves/v1/stt/"
-VOICES_ENDPOINT = "https://api.smallest.ai/waves/v1/lightning-v3.1/get_voices"
-SSE_ENDPOINT = "https://api.smallest.ai/waves/v1/lightning-v3.1/stream"
+VOICES_ENDPOINT = "https://api.smallest.ai/waves/v1/lightning-v3.1-pro/get_voices"
+SSE_ENDPOINT = "https://api.smallest.ai/waves/v1/tts/live"
 
 RETRY_ATTEMPTS = 3
 RETRY_BACKOFF_S = 2.0
@@ -72,7 +72,8 @@ class TestTTS:
             headers={**auth_headers, "Content-Type": "application/json"},
             json={
                 "text": "Hello from Smallest AI.",
-                "voice_id": "magnus",
+                "voice_id": "blake",
+                "model": "lightning_v3.1_pro",
                 "sample_rate": 24000,
                 "output_format": "wav",
             },
@@ -86,7 +87,8 @@ class TestTTS:
             headers={**auth_headers, "Content-Type": "application/json"},
             json={
                 "text": "Hello from streaming.",
-                "voice_id": "magnus",
+                "voice_id": "blake",
+                "model": "lightning_v3.1_pro",
                 "sample_rate": 24000,
             },
             stream=True,

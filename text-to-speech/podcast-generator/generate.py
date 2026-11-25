@@ -7,7 +7,7 @@ conversation script, then Lightning TTS to voice each host.
 
 Usage:
   python generate.py "The future of AI in healthcare"
-  python generate.py "Space exploration" --exchanges 8 --host1-voice magnus
+  python generate.py "Space exploration" --exchanges 8 --host1-voice blake
 
 Output:
 - podcast_output/podcast.wav  — full podcast
@@ -64,7 +64,7 @@ Return ONLY a JSON array of objects: [{{"speaker": "{host1}", "text": "..."}}, .
 
 def synthesize(text: str, voice_id: str, model: str, api_key: str) -> bytes:
     response = requests.post(
-        f"{API_BASE}/{model}/get_speech",
+        f"{API_BASE}/tts",
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -72,6 +72,7 @@ def synthesize(text: str, voice_id: str, model: str, api_key: str) -> bytes:
         json={
             "text": text,
             "voice_id": voice_id,
+            "model": model,
             "sample_rate": SAMPLE_RATE,
             "output_format": "wav",
         },
@@ -112,9 +113,9 @@ def main():
     parser.add_argument("--exchanges", type=int, default=6, help="Number of exchanges (default: 6)")
     parser.add_argument("--host1-name", default="Alex", help="Host 1 name")
     parser.add_argument("--host2-name", default="Sarah", help="Host 2 name")
-    parser.add_argument("--host1-voice", default="magnus", help="TTS voice for host 1")
-    parser.add_argument("--host2-voice", default="sophia", help="TTS voice for host 2")
-    parser.add_argument("--model", default="lightning-v3.1", help="TTS model")
+    parser.add_argument("--host1-voice", default="blake", help="TTS voice for host 1")
+    parser.add_argument("--host2-voice", default="kaitlyn", help="TTS voice for host 2")
+    parser.add_argument("--model", default="lightning_v3.1_pro", help="TTS model")
     parser.add_argument("--llm", default="gpt-4o-mini", help="LLM model for script generation")
     args = parser.parse_args()
 

@@ -105,7 +105,7 @@ The bot will fetch live HN stories, summarize them, and reply with a synthesized
 
 **Change the TTS voice**
 
-Open the **Synthesize speech** node and update the `voiceId` field. Available voices include `sophia`, `robert`, `advika`, `vivaan`, `aisha`, and 80+ more. See [Voices and languages](https://docs.smallest.ai/models/text-to-speech/voices-languages) for the full list.
+Open the **Synthesize speech** node and update the `voiceId` field. Available voices include `kaitlyn`, `robert`, `aarini`, `vivaan`, `aisha`, and 80+ more. See [Voices and languages](https://docs.smallest.ai/models/text-to-speech/voices-languages) for the full list.
 
 **Change the AI model**
 

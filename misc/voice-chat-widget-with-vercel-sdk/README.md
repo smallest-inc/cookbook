@@ -98,7 +98,7 @@ npm run dev
                                     ▼                  ▼               ▼
             wss://api.smallest.ai/waves/v1     /waves/v1/chat/   wss://api.smallest.ai/
             /stt/live?model=pulse              completions       waves/v1/tts/live
-            (Pulse STT, SDK-managed)           (Electron LLM)    (Lightning v3.1)
+            (Pulse STT, SDK-managed)           (Electron LLM)    (Lightning v3.1 Pro)
 ```
 
 The STT leg no longer touches the local proxy — the SDK is the auth boundary. This is the biggest architectural change vs the raw-WS sibling.

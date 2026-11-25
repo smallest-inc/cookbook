@@ -38,7 +38,7 @@ load_dotenv(override=True)
 parser = argparse.ArgumentParser(description="Pipecat Voice Agent")
 parser.add_argument("--host", default="localhost")
 parser.add_argument("--port", type=int, default=7860)
-parser.add_argument("--voice", default="sophia", help="TTS voice ID (default: sophia)")
+parser.add_argument("--voice", default="kaitlyn", help="TTS voice ID (default: kaitlyn)")
 parser.add_argument("--language", default="en", help="Language code for STT and TTS (default: en)")
 args = parser.parse_args()
 
@@ -58,7 +58,7 @@ app = FastAPI(lifespan=lifespan)
 app.mount("/client", SmallWebRTCPrebuiltUI)
 
 
-async def run_bot(webrtc_connection: SmallWebRTCConnection, voice: str = "sophia", language: str = "en"):
+async def run_bot(webrtc_connection: SmallWebRTCConnection, voice: str = "kaitlyn", language: str = "en"):
     transport = SmallWebRTCTransport(
         webrtc_connection=webrtc_connection,
         params=TransportParams(

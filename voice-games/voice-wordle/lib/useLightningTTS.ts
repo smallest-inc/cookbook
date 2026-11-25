@@ -1,5 +1,5 @@
 /**
- * Streaming TTS over Lightning v3.1 WebSocket.
+ * Streaming TTS over Lightning v3.1 Pro WebSocket.
  *
  * Smallest endpoint: wss://api.smallest.ai/waves/v1/tts/live
  *
@@ -70,8 +70,8 @@ export function useLightningTTS() {
     const {
       apiKey,
       text,
-      voice = "avery",
-      model = "lightning_v3.1",
+      voice = "jenna",
+      model = "lightning_v3.1_pro",
       sampleRate = 24000,
       proxyUrl,
       onWord,

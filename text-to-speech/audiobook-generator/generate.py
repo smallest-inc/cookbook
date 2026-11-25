@@ -6,7 +6,7 @@ Convert a text file into a narrated audiobook with chapter-based splitting.
 
 Usage:
   python generate.py story.txt
-  python generate.py story.txt --voice magnus --speed 0.9
+  python generate.py story.txt --voice blake --speed 0.9
   python generate.py --text "Once upon a time..."
 
 Output:
@@ -70,7 +70,7 @@ def chunk_text(text: str, max_chunk: int = 500) -> list:
 
 def synthesize(text: str, voice_id: str, speed: float, model: str, api_key: str) -> bytes:
     response = requests.post(
-        f"{API_BASE}/{model}/get_speech",
+        f"{API_BASE}/tts",
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -78,6 +78,7 @@ def synthesize(text: str, voice_id: str, speed: float, model: str, api_key: str)
         json={
             "text": text,
             "voice_id": voice_id,
+            "model": model,
             "speed": speed,
             "sample_rate": SAMPLE_RATE,
             "output_format": "wav",
@@ -111,9 +112,9 @@ def main():
     parser = argparse.ArgumentParser(description="Generate an audiobook from text")
     parser.add_argument("input_file", nargs="?", help="Path to text file")
     parser.add_argument("--text", help="Inline text (instead of file)")
-    parser.add_argument("--voice", default="sophia", help="Narrator voice (default: sophia)")
+    parser.add_argument("--voice", default="kaitlyn", help="Narrator voice (default: kaitlyn)")
     parser.add_argument("--speed", type=float, default=1.0, help="Narration speed 0.5-2.0 (default: 1.0)")
-    parser.add_argument("--model", default="lightning-v3.1", help="TTS model")
+    parser.add_argument("--model", default="lightning_v3.1_pro", help="TTS model")
     parser.add_argument("--chapter-marker", default="---", help="Chapter separator in text (default: ---)")
     parser.add_argument("--max-chunk", type=int, default=500, help="Max chars per API call (default: 500)")
     args = parser.parse_args()

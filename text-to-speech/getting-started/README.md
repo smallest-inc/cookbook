@@ -7,7 +7,7 @@ The simplest way to generate speech from text using Smallest AI's Lightning TTS 
 - Generate speech from text with a single API call
 - Save output as WAV file
 - Choose voice, speed, and language
-- Uses the unified `/waves/v1/tts` route — defaults to Lightning v3.1 Pro pool, pass `MODEL="lightning_v3.1"` to use the standard pool instead
+- Uses the unified `/waves/v1/tts` route with Lightning v3.1 Pro, the default TTS model
 
 ## Requirements
 
@@ -40,17 +40,16 @@ Output is saved to `output.wav` in the current directory.
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `MODEL` | TTS pool (`lightning_v3.1_pro` or `lightning_v3.1`) | `lightning_v3.1_pro` |
+| `MODEL` | TTS model | `lightning_v3.1_pro` |
 | `VOICE_ID` | Voice to use (see [Voices](../voices/)) | `meher` |
 | `SPEED` | Playback speed (0.5 to 2.0) | `1.0` |
 | `SAMPLE_RATE` | Audio sample rate in Hz | `24000` |
-| `LANGUAGE` | Language code — Pro pool: `en` (all voices) or `hi` (Indian voices); switch `MODEL` to `lightning_v3.1` to use `es`, `ta`, and 9 more | `en` |
+| `LANGUAGE` | Language code — Pro voices speak `en`, and Indian Pro voices also speak `hi`. Check `tags.language` on `GET /waves/v1/lightning-v3.1-pro/get_voices` | `en` |
 | `OUTPUT_FORMAT` | Output format (`wav`, `pcm`, `mp3`, `mulaw`) | `wav` |
 
 ## API Reference
 
 - [Synthesize speech (unified `/waves/v1/tts`)](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
-- [Lightning v3.1 model card](https://docs.smallest.ai/model-cards/text-to-speech/lightning-v-3-1)
 - [Lightning v3.1 Pro model card](https://docs.smallest.ai/model-cards/text-to-speech/lightning-v-3-1-pro)
 
 ## Next Steps

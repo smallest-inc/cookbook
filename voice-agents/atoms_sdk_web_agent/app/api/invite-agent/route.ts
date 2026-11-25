@@ -40,7 +40,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const payload = { agentId, synthesizer: { voice_id: "magnus", model: "waves_lightning_v3_1", provider: "smallest" } };
+        const payload = { agentId, synthesizer: { voice_id: "blake", model: "waves_lightning_v3_1_pro", provider: "smallest" } };
 
         console.log(`[API] Received request for mode: ${mode}`);
         console.log(`[API] Payload:`, { agentId, apiKeyLength: apiKey?.length });

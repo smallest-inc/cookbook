@@ -30,7 +30,7 @@ uv run generate.py "The future of AI in healthcare"
 With custom options:
 
 ```bash
-uv run generate.py "Space exploration in 2030" --exchanges 8 --host1-voice magnus --host2-voice sophia
+uv run generate.py "Space exploration in 2030" --exchanges 8 --host1-voice blake --host2-voice kaitlyn
 ```
 
 ## Configuration
@@ -40,9 +40,9 @@ uv run generate.py "Space exploration in 2030" --exchanges 8 --host1-voice magnu
 | `--exchanges` | Number of back-and-forth exchanges | `6` |
 | `--host1-name` | Name of host 1 | `Alex` |
 | `--host2-name` | Name of host 2 | `Sarah` |
-| `--host1-voice` | TTS voice for host 1 | `magnus` |
-| `--host2-voice` | TTS voice for host 2 | `sophia` |
-| `--model` | TTS model | `lightning-v3.1` |
+| `--host1-voice` | TTS voice for host 1 | `blake` |
+| `--host2-voice` | TTS voice for host 2 | `kaitlyn` |
+| `--model` | TTS model | `lightning_v3.1_pro` |
 | `--llm` | LLM model for script generation | `gpt-4o-mini` |
 
 ## Output
@@ -58,7 +58,7 @@ podcast_output/
 
 ## API Reference
 
-- [Lightning v3.1 API](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Lightning v3.1 Pro API](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
 - [OpenAI Chat API](https://platform.openai.com/docs/api-reference/chat)
 
 ## Next Steps

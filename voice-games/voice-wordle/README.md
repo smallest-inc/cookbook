@@ -1,6 +1,6 @@
 # Voice Wordle
 
-Play Wordle entirely by voice. [Pulse STT](https://docs.smallest.ai/models/speech-to-text/overview) hears your spoken guess, scores it Wordle-style, and [Lightning v3.1 TTS](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech) speaks back the letter-by-letter feedback.
+Play Wordle entirely by voice. [Pulse STT](https://docs.smallest.ai/models/speech-to-text/overview) hears your spoken guess, scores it Wordle-style, and [Lightning v3.1 Pro TTS](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech) speaks back the letter-by-letter feedback.
 
 ## Features
 
@@ -96,7 +96,7 @@ voice-wordle/
 │   └── globals.css
 ├── lib/
 │   ├── usePulseSTT.ts      # mic → 16kHz PCM16 → Pulse STT WebSocket
-│   ├── useLightningTTS.ts  # Lightning v3.1 TTS WebSocket → live PCM playback
+│   ├── useLightningTTS.ts  # Lightning v3.1 Pro TTS WebSocket → live PCM playback
 │   └── words.ts            # word bank, scoring, guess parsing
 ├── proxy.mjs           # per-connection auth-frame WS proxy (see above)
 └── package.json
@@ -114,7 +114,7 @@ voice-wordle/
 ## Documentation
 
 - [Pulse STT overview](https://docs.smallest.ai/models/speech-to-text/overview)
-- [Lightning v3.1 TTS API reference](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Lightning v3.1 Pro TTS API reference](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
 
 ## Next Steps
 

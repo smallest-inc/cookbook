@@ -9,7 +9,7 @@ Usage:
   python voices.py --language english          # Filter by language
   python voices.py --gender female             # Filter by gender
   python voices.py --accent american           # Filter by accent
-  python voices.py --preview sophia             # Generate preview for a voice
+  python voices.py --preview kaitlyn             # Generate preview for a voice
 
 Output:
 - Table of available voices
@@ -24,14 +24,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MODEL = "lightning-v3.1"
+MODEL = "lightning_v3.1_pro"
 API_BASE = "https://api.smallest.ai/waves/v1"
 PREVIEW_TEXT = "Hello! This is a preview of my voice. I can speak naturally with great clarity and expression."
 
 
 def get_voices(api_key: str, model: str = MODEL) -> list:
     response = requests.get(
-        f"{API_BASE}/{model}/get_voices",
+        f"{API_BASE}/lightning-v3.1-pro/get_voices",
         headers={"Authorization": f"Bearer {api_key}"},
     )
 
@@ -86,7 +86,7 @@ def preview_voice(voice_id: str, api_key: str, model: str = MODEL):
     print(f"Generating preview for '{voice_id}'...")
 
     response = requests.post(
-        f"{API_BASE}/{model}/get_speech",
+        f"{API_BASE}/tts",
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -94,6 +94,7 @@ def preview_voice(voice_id: str, api_key: str, model: str = MODEL):
         json={
             "text": PREVIEW_TEXT,
             "voice_id": voice_id,
+            "model": model,
             "sample_rate": 24000,
             "speed": 1.0,
             "output_format": "wav",
@@ -112,7 +113,7 @@ def preview_voice(voice_id: str, api_key: str, model: str = MODEL):
 
 def main():
     parser = argparse.ArgumentParser(description="Explore Smallest AI TTS voices")
-    parser.add_argument("--model", default=MODEL, help="TTS model (default: lightning-v3.1)")
+    parser.add_argument("--model", default=MODEL, help="TTS model (default: lightning_v3.1_pro)")
     parser.add_argument("--language", help="Filter by language (e.g. english, hindi)")
     parser.add_argument("--gender", help="Filter by gender (male/female)")
     parser.add_argument("--accent", help="Filter by accent (e.g. american, british)")

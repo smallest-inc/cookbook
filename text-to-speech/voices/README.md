@@ -32,7 +32,7 @@ uv run python/voices.py --language english --gender female
 Generate a preview for a specific voice:
 
 ```bash
-uv run python/voices.py --preview sophia
+uv run python/voices.py --preview kaitlyn
 ```
 
 ### JavaScript
@@ -40,7 +40,7 @@ uv run python/voices.py --preview sophia
 ```bash
 node javascript/voices.js
 node javascript/voices.js --language english --gender female
-node javascript/voices.js --preview sophia
+node javascript/voices.js --preview kaitlyn
 ```
 
 ## Configuration

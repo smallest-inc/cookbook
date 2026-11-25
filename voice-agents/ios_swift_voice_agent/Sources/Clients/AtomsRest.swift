@@ -41,7 +41,7 @@ enum AtomsRest {
         return AgentSnapshot(
             name: (data["name"] as? String) ?? "",
             voiceId: (voiceConfig["voiceId"] as? String) ?? "",
-            voiceModel: (voiceConfig["model"] as? String) ?? "waves_lightning_v3_1",
+            voiceModel: (voiceConfig["model"] as? String) ?? "waves_lightning_v3_1_pro",
             speed: (synth["speed"] as? Double) ?? 1.0,
             language: (language["default"] as? String) ?? "en",
             supportedLanguages: (language["supported"] as? [String]) ?? ["en"]

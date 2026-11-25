@@ -67,7 +67,7 @@ If you test on the **simulator**, audio goes through macOS CoreAudio's resampler
 
 Tap **settings** (top-right, idle screen) to open the agent configuration sheet:
 
-- **Voice** — six curated `lightning-v3.1` voices (Magnus, Daniel, Emily, Sophia, Arjun, Priya). If the current voice is a custom clone, it's shown as a "custom:" chip.
+- **Voice** — six curated Lightning v3.1 Pro voices (Rupert, Austin, Jenna, Kaitlyn, Aayan, Aarini). If the current voice is a custom clone, it's shown as a "custom:" chip.
 - **Speed** — 0.85× / 1.00× / 1.15× / 1.30×.
 - **Language** — English, Hindi, Multi (auto-detect).
 
@@ -113,7 +113,7 @@ During a session, the "sending · N" counter under the *you* waveform increments
 - **iOS simulator distorts audio.** Sample-rate bridging through macOS CoreAudio introduces artifacts on 24 kHz streams. Test on device for audio fidelity.
 - **Background mode.** The session tears down on app backgrounding. Notification Center, Control Center, and brief system dialogs keep the session alive. Running a socket + mic across a full app suspension requires VoIP entitlements + a CallKit integration, which is intentionally out of scope here.
 - **Reconnect is auth-unaware.** If the server closes with an auth error the transport retries once more before giving up. Replace the retry logic in `AtomsClient.swift` if you need instant auth-error surfacing.
-- **Curated voice list.** The settings sheet ships with six shortlisted voices. Fetch `GET /waves/v1/voices` at runtime for the full `lightning-v3.1` catalogue (106 voices).
+- **Curated voice list.** The settings sheet ships with six shortlisted voices. Fetch `GET /waves/v1/lightning-v3.1-pro/get_voices` at runtime for the full Lightning v3.1 Pro catalogue.
 
 ## Reference
 

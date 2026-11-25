@@ -6,7 +6,7 @@ Translate text between 40+ languages and hear results spoken aloud. Type or spea
 
 - **Type or speak** — Enter text or use the mic to speak (Pulse STT)
 - **40+ source languages** — Chinese, Japanese, Korean, Spanish, French, and many more
-- **15 target languages** — Translate and hear results with Lightning v3.1 TTS
+- **15 target languages** — Translate and hear results with Lightning v3.1 Pro TTS
 - **Voice selector** — Choose from language-specific TTS voices
 - **Copy & download** — Copy text or save audio as WAV
 - **History** — Last 10 translations
@@ -80,7 +80,7 @@ language-translation-app/
 ## How It Works
 
 1. **Translation** — Text is sent to the backend, translated via Google (deep-translator, free), and returned.
-2. **TTS** — Lightning v3.1 via the unified `/waves/v1/tts` endpoint for all target languages. Voices are filtered by language tag from the API.
+2. **TTS** — Lightning v3.1 Pro via the unified `/waves/v1/tts` endpoint for all target languages. Voices are filtered by language tag from the API.
 3. **STT** — Pulse STT transcribes mic input; only languages supported by both Pulse and Lightning are enabled for speech input.
 
 ## API Reference
