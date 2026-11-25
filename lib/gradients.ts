@@ -7,6 +7,8 @@ export const categoryGradients: Record<Category, string> = {
     "bg-gradient-to-br from-emerald-100 via-teal-50 to-cyan-100 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-cyan-950/40",
   "voice-agents":
     "bg-gradient-to-br from-amber-100 via-yellow-50 to-orange-100 dark:from-amber-950/40 dark:via-yellow-950/30 dark:to-orange-950/40",
+  "speech-to-speech":
+    "bg-gradient-to-br from-violet-100 via-fuchsia-50 to-pink-100 dark:from-violet-950/40 dark:via-fuchsia-950/30 dark:to-pink-950/40",
   community:
     "bg-gradient-to-br from-rose-100 via-pink-50 to-fuchsia-100 dark:from-rose-950/40 dark:via-pink-950/30 dark:to-fuchsia-950/40",
 };
@@ -15,6 +17,7 @@ export const categoryIcons: Record<Category, string> = {
   "speech-to-text": "🎙",
   "text-to-speech": "🔊",
   "voice-agents": "🤖",
+  "speech-to-speech": "🔁",
   community: "👥",
 };
 

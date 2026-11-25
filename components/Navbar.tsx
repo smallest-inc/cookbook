@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/category/speech-to-text", label: "STT" },
   { href: "/category/text-to-speech", label: "TTS" },
   { href: "/category/voice-agents", label: "Voice Agents" },
+  { href: "/category/speech-to-speech", label: "S2S" },
   { href: "/community", label: "Community" },
 ];
 

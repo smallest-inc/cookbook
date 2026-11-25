@@ -17,6 +17,7 @@ import {
   Volume2,
   Bot,
   Users,
+  AudioLines,
 } from "lucide-react";
 import { useState } from "react";
 import { Project, Category } from "@/lib/types";
@@ -111,6 +112,8 @@ export function ProjectDetail({ project }: { project: Project }) {
                 ? "Lightning TTS"
                 : product === "atoms"
                 ? "Atoms SDK"
+                : product === "hydra-s2s"
+                ? "Hydra S2S"
                 : "Voice Cloning"}
             </span>
           ))}
@@ -394,6 +397,7 @@ const categoryIconMap: Record<Category, typeof Mic> = {
   "speech-to-text": Mic,
   "text-to-speech": Volume2,
   "voice-agents": Bot,
+  "speech-to-speech": AudioLines,
   community: Users,
 };
 
@@ -401,6 +405,7 @@ const categoryLabel: Record<Category, string> = {
   "speech-to-text": "Speech to Text",
   "text-to-speech": "Text to Speech",
   "voice-agents": "Voice Agent",
+  "speech-to-speech": "Speech to Speech",
   community: "Community",
 };
 

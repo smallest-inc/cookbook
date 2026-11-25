@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ExternalLink, Play, Code2, ArrowUpRight, Mic, Volume2, Bot, Users } from "lucide-react";
+import { ExternalLink, Play, Code2, ArrowUpRight, Mic, Volume2, Bot, Users, AudioLines } from "lucide-react";
 import { Project, Category } from "@/lib/types";
 import { trackProjectCardClick } from "@/lib/analytics";
 import { getProjectGradient } from "@/lib/gradients";
@@ -11,6 +11,7 @@ const categoryIcon: Record<Category, typeof Mic> = {
   "speech-to-text": Mic,
   "text-to-speech": Volume2,
   "voice-agents": Bot,
+  "speech-to-speech": AudioLines,
   community: Users,
 };
 
@@ -18,6 +19,7 @@ const categoryLabel: Record<Category, string> = {
   "speech-to-text": "Speech to Text",
   "text-to-speech": "Text to Speech",
   "voice-agents": "Voice Agents",
+  "speech-to-speech": "Speech to Speech",
   community: "Community",
 };
 

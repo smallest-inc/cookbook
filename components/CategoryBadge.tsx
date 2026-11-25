@@ -1,4 +1,4 @@
-import { Mic, Volume2, Bot, Users } from "lucide-react";
+import { Mic, Volume2, Bot, Users, AudioLines } from "lucide-react";
 import type { Category } from "@/lib/types";
 
 const config: Record<
@@ -18,6 +18,11 @@ const config: Record<
   "voice-agents": {
     label: "Voice Agents",
     icon: Bot,
+    className: "bg-foreground/5 text-foreground/70 border-foreground/10",
+  },
+  "speech-to-speech": {
+    label: "Speech to Speech",
+    icon: AudioLines,
     className: "bg-foreground/5 text-foreground/70 border-foreground/10",
   },
   community: {

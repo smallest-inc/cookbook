@@ -1,6 +1,6 @@
 "use client";
 
-import { Mic, Volume2, Bot, Users, Sparkles } from "lucide-react";
+import { Mic, Volume2, Bot, Users, Sparkles, AudioLines } from "lucide-react";
 import { trackCategoryFilter } from "@/lib/analytics";
 
 const categories = [
@@ -8,6 +8,7 @@ const categories = [
   { id: "speech-to-text", label: "Speech to Text", icon: Mic },
   { id: "text-to-speech", label: "Text to Speech", icon: Volume2 },
   { id: "voice-agents", label: "Voice Agents", icon: Bot },
+  { id: "speech-to-speech", label: "Speech to Speech", icon: AudioLines },
   { id: "community", label: "Community", icon: Users },
 ];
 
