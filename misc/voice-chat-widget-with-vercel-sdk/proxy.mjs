@@ -1,5 +1,5 @@
 /**
- * Tiny WebSocket proxy: bridges browser TTS clients to Lightning v3.1.
+ * Tiny WebSocket proxy: bridges browser TTS clients to Lightning v3.1 Pro.
  *
  * Only ONE route now (vs two in the raw-WS sibling) because the Smallest
  * Vercel provider streams STT directly from the browser via `auth: 'query'`,

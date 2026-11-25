@@ -15,12 +15,11 @@ from fastembed import TextEmbedding
 
 load_dotenv()
 
-VOICES_URL = "https://api.smallest.ai/waves/v1/lightning-v3.1/get_voices"
+VOICES_URL = "https://api.smallest.ai/waves/v1/lightning-v3.1-pro/get_voices"
 CLONED_VOICES_URL = "https://api.smallest.ai/waves/v1/voice-cloning"
 SYNTHESIS_URL = "https://api.smallest.ai/waves/v1/tts"
 
 MODELS = {
-    "Lightning v3.1": "lightning_v3.1",
     "Lightning v3.1 Pro": "lightning_v3.1_pro",
 }
 
@@ -43,7 +42,7 @@ _C_BLUE   = "#3E91D6"
 
 @st.cache_data(ttl=300)
 def fetch_voices(model: str, api_key: str) -> list[dict]:
-    # One catalog serves both v3.1 and v3.1 Pro; the model is picked at synthesis time.
+    # Lightning v3.1 Pro catalog.
     resp = requests.get(
         VOICES_URL,
         headers={"Authorization": f"Bearer {api_key}"},
@@ -291,7 +290,7 @@ def main() -> None:
         model_label = st.selectbox(
             "Model",
             list(MODELS.keys()),
-            help="v3.1 and v3.1 Pro serve different voice pools; a voice that fails on one model may be available on the other.",
+            help="Lightning v3.1 Pro is the default TTS model.",
         )
     model = MODELS[model_label]
 

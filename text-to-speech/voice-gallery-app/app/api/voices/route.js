@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const res = await fetch(
-    "https://api.smallest.ai/waves/v1/lightning-v3.1/get_voices",
+    "https://api.smallest.ai/waves/v1/lightning-v3.1-pro/get_voices",
     {
       headers: {
         Authorization: `Bearer ${process.env.SMALLEST_API_KEY}`,

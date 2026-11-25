@@ -425,7 +425,7 @@ def main():
     
     if not SMALLEST_API_KEY:
         print("Error: SMALLEST_API_KEY environment variable not set")
-        print("Get your API key at: https://smallest.ai/console")
+        print("Get your API key at: https://app.smallest.ai/dashboard/api-keys")
         sys.exit(1)
     
     meeting_url = sys.argv[1]

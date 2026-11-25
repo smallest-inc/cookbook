@@ -40,8 +40,8 @@ Saved to out.wav
    ```json
    {
      "text": "Word timestamps make live captions easy.",
-     "voice_id": "sophia",
-     "model": "lightning_v3.1",
+     "voice_id": "kaitlyn",
+     "model": "lightning_v3.1_pro",
      "sample_rate": 24000,
      "word_timestamps": true
    }
@@ -63,8 +63,8 @@ Saved to out.wav
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `MODEL` | TTS model | `lightning_v3.1` |
-| `VOICE_ID` | Voice to use | `sophia` |
+| `MODEL` | TTS model | `lightning_v3.1_pro` |
+| `VOICE_ID` | Voice to use | `kaitlyn` |
 | `SAMPLE_RATE` | Audio sample rate in Hz | `24000` |
 | `word_timestamps` | Enable per-word timing frames | `true` |
 

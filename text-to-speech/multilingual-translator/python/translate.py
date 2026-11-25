@@ -3,7 +3,7 @@
 Smallest AI Text-to-Speech - Multilingual Translator
 
 Generate speech in multiple languages from a single input text.
-Uses Lightning v3.1 for all supported languages.
+Uses Lightning v3.1 Pro for all supported languages.
 
 Usage:
   python translate.py "Hello world"
@@ -22,14 +22,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 API_BASE = "https://api.smallest.ai/waves/v1"
-MODEL = "lightning-v3.1"
+MODEL = "lightning_v3.1_pro"
 SAMPLE_RATE = 24000
 
 LANGUAGES = {
-    "english": {"code": "en", "voice": "sophia"},
-    "hindi":   {"code": "hi", "voice": "advika"},
-    "spanish": {"code": "es", "voice": "camilla"},
-    "tamil":   {"code": "ta", "voice": "anitha"},
+    "english": {"code": "en", "voice": "kaitlyn"},
+    "hindi":   {"code": "hi", "voice": "aarini"},
+    "spanish": {"code": "es", "voice": "alejandra"},
+    "tamil":   {"code": "ta", "voice": "ankita"},
 }
 
 DEFAULT_LANGUAGES = list(LANGUAGES.keys())
@@ -37,7 +37,7 @@ DEFAULT_LANGUAGES = list(LANGUAGES.keys())
 
 def synthesize(text: str, lang_config: dict, api_key: str) -> bytes:
     response = requests.post(
-        f"{API_BASE}/{MODEL}/get_speech",
+        f"{API_BASE}/tts",
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -45,6 +45,7 @@ def synthesize(text: str, lang_config: dict, api_key: str) -> bytes:
         json={
             "text": text,
             "voice_id": lang_config["voice"],
+            "model": MODEL,
             "language": lang_config["code"],
             "sample_rate": SAMPLE_RATE,
             "output_format": "wav",

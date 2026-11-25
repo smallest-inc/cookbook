@@ -13,9 +13,8 @@
 const fs = require("fs");
 
 // Configuration
-// Set MODEL to "lightning_v3.1_pro" for the Pro pool (curated voices, en + hi
-// on Indian voices, en on British/American voices). Set to "lightning_v3.1"
-// for the standard pool (more voices, full 12-language catalog, voice cloning).
+// Lightning v3.1 Pro is the default TTS model. Create voice clones with
+// model="lightning-v3.1-pro" so they keep working on this pool.
 const MODEL = "lightning_v3.1_pro";
 const VOICE_ID = "meher";
 const SPEED = 1.0;

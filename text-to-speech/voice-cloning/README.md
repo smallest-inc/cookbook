@@ -15,6 +15,7 @@ with open("sample.wav", "rb") as f:
     res = client.waves.create_voice_clone(
         display_name="My Custom Voice",
         file=("sample.wav", f, "audio/wav"),
+        model="lightning-v3.1-pro",
     )
 voice_id = res.data.voice_id
 print(f"Voice ID: {voice_id}")
@@ -30,7 +31,7 @@ Use the new voice ID like any catalog voice on the unified TTS endpoint:
 audio = b"".join(client.waves.synthesize_tts(
     text="Hello from my cloned voice!",
     voice_id=voice_id,
-    model="lightning_v3.1",
+    model="lightning_v3.1_pro",
     sample_rate=24000,
 ))
 ```
@@ -49,6 +50,7 @@ for clone in client.waves.list_voice_clones().data:
 curl -X POST "https://api.smallest.ai/waves/v1/voice-cloning" \
   -H "Authorization: Bearer $SMALLEST_API_KEY" \
   -F "displayName=My Custom Voice" \
+  -F "model=lightning-v3.1-pro" \
   -F "file=@sample.wav"
 
 # List

@@ -41,14 +41,14 @@ Output files are saved to a `translations/` folder.
 
 | Language | Code | Default Voice | Accent |
 |----------|------|---------------|--------|
-| English | `en` | sophia | American |
-| Hindi | `hi` | advika | Indian |
-| Spanish | `es` | camilla | Mexican/Latin |
-| Tamil | `ta` | anitha | Tamil |
+| English | `en` | kaitlyn | American |
+| Hindi | `hi` | aarini | Indian |
+| Spanish | `es` | alejandra | Mexican/Latin |
+| Tamil | `ta` | ankita | Tamil |
 
 ## API Reference
 
-- [Lightning v3.1 API](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Lightning v3.1 Pro API](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
 
 ## Next Steps
 

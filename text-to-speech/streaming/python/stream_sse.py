@@ -23,8 +23,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Set MODEL to "lightning_v3.1_pro" for the Pro pool (curated voices)
-# or "lightning_v3.1" for the standard pool (more voices + voice cloning).
+# Lightning v3.1 Pro is the default TTS model.
 MODEL = "lightning_v3.1_pro"
 VOICE_ID = "meher"
 SAMPLE_RATE = 24000

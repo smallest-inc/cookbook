@@ -191,7 +191,7 @@ export default function Home() {
         <a href="https://smallest.ai" className="text-blue-400 hover:underline">
           Smallest AI
         </a>{" "}
-        Lightning TTS v3.1 &middot;{" "}
+        Lightning v3.1 Pro &middot;{" "}
         <a
           href="https://github.com/smallest-inc/cookbook/tree/main/text-to-speech/voice-gallery-app"
           className="text-blue-400 hover:underline"

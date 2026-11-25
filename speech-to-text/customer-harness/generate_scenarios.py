@@ -78,8 +78,8 @@ def check_wav(data: bytes) -> float:
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--out", default=str(Path(__file__).with_name("scenarios")))
-    p.add_argument("--voice-id", default="lakshya")
-    p.add_argument("--model", default="lightning_v3.1")
+    p.add_argument("--voice-id", default="aayan")
+    p.add_argument("--model", default="lightning_v3.1_pro")
     p.add_argument("--only", nargs="*", help="Subset of scenario names to generate.")
     p.add_argument("--force", action="store_true", help="Overwrite existing WAVs.")
     args = p.parse_args()

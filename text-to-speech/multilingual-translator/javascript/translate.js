@@ -3,7 +3,7 @@
  * Smallest AI Text-to-Speech - Multilingual Translator
  *
  * Generate speech in multiple languages from a single input text.
- * Uses Lightning v3.1 for all supported languages.
+ * Uses Lightning v3.1 Pro for all supported languages.
  *
  * Usage:
  *   node translate.js "Hello world"
@@ -17,20 +17,20 @@ const fs = require("fs");
 const path = require("path");
 
 const API_BASE = "https://api.smallest.ai/waves/v1";
-const MODEL = "lightning-v3.1";
+const MODEL = "lightning_v3.1_pro";
 const SAMPLE_RATE = 24000;
 
 const LANGUAGES = {
-  english: { code: "en", voice: "sophia" },
-  hindi:   { code: "hi", voice: "advika" },
-  spanish: { code: "es", voice: "camilla" },
-  tamil:   { code: "ta", voice: "anitha" },
+  english: { code: "en", voice: "kaitlyn" },
+  hindi:   { code: "hi", voice: "aarini" },
+  spanish: { code: "es", voice: "alejandra" },
+  tamil:   { code: "ta", voice: "ankita" },
 };
 
 const DEFAULT_LANGUAGES = Object.keys(LANGUAGES);
 
 async function synthesize(text, langConfig, apiKey) {
-  const response = await fetch(`${API_BASE}/${MODEL}/get_speech`, {
+  const response = await fetch(`${API_BASE}/tts`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -39,6 +39,7 @@ async function synthesize(text, langConfig, apiKey) {
     body: JSON.stringify({
       text,
       voice_id: langConfig.voice,
+      model: MODEL,
       language: langConfig.code,
       sample_rate: SAMPLE_RATE,
       output_format: "wav",

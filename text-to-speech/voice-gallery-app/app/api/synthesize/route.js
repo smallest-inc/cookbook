@@ -21,7 +21,7 @@ export async function POST(request) {
       body: JSON.stringify({
         text: text.slice(0, 1000),
         voice_id,
-        model: "lightning_v3.1",
+        model: "lightning_v3.1_pro",
         sample_rate: 24000,
         speed: 1.0,
         output_format: "mp3",

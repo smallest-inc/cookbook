@@ -46,4 +46,4 @@ npm start
 
 - Next.js 14 (App Router)
 - Tailwind CSS
-- Smallest AI Lightning TTS v3.1 API
+- Smallest AI Lightning v3.1 Pro API

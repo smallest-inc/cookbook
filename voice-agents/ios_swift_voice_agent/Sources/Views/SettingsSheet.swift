@@ -17,12 +17,12 @@ struct SettingsSheet: View {
     @State private var appliedOK = false
 
     private let voices: [(id: String, label: String)] = [
-        ("magnus", "Magnus (warm British male)"),
-        ("daniel", "Daniel (neutral male)"),
-        ("emily",  "Emily (friendly female)"),
-        ("sophia", "Sophia (professional female)"),
-        ("arjun",  "Arjun (Indian English male)"),
-        ("priya",  "Priya (Indian English female)"),
+        ("rupert", "Rupert (warm British male)"),
+        ("austin", "Austin (neutral male)"),
+        ("jenna",  "Jenna (friendly female)"),
+        ("kaitlyn", "Kaitlyn (professional female)"),
+        ("aayan",  "Aayan (Indian English male)"),
+        ("aarini", "Aarini (Indian English female)"),
     ]
     private let speeds: [Double] = [0.85, 1.0, 1.15, 1.3]
     private let languages: [(code: String, label: String)] = [

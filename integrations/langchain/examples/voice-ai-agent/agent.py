@@ -93,7 +93,7 @@ def wrap_wav(pcm_data: bytes, sample_rate: int = 24000) -> bytes:
 def synthesize_speech(
     text: str,
     output_dir: str = "output",
-    voice_id: str = "magnus",
+    voice_id: str = "blake",
     sample_rate: int = 24000,
 ) -> str:
     """Generate speech using Lightning TTS. Returns path to audio file."""

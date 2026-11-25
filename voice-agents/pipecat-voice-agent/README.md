@@ -69,14 +69,14 @@ Press `Ctrl+C` to stop.
 
 | Variable | Description |
 |---|---|
-| `SMALLEST_API_KEY` | Your Smallest AI API key — [get one here](https://waves.smallest.ai) |
+| `SMALLEST_API_KEY` | Your Smallest AI API key — [get one here](https://app.smallest.ai) |
 | `OPENAI_API_KEY` | Your OpenAI API key — [get one here](https://platform.openai.com/api-keys) |
 
 **CLI flags** (optional, passed at startup):
 
 | Flag | Default | Description |
 |---|---|---|
-| `--voice` | `sophia` | TTS voice ID — browse voices at [waves.smallest.ai](https://waves.smallest.ai) |
+| `--voice` | `kaitlyn` | TTS voice ID — browse voices at [app.smallest.ai](https://app.smallest.ai) |
 | `--language` | `en` | Language code for STT and TTS (e.g. `hi`, `de`, `fr`) |
 | `--host` | `localhost` | Host to bind the server to |
 | `--port` | `7860` | Port to bind the server to |
@@ -87,7 +87,7 @@ Press `Ctrl+C` to stop.
 
 ### Plugging in Smallest AI STT + TTS
 
-Both speech-to-text and text-to-speech use your single `SMALLEST_API_KEY` — no extra accounts needed. The `voice` field accepts any voice ID from [waves.smallest.ai](https://waves.smallest.ai):
+Both speech-to-text and text-to-speech use your single `SMALLEST_API_KEY` — no extra accounts needed. The `voice` field accepts any voice ID from [app.smallest.ai](https://app.smallest.ai):
 
 ```python
 from pipecat.services.smallest.stt import SmallestSTTService
@@ -102,7 +102,7 @@ tts = SmallestTTSService(
     api_key=os.getenv("SMALLEST_API_KEY"),
     sample_rate=24000,
     settings=SmallestTTSService.Settings(
-        voice="sophia",
+        voice="kaitlyn",
         language="en",
     ),
 )

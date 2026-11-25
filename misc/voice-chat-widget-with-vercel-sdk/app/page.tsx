@@ -119,8 +119,8 @@ export default function Page() {
       tts.speak({
         apiKey,
         text,
-        voice: "avery",
-        model: "lightning_v3.1",
+        voice: "jenna",
+        model: "lightning_v3.1_pro",
         onEnd: () => {
           setStatus("idle");
           setMessages((prev) =>
@@ -193,8 +193,8 @@ export default function Page() {
         tts.speak({
           apiKey,
           text: chunk,
-          voice: "avery",
-          model: "lightning_v3.1",
+          voice: "jenna",
+          model: "lightning_v3.1_pro",
           onStart: () => setStatus("speaking"),
           onEnd: () => {
             ttsRunning = false;
@@ -297,7 +297,7 @@ export default function Page() {
         <div className="logo">S</div>
         <div>
           <div className="title">Smallest AI — live voice chat</div>
-          <div className="subtitle">Pulse STT WS · Lightning v3.1 TTS WS</div>
+          <div className="subtitle">Pulse STT WS · Lightning v3.1 Pro TTS WS</div>
         </div>
         <div className="status-pill" data-state={status}>
           <span className="dot" />

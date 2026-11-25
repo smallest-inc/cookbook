@@ -74,14 +74,14 @@ Open the [LiveKit Agents Playground](https://agents-playground.livekit.io) and e
 | `LIVEKIT_API_KEY` | Your LiveKit project API key |
 | `LIVEKIT_API_SECRET` | Your LiveKit project API secret |
 | `LIVEKIT_URL` | Your LiveKit WebSocket URL (e.g. `wss://your-project.livekit.cloud`) |
-| `SMALLEST_API_KEY` | Your Smallest AI API key — [get one here](https://waves.smallest.ai) |
+| `SMALLEST_API_KEY` | Your Smallest AI API key — [get one here](https://app.smallest.ai) |
 | `OPENAI_API_KEY` | Your OpenAI API key — [get one here](https://platform.openai.com/api-keys) |
 
 **Optional overrides** (set in `.env` or export before running):
 
 | Variable | Default | Description |
 |---|---|---|
-| `VOICE_ID` | `meher` | TTS voice ID — browse all voices at [waves.smallest.ai](https://waves.smallest.ai) |
+| `VOICE_ID` | `meher` | TTS voice ID — browse all voices at [app.smallest.ai](https://app.smallest.ai) |
 | `LANGUAGE` | `en` | BCP-47 language code for STT and TTS. Use `multi` for automatic detection across 39 languages |
 | `LLM_MODEL` | `gpt-4o-mini` | OpenAI model name |
 
@@ -119,5 +119,5 @@ The `AgentSession` handles interruptions automatically. When Silero VAD detects 
 
 - **Interrupt mid-sentence** — start speaking while the agent is talking; it stops immediately
 - **Switch to Hindi** — set `LANGUAGE=hi` in `.env` and restart
-- **Change the voice** — set `VOICE_ID=<id>` in `.env` (browse voices at [waves.smallest.ai](https://waves.smallest.ai))
+- **Change the voice** — set `VOICE_ID=<id>` in `.env` (browse voices at [app.smallest.ai](https://app.smallest.ai))
 - **Try multilingual detection** — set `LANGUAGE=multi` and speak in any of the 39 supported languages

@@ -18,9 +18,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuration
-# Set MODEL to "lightning_v3.1_pro" for the Pro pool (curated voices, en + hi
-# on Indian voices, en on British/American voices). Set to "lightning_v3.1"
-# for the standard pool (more voices, full 12-language catalog, voice cloning).
+# Lightning v3.1 Pro is the default TTS model. Create voice clones with
+# model="lightning-v3.1-pro" so they keep working on this pool.
 MODEL = "lightning_v3.1_pro"
 VOICE_ID = "meher"
 SPEED = 1.0

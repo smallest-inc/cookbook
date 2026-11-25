@@ -83,7 +83,7 @@ speech-to-text/websocket/jarvis/
 | `jarvis.py` | `WAKE_WORD` | `"jarvis"` | Trigger phrase (case-insensitive) |
 | `jarvis.py` | `SILENCE_TIMEOUT` | `5.0` | Seconds of silence to end query |
 | `jarvis.py` | `CONVERSATION_TIMEOUT` | `60.0` | Seconds before returning to wake word mode |
-| `tts.py` | `TTS_VOICE` | `"sophia"` | Lightning TTS voice ID |
+| `tts.py` | `TTS_VOICE` | `"kaitlyn"` | Lightning TTS voice ID |
 | `llm.py` | `LLM_MODEL` | `"llama-3.3-70b-versatile"` | Text model |
 | `llm.py` | `LLM_VISION_MODEL` | `"meta-llama/llama-4-scout-17b-16e-instruct"` | Vision model for screenshots |
 

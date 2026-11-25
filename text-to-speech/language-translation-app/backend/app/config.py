@@ -9,7 +9,7 @@ for _p in [Path(__file__).parent.parent / ".env", Path(__file__).parent.parent.p
         load_dotenv(_p)
         break
 
-# Target languages: translation + TTS - 15 languages supported by Lightning v3.1
+# Target languages: translation + TTS - 15 languages supported by Lightning v3.1 Pro
 TARGET_LANGUAGES = {
     "en": "English",
     "hi": "Hindi",
@@ -55,7 +55,7 @@ SOURCE_LANGUAGES = {
     "tl": "Filipino",
 }
 
-# Speech input: intersection of Pulse STT and Lightning v3.1 TTS
+# Speech input: intersection of Pulse STT and Lightning v3.1 Pro TTS
 SPEECH_LANGUAGES = {
     "en": "English",
     "hi": "Hindi",
@@ -77,4 +77,4 @@ SPEECH_LANGUAGES = {
 SUPPORTED_LANGUAGES = TARGET_LANGUAGES
 
 SMALLEST_API_KEY = os.getenv("SMALLEST_API_KEY", "")
-DEFAULT_VOICE_ID = "magnus"
+DEFAULT_VOICE_ID = "blake"

@@ -8,7 +8,7 @@
  *   node voices.js                             # List all voices
  *   node voices.js --language english          # Filter by language
  *   node voices.js --gender female             # Filter by gender
- *   node voices.js --preview sophia             # Generate preview for a voice
+ *   node voices.js --preview kaitlyn             # Generate preview for a voice
  *
  * Output:
  * - Table of available voices
@@ -17,7 +17,7 @@
 
 const fs = require("fs");
 
-const MODEL = "lightning-v3.1";
+const MODEL = "lightning_v3.1_pro";
 const API_BASE = "https://api.smallest.ai/waves/v1";
 const PREVIEW_TEXT =
   "Hello! This is a preview of my voice. I can speak naturally with great clarity and expression.";
@@ -35,7 +35,7 @@ function parseArgs(argv) {
 }
 
 async function getVoices(apiKey, model) {
-  const response = await fetch(`${API_BASE}/${model}/get_voices`, {
+  const response = await fetch(`${API_BASE}/lightning-v3.1-pro/get_voices`, {
     headers: { Authorization: `Bearer ${apiKey}` },
   });
 
@@ -104,7 +104,7 @@ function printVoices(voices) {
 async function previewVoice(voiceId, apiKey, model) {
   console.log(`Generating preview for '${voiceId}'...`);
 
-  const response = await fetch(`${API_BASE}/${model}/get_speech`, {
+  const response = await fetch(`${API_BASE}/tts`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -113,6 +113,7 @@ async function previewVoice(voiceId, apiKey, model) {
     body: JSON.stringify({
       text: PREVIEW_TEXT,
       voice_id: voiceId,
+      model: model,
       sample_rate: 24000,
       speed: 1.0,
       output_format: "wav",

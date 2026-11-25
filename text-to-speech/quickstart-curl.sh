@@ -1,8 +1,7 @@
 #!/bin/bash
 # Text-to-Speech Quickstart — cURL
 # Generate speech from text using the unified Lightning TTS route.
-# Targets the Lightning v3.1 Pro pool — drop the `model` field to use the
-# standard Lightning v3.1 pool instead.
+# Targets Lightning v3.1 Pro, the default TTS model, on the unified /waves/v1/tts route.
 #
 # Usage:
 #     export SMALLEST_API_KEY="your-api-key"

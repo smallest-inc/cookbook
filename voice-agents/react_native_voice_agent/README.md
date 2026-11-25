@@ -49,7 +49,7 @@ npx expo prebuild --clean            # regenerates ios/ and android/ projects
 Flags:
 
 ```bash
-python3 scripts/setup_agent.py --voice magnus        # different voice
+python3 scripts/setup_agent.py --voice blake        # different voice
 python3 scripts/setup_agent.py --model electron      # different LLM (electron or gpt-4o)
 python3 scripts/setup_agent.py --name "Mystery Narrator"
 python3 scripts/setup_agent.py --force-create       # ignore existing AGENT_ID in .env
@@ -111,7 +111,7 @@ On first launch the app requests microphone permission. Tap **Begin story**. The
 
 Tap **settings** (top-right, idle screen only) to open the agent configuration sheet:
 
-- **Voice** — pick from six curated `lightning-v3.1` voices, or the custom chip shows the currently-active voice (e.g. your own clone).
+- **Voice** — pick from six curated Lightning v3.1 Pro voices (Rupert, Austin, Jenna, Kaitlyn, Aayan, Aarini), or the custom chip shows the currently-active voice (e.g. your own clone).
 - **Speed** — 0.85× / 1.00× / 1.15× / 1.30×.
 - **Language** — English, Hindi, or Multi (auto-detect).
 
@@ -149,7 +149,7 @@ For a storytelling app with long-running playback, `default` is the right pick. 
 - **Android emulator virtual microphone.** The emulator records silence by default. The *sending · N* counter still climbs (transport works) but the server hears zero audio. Enable *Extended Controls → Microphone → Virtual microphone uses host audio input*, or test on a physical device.
 - **Android emulator audio output on Apple Silicon.** qemu's CoreAudio routing binds the output to whatever device was active at emulator boot. If you plug in headphones mid-session you need to restart the emulator — the built-in speaker path doesn't re-route automatically. Real Android devices are fine.
 - **Background mode.** The session tears down on actual app backgrounding. Notification shade, Control Center, and brief system dialogs keep the session alive. Keeping the socket open across a full suspension needs a foreground service on Android and VoIP entitlements on iOS, neither of which is in scope for a cookbook demo.
-- **Curated voice list.** The settings sheet ships with six shortlisted voices to keep the picker readable. The full `lightning-v3.1` catalogue is 106 voices; if you want the complete list, fetch `GET /waves/v1/voices` at runtime.
+- **Curated voice list.** The settings sheet ships with six shortlisted voices to keep the picker readable. If you want the complete list, fetch `GET /waves/v1/lightning-v3.1-pro/get_voices` at runtime.
 
 ## Reference
 

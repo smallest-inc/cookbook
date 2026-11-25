@@ -2,9 +2,7 @@
 TTS Streaming — Python
 Stream speech via SSE (Server-Sent Events) for real-time playback.
 
-Targets the Lightning v3.1 Pro pool on the unified /waves/v1/tts/live
-endpoint. Drop the `model` field (or set it to "lightning_v3.1") to use the
-standard Lightning v3.1 pool instead.
+Targets Lightning v3.1 Pro on the unified /waves/v1/tts/live endpoint.
 
 Usage:
     export SMALLEST_API_KEY="your-api-key"

@@ -16,8 +16,8 @@ client = SmallestAI()  # reads SMALLEST_API_KEY from the environment
 
 audio = b"".join(client.waves.synthesize_tts(
     text="Hello from the Python SDK!",
-    voice_id="sophia",
-    model="lightning_v3.1",
+    voice_id="kaitlyn",
+    model="lightning_v3.1_pro",
     sample_rate=24000,
     output_format="wav",
 ))
@@ -36,8 +36,8 @@ async def main():
     chunks = []
     async for chunk in client.waves.synthesize_tts(
         text="Async works the same way.",
-        voice_id="sophia",
-        model="lightning_v3.1",
+        voice_id="kaitlyn",
+        model="lightning_v3.1_pro",
     ):
         chunks.append(chunk)
     with open("hello_async.wav", "wb") as f:
@@ -51,7 +51,7 @@ asyncio.run(main())
 ```python
 from smallestai.waves import WavesStreamingTTS, TTSConfig
 
-config = TTSConfig(voice_id="sophia", model="lightning_v3.1", api_key="YOUR_API_KEY")
+config = TTSConfig(voice_id="kaitlyn", model="lightning_v3.1_pro", api_key="YOUR_API_KEY")
 streaming_tts = WavesStreamingTTS(config)
 for chunk in streaming_tts.synthesize("Streaming audio, chunk by chunk."):
     ...  # play or buffer each PCM chunk as it arrives
@@ -62,7 +62,7 @@ For SSE streaming use `client.waves.synthesize_sse_tts(...)` with the same paylo
 ## Utility methods
 
 ```python
-voices = client.waves.get_voices(model="lightning-v3.1")
+voices = client.waves.get_voices(model="lightning-v3.1-pro")
 clones = client.waves.list_voice_clones()
 ```
 
@@ -70,4 +70,4 @@ clones = client.waves.list_voice_clones()
 
 - [Python SDK on GitHub](https://github.com/smallest-inc/smallest-python-sdk)
 - [TTS documentation](https://docs.smallest.ai/models/text-to-speech/quickstart)
-- [Lightning v3.1 API](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)
+- [Lightning v3.1 Pro API](https://docs.smallest.ai/api-reference/models/text-to-speech/synthesize-speech)

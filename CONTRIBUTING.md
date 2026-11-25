@@ -52,7 +52,7 @@ Create a `.env.sample` listing all required variables:
 
 ```bash
 # Smallest AI API Key
-# Get yours at https://smallest.ai/console
+# Get yours at https://app.smallest.ai/dashboard/api-keys
 SMALLEST_API_KEY=your-smallest-api-key-here
 
 # Any other keys needed

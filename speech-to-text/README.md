@@ -34,7 +34,7 @@ export SMALLEST_API_KEY="your-api-key-here"
 uv run speech-to-text/getting-started/python/transcribe.py recording.wav
 ```
 
-Get your API key at [smallest.ai/console](https://smallest.ai/console).
+Get your API key at [app.smallest.ai](https://app.smallest.ai/dashboard/api-keys).
 
 ## Supported Languages
 

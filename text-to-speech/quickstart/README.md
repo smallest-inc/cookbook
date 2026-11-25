@@ -16,7 +16,7 @@ curl -X POST https://api.smallest.ai/waves/v1/tts \
 
 Replace `YOUR_API_KEY` with your key. That's it — you'll have a WAV file in 2 seconds.
 
-> The example above uses the Lightning v3.1 Pro pool. Omit `"model"` (or set it to `"lightning_v3.1"`) to use the standard pool — that one has more voices, the full 12-language catalog, plus voice cloning.
+> The example uses Lightning v3.1 Pro, the default TTS model. Create voice clones with `model=lightning-v3.1-pro`.
 
 ## Python
 

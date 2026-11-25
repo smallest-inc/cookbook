@@ -89,7 +89,7 @@ async function readAgent() {
   return {
     name: d?.name ?? "",
     voiceId: d?.synthesizer?.voiceConfig?.voiceId ?? "",
-    voiceModel: d?.synthesizer?.voiceConfig?.model ?? "waves_lightning_v3_1",
+    voiceModel: d?.synthesizer?.voiceConfig?.model ?? "waves_lightning_v3_1_pro",
     speed: d?.synthesizer?.speed ?? 1.0,
     language: d?.language?.default ?? "en",
     supportedLanguages: d?.language?.supported ?? ["en"],

@@ -213,7 +213,7 @@ def create_agent(api_key: str, name: str, slm: str, language: str,
     if voice_id:
         body["synthesizer"] = {
             "voiceConfig": {
-                "model":   voice_model or "waves_lightning_v3_1",
+                "model":   voice_model or "waves_lightning_v3_1_pro",
                 "voiceId": voice_id,
             },
             "speed": 1.0,
@@ -267,7 +267,7 @@ def edit_branch_draft(api_key: str, agent_id: str, branch_id: str, *,
     if voice_id:
         body["synthesizer"] = {
             "voiceConfig": {
-                "model":   voice_model or "waves_lightning_v3_1",
+                "model":   voice_model or "waves_lightning_v3_1_pro",
                 "voiceId": voice_id,
             },
             "speed": 1.0,
@@ -316,12 +316,12 @@ def main() -> int:
     parser.add_argument("--language", default=DEFAULT_LANGUAGE, choices=["en", "hi", "ta"],
                         help="primary language")
     parser.add_argument("--voice",    default=None,
-                        help="voiceId to pin (example: magnus, daniel, nyah). "
+                        help="voiceId to pin (example: blake, austin, nyah). "
                              "Omit to let the backend pick a default voice that "
                              "renders correctly in the dashboard.")
     parser.add_argument("--voice-model", default=None,
                         help="Synthesizer model to pair with --voice. Defaults to "
-                             "waves_lightning_v3_1 when --voice is passed.")
+                             "waves_lightning_v3_1_pro when --voice is passed.")
     parser.add_argument("--force-create", action="store_true",
                         help="ignore existing AGENT_ID in .env and run the full create flow")
     args = parser.parse_args()

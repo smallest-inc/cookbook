@@ -2,8 +2,7 @@
 TTS WebSocket — Python
 Stream speech via WebSocket and report time-to-first-byte (TTFB).
 
-Targets the Lightning v3.1 Pro pool on the live WebSocket endpoint. Pass
-`--model lightning_v3.1` to use the standard Lightning v3.1 pool instead.
+Targets Lightning v3.1 Pro on the live WebSocket endpoint.
 
 Usage:
     export SMALLEST_API_KEY="your-api-key"
