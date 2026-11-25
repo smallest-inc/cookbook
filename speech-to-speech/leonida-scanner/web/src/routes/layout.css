@@ -1,0 +1,156 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/schibsted-grotesk';
+@import '@fontsource-variable/geist-mono';
+
+/* ───────────────────────────────────────────────────────────────
+   Smallest demo tokens. Light only. White ground, zinc ink,
+   ONE accent (Smallest blue). Orange is reserved for "live/recording".
+   Source of truth: DEMO_DESIGN_GUIDE.md §3.
+   ─────────────────────────────────────────────────────────────── */
+:root {
+	/* surfaces */
+	--paper: #ffffff; /* page ground */
+	--surface: #ffffff; /* panels that carry content */
+	--sunken: #f4f4f5; /* wells, transcript, code */
+	--line: #e4e4e7; /* hairlines */
+	--line-strong: #d4d4d8;
+
+	/* text */
+	--ink: #18181b; /* primary text + primary button (matches smallest.ai black) */
+	--ink-2: #3f3f46; /* secondary text, 9.6:1 on paper */
+	--ink-3: #52525b; /* tertiary, 5.2:1 on paper, never below 14px */
+
+	/* the accent + the one signal colour */
+	--blue: #2a5fd0; /* Smallest blue (docs.smallest.ai CTA). 5.9:1 on paper */
+	--blue-wash: #eaf0fc;
+	--live: #e05a00; /* Smallest orange, deepened to 3.3:1 for graphics. ONLY for live / recording */
+	--live-wash: #fff0e3;
+	--ok: #1f7a4d;
+	--ok-wash: #e6f4ec;
+	--err: #b42318;
+	--err-wash: #fdebe9;
+
+	/* shadcn-svelte contract → our tokens */
+	--radius: 0.625rem;
+	--sans: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+	--mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+	--background: var(--paper);
+	--foreground: var(--ink);
+	--card: var(--surface);
+	--card-foreground: var(--ink);
+	--popover: var(--surface);
+	--popover-foreground: var(--ink);
+	--primary: var(--ink);
+	--primary-foreground: var(--paper);
+	--secondary: var(--sunken);
+	--secondary-foreground: var(--ink);
+	--muted: var(--sunken);
+	--muted-foreground: var(--ink-3);
+	--accent: var(--blue-wash);
+	--accent-foreground: var(--blue);
+	--destructive: var(--err);
+	--border: var(--line);
+	--input: var(--line-strong);
+	--ring: var(--blue);
+}
+
+@theme inline {
+	--font-sans: 'Schibsted Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+	--font-mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+
+	--color-paper: var(--paper);
+	--color-surface: var(--surface);
+	--color-sunken: var(--sunken);
+	--color-line: var(--line);
+	--color-ink: var(--ink);
+	--color-ink-2: var(--ink-2);
+	--color-ink-3: var(--ink-3);
+	--color-blue: var(--blue);
+	--color-blue-wash: var(--blue-wash);
+	--color-live: var(--live);
+	--color-live-wash: var(--live-wash);
+	--color-ok: var(--ok);
+	--color-ok-wash: var(--ok-wash);
+	--color-err: var(--err);
+	--color-err-wash: var(--err-wash);
+
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+
+	--radius-sm: calc(var(--radius) - 4px); /* 6  chips, kbd */
+	--radius-md: calc(var(--radius) - 2px); /* 8  buttons, inputs */
+	--radius-lg: var(--radius); /* 10 */
+	--radius-xl: calc(var(--radius) + 4px); /* 14 panels */
+
+	/* type scale (rem, 1.2 ratio, display tightened) */
+	--text-xs: 0.75rem;
+	--text-sm: 0.875rem;
+	--text-base: 1rem;
+	--text-lg: 1.1875rem;
+	--text-xl: 1.4375rem;
+	--text-2xl: 1.75rem;
+	--text-3xl: 2.25rem;
+	--text-4xl: 3rem;
+
+	--ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	html {
+		color-scheme: light;
+	}
+	body {
+		@apply bg-background text-foreground font-sans antialiased;
+		font-feature-settings: 'ss01', 'cv11';
+		font-size: 16px;
+		line-height: 1.5;
+	}
+	h1,
+	h2,
+	h3 {
+		letter-spacing: -0.025em;
+		line-height: 1.08;
+		font-weight: 600;
+		text-wrap: balance;
+	}
+	p {
+		text-wrap: pretty;
+	}
+	::selection {
+		background: var(--blue-wash);
+		color: var(--ink);
+	}
+	.num {
+		font-variant-numeric: tabular-nums;
+	}
+}
+
+/* Motion: functional only. Respect the OS setting. */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+	}
+}
