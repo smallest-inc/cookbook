@@ -36,6 +36,35 @@ export const projects: Project[] = [
     ],
   },
   {
+    slug: "leonida-scanner",
+    title: "Leonida Scanner: Talk to an AI Chopper Pilot",
+    description:
+      "A browser walkie-talkie game. Flip to channel 6 and a live Hydra pilot flies wherever you tell him, with every tool call on screen.",
+    longDescription:
+      "A handheld radio for a made-up sun-belt city. Channel 6 is a live Hydra speech-to-speech session: a news chopper pilot you talk to over an open mic, who stops when you talk over him and flies the chopper with five tool calls (fly_to, follow, circle, spotlight, report). Tool arguments are matched against the city's own map, so an unknown street comes back with the nearest real one as a suggestion, and the desktop layout lists every call with its arguments and result. Channels 1 to 5 are scripted radio chatter in 15 Lightning v3.1 Pro voices, and push-to-talk replies go through Pulse and Electron. Channel 6 runs on your own Smallest key. Fan-made, not affiliated with Rockstar Games.",
+    category: "speech-to-speech",
+    tags: ["hydra", "tool-calling", "barge-in", "game", "byok", "svelte", "3d"],
+    difficulty: "advanced",
+    status: "live",
+    featured: true,
+    cookbookPath: "speech-to-speech/leonida-scanner",
+    githubUrl: `${GITHUB_BASE}/speech-to-speech/leonida-scanner`,
+    demoUrl: "https://leonida-scanner.vercel.app",
+    thumbnailUrl: "/thumbnails/leonida-scanner.png",
+    techStack: ["Hydra", "Lightning v3.1 Pro", "Pulse STT", "Electron", "SvelteKit", "Three.js", "Python"],
+    apiProducts: ["hydra-s2s", "lightning-tts", "pulse-stt"],
+    features: [
+      "Live Hydra pilot on channel 6: open mic, full duplex, barge-in",
+      "Five Hydra tools that fly the chopper on a 2D map and a 3D chase view",
+      "Unknown places come back with a suggestion instead of a guess",
+      "Every tool call shown on screen with its arguments and result",
+      "15 Lightning v3.1 Pro voices across five scripted channels",
+      "Push-to-talk replies through Pulse and Electron",
+      "Bring your own Smallest key for channel 6",
+      "Python standard library server, runs with one command",
+    ],
+  },
+  {
     slug: "debate-arena",
     title: "The Agora — AI Debate Arena",
     description:

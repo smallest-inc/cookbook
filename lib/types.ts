@@ -2,6 +2,7 @@ export type Category =
   | "speech-to-text"
   | "text-to-speech"
   | "voice-agents"
+  | "speech-to-speech"
   | "community";
 
 export type DifficultyLevel = "beginner" | "intermediate" | "advanced";
@@ -42,7 +43,7 @@ export interface Project {
   };
 
   techStack: string[];
-  apiProducts: ("pulse-stt" | "lightning-tts" | "atoms" | "voice-cloning")[];
+  apiProducts: ("pulse-stt" | "lightning-tts" | "atoms" | "voice-cloning" | "hydra-s2s")[];
 
   tryItConfig?: {
     type: "tts" | "stt" | "agent";

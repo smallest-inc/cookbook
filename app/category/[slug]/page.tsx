@@ -18,6 +18,11 @@ const categoryMeta: Record<string, { title: string; description: string }> = {
     description:
       "Build AI voice agents that can talk to anyone, in any language, in any voice. Powered by the Atoms SDK with tool calling, knowledge bases, and campaigns.",
   },
+  "speech-to-speech": {
+    title: "Speech to Speech",
+    description:
+      "Full-duplex voice conversations with Hydra: stream audio in, get spoken replies back over one WebSocket, with tool calling and barge-in. No separate STT, LLM and TTS pipeline.",
+  },
   community: {
     title: "Community",
     description:
